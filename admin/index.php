@@ -1,4 +1,3 @@
-<!-- deploy-test: 2025-08-27 -->
 <?php
 session_start();
 // Proteção: só terapeuta pode acessar
@@ -14,6 +13,7 @@ if (password_verify($senha, $usuario['senha_hash'])) {
 }
 ?>
 <!DOCTYPE html>
+<!-- deploy-test: 2025-08-27 -->
 <html lang="pt-br">
 <head>
       <link rel="icon" type="image/png" href="/favicon-transparente.png">
