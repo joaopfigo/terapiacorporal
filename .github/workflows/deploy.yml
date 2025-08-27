@@ -2,16 +2,20 @@ name: Deploy para Hostinger
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
-      - name: Baixar código
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Enviar para Hostinger (FTP)
+      - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -20,7 +24,6 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           server-dir: ${{ secrets.REMOTE_DIR }}/
           local-dir: ./
-          # MUITO IMPORTANTE: não tocar nos uploads/imagens e em itens sensíveis
           exclude: |
             **/.git/**
             **/.git*
@@ -36,3 +39,4 @@ jobs:
             **/*.log
             **/uploads/**
             **/img/**
+          log-level: verbose
