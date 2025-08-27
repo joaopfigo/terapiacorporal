@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+      <link rel="icon" type="image/png" href="/favicon-transparente.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>O Espaço | Consultório de Terapia Corporal Sistêmica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cor-principal: #57643a;
+      --cor-texto: #222;
+      --cor-fundo: #fcfaf7;
+      --cor-box: #fff;
+      --cor-titulo: #30795b;
+    }
+    body {
+      background: var(--cor-fundo);
+      margin: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      color: var(--cor-texto);
+      font-size: 1.07rem;
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--cor-principal);
+      color: #fff;
+      padding: 0.4rem 2vw;
+      height: 72px;
+      min-height: 60px;
+      position: relative;
+      z-index: 1000;
+    }
+    .navbar-logo-central span {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.52rem;
+      color: #fff2c6;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-left: 10px;
+      text-shadow: 0 2px 7px #b79b6350;
+      transition: color 0.18s;
+    }
+
+    /* LOGO CENTRAL */
+    .navbar-logo-central {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .navbar-logo-central img {
+      height: 200px; /* Aqui aumentei um pouco a logo, ajuste conforme seu gosto, mas sem passar de 72px */
+      width: auto;
+      max-width: 210px;
+      object-fit: contain;
+      display: block;
+      margin-right: 12px;
+    }
+
+    /* MENU */
+    .navbar-menu {
+      display: flex;
+      gap: 1.4rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      align-items: center;
+    }
+
+    .navbar-menu a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: color 0.18s;
+    }
+    .navbar-menu a:hover {
+      color: #ffd970;
+    }
+
+    /* Botão do menu sanduíche só aparece em telas pequenas */
+    .navbar-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 2.2rem;
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    /* RESPONSIVO */
+    @media (max-width: 1050px) {
+      .navbar-menu {
+        position: fixed;
+        top: 72px;
+        right: 0;
+        width: 68vw;
+        max-width: 320px;
+        height: 100vh;
+        background: var(--cor-principal);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.2rem;
+        padding: 2.4rem 1.3rem;
+        box-shadow: -2px 0 18px #2222;
+        transform: translateX(110%);
+        transition: transform 0.28s;
+        z-index: 999;
+      }
+      .navbar-menu.open {
+        transform: translateX(0%);
+      }
+      .navbar-toggle {
+        display: block;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .navbar { padding: 0.3rem 2vw; height: 54px; }
+      .navbar-logo-central img { height: 150px; max-width: 105px; }
+      .navbar-menu { gap: 0.6rem; padding: 1.2rem 2vw; top: 54px; }
+    }
+    @media (max-width: 800px) {
+      .content-box { padding: 24px 2vw 12px 2vw; }
+      .fotos-espaco { flex-direction: column; gap: 18px; }
+      .fotos-espaco img { width: 98vw; max-width: 99vw; min-width: unset; }
+    }
+    .banner-terra {
+    max-width: 660px;
+    margin: 38px auto 32px auto;
+    background: linear-gradient(90deg, #6A5036 0%, #44331E 100%);
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    border-radius: 19px;
+    padding: 31px 0 21px 46px;
+    box-shadow: 0 5px 38px rgba(106,80,54,0.10);
+    border-left: 6px solid #e4c7a6;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    }
+    @media (max-width: 800px) {
+    .banner-terra { font-size: 1.22rem; padding: 18px 0 13px 18px; }
+    }
+
+    .content-box {
+      max-width: 1120px;
+      margin: 0 auto;
+      background: var(--cor-box);
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(48,121,91,0.06);
+      padding: 36px 3vw 30px 3vw;
+      margin-top: 22px;
+      margin-bottom: 38px;
+    }
+    .intro-text {
+      font-size: 1.18rem;
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+    .intro-text b {
+      color: var(--cor-titulo);
+      font-weight: 700;
+    }
+    .intro-text strong {
+      color: #232c24;
+      font-weight: 700;
+    }
+    .endereco {
+      font-size: 1.12rem;
+      font-weight: 700;
+      margin-top: 16px;
+      margin-bottom: 12px;
+      color: var(--cor-titulo);
+    }
+    .horarios-title {
+      font-size: 1.09rem;
+      font-weight: bold;
+      margin-top: 20px;
+      margin-bottom: 0;
+      color: #232c24;
+      letter-spacing: .01em;
+    }
+    .horarios {
+      margin: 3px 0 26px 0;
+      font-size: 1.09rem;
+      line-height: 1.52;
+      color: #292929;
+    }
+    .fotos-espaco {
+      display: flex;
+      gap: 32px;
+      margin-top: 36px;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .fotos-espaco img {
+      width: 348px;
+      min-width: 265px;
+      height: 298px;
+      object-fit: cover;
+      border-radius: 19px;
+      box-shadow: 0 2px 18px rgba(48,121,91,0.11);
+      background: #e4f1e6;
+    }
+    @media (max-width: 600px) {
+      .content-box { border-radius: 8px; padding: 14px 2vw 14px 2vw; }
+      .fotos-espaco img { height: 42vw; min-width: 40vw; }
+    }
+    .maps-gps-container {
+    margin: 30px auto 35px auto;
+    border-radius: 16px;
+    overflow: hidden;
+    max-width: 670px;
+    box-shadow: 0 4px 28px #29455c13;
+    }
+    .maps-gps-container iframe {
+    width: 100%;
+    min-height: 240px;
+    border: none;
+    display: block;
+    border-radius: 16px;
+    }
+    @media (max-width: 700px) {
+    .maps-gps-container { max-width: 98vw; }
+    .maps-gps-container iframe { min-height: 160px; }
+    }
+
+  </style>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-logo-central">
+      <img src="img/logo.png" alt="Consultório de Terapia Corporal Sistêmica" />
+      <span>Virlene Figueiredo</span>
+    </div>
+    <button class="navbar-toggle" aria-label="Abrir menu">&#9776;</button>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="espaco.html">O Espaço</a></li>
+      <li><a href="servicos.html">Serviços</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contato.html">Contato</a></li>
+      <li id="li-perfil-login"><a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a></li>
+    </ul>
+  </nav>
+
+  <div class="banner-terra">
+    O seu espaço de terapia corporal em Belo Horizonte MG
+  </div>
+
+  <div class="content-box">
+    <div class="intro-text">
+      <b>O Consultório de Terapia Corporal Sistêmica</b>, coordenado por <strong>Virlene Figueiredo</strong>, oferece atendimentos terapêuticos com base na massoterapia, medicina chinesa e práticas integrativas. Cada sessão é um convite à escuta do corpo, ao relaxamento profundo e ao equilíbrio energético.<br><br>
+      Com mais de <b>30 anos de experiência</b>, o espaço acolhe pessoas em busca de bem-estar físico, emocional e energético.<br>
+      <span class="endereco">
+        Endereço: <b>Rua Ouro Fino, 395 – Bairro Cruzeiro – Sala 304</b>
+      </span>
+    </div>
+    <div class="horarios-title">Horário de Atendimento:</div>
+    <div class="horarios">
+      <b>Seg a Sex</b> – 09h00 às 22h00<br>
+      <b>Sáb</b> – 10h00 às 17h00<br>
+    </div>
+    <!-- GPS MAPA -->
+    <div class="maps-gps-container">
+      <iframe
+        src="https://www.google.com/maps?q=R.+Ouro+Fino,+395+-+Cruzeiro,+Belo+Horizonte+-+MG,+30310-110&output=embed"
+        width="100%" height="320" style="border:0; border-radius:16px;" allowfullscreen="" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+
+    <div class="fotos-espaco">
+      <img src="img/espaco1.png" alt="Sala de atendimento 1 - Virlene Figueiredo" loading="lazy">
+      <img src="img/espaco2.png" alt="Sala de atendimento 2 - Virlene Figueiredo" loading="lazy">
+    </div>
+  </div>
+
+<script>
+        // Menu responsivo sanduíche
+    const navbarToggle = document.querySelector('.navbar-toggle');
+    const navbarMenu = document.querySelector('.navbar-menu');
+    navbarToggle.addEventListener('click', () => {
+      navbarMenu.classList.toggle('open');
+    });
+    // Fechar menu ao clicar em um item
+    document.querySelectorAll('.navbar-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        navbarMenu.classList.remove('open');
+      });
+    });
+    // --- Troca "Perfil" ou "Login" no menu, conforme login ---
+    fetch('getPerfil.php', { credentials: 'include' })
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(data => {
+          if (data.usuario && data.usuario.nome) {
+              // Usuário logado
+              document.getElementById('li-perfil-login').innerHTML =
+                  '<a href="perfil.html"><i class="fa-solid fa-user"></i> Perfil</a>';
+          } else {
+              // Não logado
+              document.getElementById('li-perfil-login').innerHTML =
+                  '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+          }
+      })
+      .catch(() => {
+          // Não logado ou erro de sessão
+          document.getElementById('li-perfil-login').innerHTML =
+              '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+      });
+
+</script>
+  
+
+</body>
+</html>

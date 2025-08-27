@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+      <link rel="icon" type="image/png" href="/favicon-transparente.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contato | Consultório de Terapia Corporal Sistêmica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cor-principal: #57643a;
+      --cor-terra: #6A5036;
+      --cor-clara: #fcfaf7;
+      --cor-card: #fff;
+      --cor-btn: #44a24b;
+      --cor-btn-hover: #30795b;
+      --cor-icon: #25d366;
+    }
+    body { background: var(--cor-clara); margin: 0; font-family: 'Roboto', Arial, sans-serif; color: #222; }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--cor-principal);
+      color: #fff;
+      padding: 0.4rem 2vw;
+      height: 72px;
+      min-height: 60px;
+      position: relative;
+      z-index: 1000;
+    }
+    .navbar-logo-central span {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.52rem;
+      color: #fff2c6;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-left: 10px;
+      text-shadow: 0 2px 7px #b79b6350;
+      transition: color 0.18s;
+    }
+
+    /* LOGO CENTRAL */
+    .navbar-logo-central {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .navbar-logo-central img {
+      height: 200px; /* Aqui aumentei um pouco a logo, ajuste conforme seu gosto, mas sem passar de 72px */
+      width: auto;
+      max-width: 210px;
+      object-fit: contain;
+      display: block;
+      margin-right: 12px;
+    }
+
+    /* MENU */
+    .navbar-menu {
+      display: flex;
+      gap: 1.4rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      align-items: center;
+    }
+
+    .navbar-menu a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: color 0.18s;
+    }
+    .navbar-menu a:hover {
+      color: #ffd970;
+    }
+
+    /* Botão do menu sanduíche só aparece em telas pequenas */
+    .navbar-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 2.2rem;
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    /* RESPONSIVO */
+    @media (max-width: 1050px) {
+      .navbar-menu {
+        position: fixed;
+        top: 72px;
+        right: 0;
+        width: 68vw;
+        max-width: 320px;
+        height: 100vh;
+        background: var(--cor-principal);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.2rem;
+        padding: 2.4rem 1.3rem;
+        box-shadow: -2px 0 18px #2222;
+        transform: translateX(110%);
+        transition: transform 0.28s;
+        z-index: 999;
+      }
+      .navbar-menu.open {
+        transform: translateX(0%);
+      }
+      .navbar-toggle {
+        display: block;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .navbar { padding: 0.3rem 2vw; height: 54px; }
+      .navbar-logo-central img { height: 150px; max-width: 105px; }
+      .navbar-menu { gap: 0.6rem; padding: 1.2rem 2vw; top: 54px; }
+    }
+    .banner-contato {
+      max-width: 660px;
+      margin: 38px auto 32px auto;
+      background: linear-gradient(90deg, #6A5036 0%, #44331E 100%);
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      border-radius: 19px;
+      padding: 31px 0 21px 46px;
+      box-shadow: 0 5px 38px rgba(106,80,54,0.10);
+      border-left: 6px solid #e4c7a6;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    @media (max-width: 800px) {
+      .banner-contato { font-size: 1.22rem; padding: 18px 0 13px 18px; }
+    }
+    .contato-container {
+      max-width: 650px;
+      margin: 0 auto 54px auto;
+      background: var(--cor-card);
+      border-radius: 17px;
+      box-shadow: 0 4px 24px rgba(106,80,54,0.09);
+      padding: 34px 4vw 28px 4vw;
+    }
+    .contato-box {
+      display: flex; align-items: center; gap: 26px;
+      margin-bottom: 31px;
+      flex-wrap: wrap;
+    }
+    .contato-info {
+      font-size: 1.16rem; font-family: 'Roboto', Arial, sans-serif; color: #44331E;
+    }
+    .whatsapp-btn {
+      display: flex; align-items: center; gap: 7px;
+      background: #fff; border: 2.2px solid var(--cor-icon); color: var(--cor-icon);
+      font-weight: 700; font-size: 1.09rem; border-radius: 8px; padding: 10px 26px;
+      text-decoration: none; transition: background .18s, color .18s;
+      box-shadow: 0 2px 16px rgba(48,121,91,0.07);
+      margin-top: 7px;
+    }
+    .whatsapp-btn:hover {
+      background: var(--cor-icon); color: #fff;
+    }
+    .whatsapp-icon {
+      font-size: 2.0rem; color: var(--cor-icon); vertical-align: -3px;
+      transition: color 0.18s;
+    }
+    .contato-divider { border: none; border-top: 1.3px solid #ece6dc; margin: 26px 0; }
+    .contato-form-titulo {
+      font-size: 1.19rem;
+      color: var(--cor-terra);
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      margin-bottom: 13px;
+    }
+    .contato-form {
+      display: flex; flex-direction: column; gap: 13px;
+    }
+    .contato-form input, .contato-form textarea {
+      border: 1.2px solid #d5c4a2;
+      border-radius: 7px;
+      padding: 9px 12px;
+      font-size: 1rem;
+      background: #f9f8f6;
+      font-family: 'Roboto', Arial, sans-serif;
+    }
+    .contato-form textarea { min-height: 94px; resize: vertical; }
+    .contato-form input[readonly] { background: #e6ece8; color: #70655c; font-weight: 700; }
+    .contato-form button {
+      background: var(--cor-btn);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 0;
+      font-size: 1.09rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 2px 14px rgba(34,144,90,0.08);
+      transition: background .18s;
+    }
+    .contato-form button:hover { background: var(--cor-btn-hover); }
+    .msg-enviada {
+      margin-top: 20px;
+      background: #e0f5e4;
+      color: #287b43;
+      border-radius: 8px;
+      padding: 16px 18px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.11rem;
+      box-shadow: 0 2px 9px rgba(48,121,91,0.06);
+    }
+  </style>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-logo-central">
+      <img src="img/logo.png" alt="Consultório de Terapia Corporal Sistêmica" />
+      <span>Virlene Figueiredo</span>
+    </div>
+    <button class="navbar-toggle" aria-label="Abrir menu">&#9776;</button>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="espaco.html">O Espaço</a></li>
+      <li><a href="servicos.html">Serviços</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contato.html">Contato</a></li>
+      <li id="li-perfil-login"><a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a></li>
+    </ul>
+  </nav>
+  <div class="banner-contato">Contato</div>
+
+  <div class="contato-container">
+    <div class="contato-box">
+      <div class="contato-info">
+        <b>Telefone:</b> <a href="tel:+5531999887766" style="color:inherit; text-decoration:underline;">(31) 99988-7766</a><br>
+        <b>WhatsApp:</b>
+          <a href="https://wa.me/5531999887766?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20uma%20consulta%21" class="whatsapp-btn" target="_blank">
+            <span class="whatsapp-icon">&#x1F4F2;</span> Fale no WhatsApp
+          </a>
+      </div>
+    </div>
+    <hr class="contato-divider">
+    <div class="contato-form-titulo">Envie uma mensagem ou feedback</div>
+    <form class="contato-form" id="form-contato" onsubmit="enviarContato(event)">
+      <input type="text" id="nome" name="nome" placeholder="Seu nome*" required>
+      <input type="email" id="email" name="email" placeholder="Seu e-mail*" required>
+      <textarea id="mensagem" name="mensagem" placeholder="Mensagem ou feedback*" required></textarea>
+      <button type="submit">Enviar Mensagem</button>
+    </form>
+    <div id="contato-msg"></div>
+  </div>
+  <script>
+    // Busca dados reais do usuário logado
+    window.onload = function() {
+      fetch('getPerfil.php')
+        .then(res => res.json())
+        .then(data => {
+          if (data.usuario && data.usuario.nome && data.usuario.email) {
+            document.getElementById('nome').value = data.usuario.nome;
+            document.getElementById('email').value = data.usuario.email;
+            document.getElementById('nome').setAttribute('readonly', true);
+            document.getElementById('email').setAttribute('readonly', true);
+          }
+        })
+        .catch(() => { /* se não logado, campos permanecem livres */ });
+    };
+
+    function enviarContato(e) {
+      e.preventDefault();
+
+      const nome = document.getElementById('nome').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const mensagem = document.getElementById('mensagem').value.trim();
+
+      // Validação extra (opcional)
+      if (!nome || !email || !mensagem) {
+        document.getElementById('contato-msg').innerHTML = "<div class='msg-enviada' style='color:#b32d2d;background:#fde0e0;'>Preencha todos os campos obrigatórios.</div>";
+        return;
+      }
+
+      // Envia para o PHP
+      fetch('contato.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `nome=${encodeURIComponent(nome)}&email=${encodeURIComponent(email)}&mensagem=${encodeURIComponent(mensagem)}`
+      })
+      .then(res => res.text())
+      .then(resposta => {
+        document.getElementById('form-contato').style.display = 'none';
+        if (resposta.trim() === "SUCESSO") {
+          document.getElementById('contato-msg').innerHTML = '<div class="msg-enviada">Mensagem enviada com sucesso! Em breve entraremos em contato pelo WhatsApp ou e-mail informado.</div>';
+        } else {
+          document.getElementById('contato-msg').innerHTML = '<div class="msg-enviada" style="color:#b32d2d;background:#fde0e0;">Erro ao enviar mensagem. Tente novamente mais tarde.</div>';
+          document.getElementById('form-contato').style.display = '';
+        }
+      })
+      .catch(() => {
+        document.getElementById('contato-msg').innerHTML = '<div class="msg-enviada" style="color:#b32d2d;background:#fde0e0;">Erro de conexão. Tente novamente.</div>';
+        document.getElementById('form-contato').style.display = '';
+      });
+    }
+
+        // Menu responsivo sanduíche
+    const navbarToggle = document.querySelector('.navbar-toggle');
+    const navbarMenu = document.querySelector('.navbar-menu');
+    navbarToggle.addEventListener('click', () => {
+      navbarMenu.classList.toggle('open');
+    });
+    // Fechar menu ao clicar em um item
+    document.querySelectorAll('.navbar-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        navbarMenu.classList.remove('open');
+      });
+    });
+    // --- Troca "Perfil" ou "Login" no menu, conforme login ---
+    fetch('getPerfil.php', { credentials: 'include' })
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(data => {
+          if (data.usuario && data.usuario.nome) {
+              // Usuário logado
+              document.getElementById('li-perfil-login').innerHTML =
+                  '<a href="perfil.html"><i class="fa-solid fa-user"></i> Perfil</a>';
+          } else {
+              // Não logado
+              document.getElementById('li-perfil-login').innerHTML =
+                  '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+          }
+      })
+      .catch(() => {
+          // Não logado ou erro de sessão
+          document.getElementById('li-perfil-login').innerHTML =
+              '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+      });
+
+  </script>
+
+</body>
+</html>

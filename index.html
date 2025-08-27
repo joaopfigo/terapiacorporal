@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/png" href="/favicon-transparente.png">
+  <meta charset="UTF-8" />
+<meta name="viewport" content="width=1024"/>
+
+  <title>Consultório de Terapia Corporal Sistêmica</title>
+  <style>
+    html, body {
+      width: 100%;
+      min-width: 0;
+      max-width: 100vw;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+    :root {
+      --cor-principal: #57643a;
+      --cor-secundaria: #e3decf;
+      --cor-destaque: #b79b63;
+      --cor-btn: #f9b233;
+      --cor-faq: #b79b63;
+      --fonte: 'Montserrat', Arial, sans-serif;
+    }
+    body {
+      margin: 0;
+      font-family: var(--fonte);
+      background: var(--cor-secundaria);
+      color: #333;
+    }
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--cor-principal);
+  color: #fff;
+  padding: 0.8rem 3vw;
+  height: 96px;
+  min-height: 72px;
+  box-shadow: 0 2px 16px #0003;
+  z-index: 1000;
+}
+
+.navbar-logo-central span {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.52rem;
+  color: #fff2c6;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-left: 10px;
+  text-shadow: 0 2px 7px #b79b6350;
+  transition: color 0.18s;
+}
+
+.navbar-logo-central {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo-central img {
+  height: 200px;
+  width: auto;
+  max-width: 210px;
+  object-fit: contain;
+  display: block;
+  margin-right: 12px;
+}
+
+.navbar-menu {
+  display: flex;
+  gap: 1.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.navbar-menu a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.18s;
+}
+
+.navbar-menu a:hover {
+  color: #ffd970;
+}
+
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2.2rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+@media (max-width: 1050px) {
+  .navbar-menu {
+    position: fixed;
+    top: 96px;
+    right: 0;
+    width: 84vw;
+    max-width: 420px;
+    height: 100vh;
+    background: var(--cor-principal);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.6rem;
+    padding: 2.8rem 2rem;
+    box-shadow: -3px 0 24px #0003;
+    transform: translateX(110%);
+    transition: transform 0.28s;
+    z-index: 999;
+  }
+
+  .navbar-menu.open {
+    transform: translateX(0%);
+  }
+
+  .navbar-toggle {
+    display: block;
+    font-size: 2.6rem;
+  }
+
+  .navbar-menu a {
+    font-size: 1.8rem;
+    padding: 0.8rem 0;
+    width: 100%;
+    font-weight: 700;
+  }
+}
+
+.hero {
+  position: relative;
+  min-height: 520px;      /* MUITO MAIOR, destaca o hero! */
+  height: 66vw;
+  max-height: 700px;
+  display: flex;
+  align-items: flex-start;  /* Alinha pelo topo */
+  justify-content: center;
+  background: url('img/imagem-hero.png') center center/cover no-repeat;
+  /* Substitua pelo nome do seu arquivo de fundo */
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  padding-top: 36px;  /* Espaço entre navbar e overlay */
+}
+
+.hero-overlay {
+  background: rgba(87,100,58,0.08);
+  padding: 3.5rem 2.6rem 2.5rem 2.6rem;   /* Mais espaço interno no topo */
+  border-radius: 36px;
+  text-align: left;
+  max-width: 760px;
+  margin-top: 28px;   /* Deixa o texto mais para cima */
+  box-shadow: 0 9px 42px #0002;
+}
+
+.hero-overlay h1 {
+  font-size: 2.8rem;
+  color: #fff;
+  text-shadow: 1px 2px 20px #4448;
+  margin-bottom: 2.2rem; /* MAIS espaço entre título e frase */
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.hero-overlay p {
+  color: #f2ecd3;
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 2.6rem;
+  text-shadow: 0 2px 14px #0009, 0 0 12px #29455c88;
+}
+
+    .btn-primary {
+    background: var(--cor-btn);
+    color: #fff;
+    border: none;
+    padding: 0.95rem 2.3rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 24px;
+    text-decoration: none;
+    transition: background 0.2s;
+    box-shadow: 0 2px 6px #0001;
+    }
+    .btn-pacote {
+  background: #b78710;
+  color: #fff;
+  border: none;
+  padding: 0.95rem 2.3rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-radius: 24px;
+  text-decoration: none;
+  transition: background 0.2s;
+  box-shadow: 0 2px 6px #0001;
+  display: inline-block;
+  margin-top: 1.1rem;
+  margin-left: 0;
+}
+
+.btn-pacote:hover {
+  background: #b37e00;
+}
+@media (max-width: 600px) {
+  .btn-pacote { font-size: 1.08rem; padding: 0.85rem 0.8rem; }
+}
+
+    .btn-primary:hover {
+    background: #b37e00;
+    }
+
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.1rem;  
+  background: #fff8e1;
+  padding: 1.5rem 0.5rem 1.3rem 0.5rem;
+  margin-bottom: 2rem;
+  width: 100vw;
+  margin-left: calc(-1 * ((100vw - 100%) / 2)); 
+  margin-right: 0;
+  box-sizing: border-box;
+}
+.stat {
+  text-align: center;
+  color: #2670b7;             /* Azul escuro como no propósito */
+  background: #f4f9fd;           /* Azul muito claro, contraste sutil */
+  font-weight: 700;
+  font-size: 1.21rem;
+  min-width: 120px;
+  max-width: 180px;
+  flex: 1 1 130px;
+  border-radius: 19px;
+  box-shadow: 0 2px 20px #29455c13;
+  padding: 1.1rem 0.75rem 0.7rem 0.75rem;
+  margin: 0;
+  line-height: 1.16;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  transition: box-shadow 0.16s, transform 0.13s;
+  border: 2px solid #b7d4ec33;
+}
+.stat:hover {
+  box-shadow: 0 4px 30px #29455c29, 0 0 0 4px #b7d4ec25;
+  transform: translateY(-3px) scale(1.025);
+  background: #eaf6fa;
+}
+
+.stat span {
+  display: block;
+  font-size: 2.1rem;
+  color: #2471c1;
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 4px;
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+}
+.stat small {
+  display: block;
+  font-weight: 500;
+  font-size: 1.09rem;
+  color: #101c2b; 
+  margin-top: 2px;
+  line-height: 1.1;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+
+    .integral-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3.5vw;
+      padding: 2.6rem 6vw 2.2rem 6vw;
+      background: linear-gradient(90deg, #f7f4ee 70%, #ede6c6 100%);
+      border-radius: 0 0 45px 0;
+      margin-bottom: 1.7rem;
+      box-shadow: 0 2px 18px #b79b6330;
+      position: relative;
+      min-height: 380px;
+    }
+
+    .integral-text {
+      flex: 1 1 350px;
+      padding-right: 2vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .integral-text h2 {
+      font-size: 2.25rem;
+      margin-bottom: 1.2rem;
+      font-family: 'Playfair Display', serif;
+      color: #29455c;
+      letter-spacing: 0.01em;
+      font-weight: 700;
+      line-height: 1.4;
+      background: none;
+    }
+
+    .integral-text p {
+      font-size: 1.4rem;
+      color: #60451a;
+      max-width: 520px;
+      margin-bottom: 0;
+      line-height: 1.9;
+      font-family: 'Montserrat', Arial, sans-serif;
+      letter-spacing: 0.001em;
+      font-weight: 400;
+    }
+
+
+    .integral-image {
+      flex: 0 0 240px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .integral-image img {
+      width: 260px;
+      height: 260px;
+      max-width: 40vw;
+      max-height: 40vw;
+      object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0 6px 34px #29455c22, 0 0 0 6px #ede6c6;
+      border: 2px solid #b79b63;
+      background: #fff;
+      transition: box-shadow 0.19s;
+    }
+
+    .integral-image img:hover {
+      box-shadow: 0 12px 40px #29455c55, 0 0 0 9px #ede6c6;
+    }
+
+    .purpose-section.pro-section-elegant {
+      display: flex;
+    align-items: flex-start;
+      justify-content: center;
+      gap: 3.5vw;              /* diminua o gap */
+      padding: 2.0rem 5vw 1.3rem 5vw;  /* padding mais compacto */
+      background: linear-gradient(120deg, #e8e0d2 60%, #f4f1ea 100%);
+      border-radius: 50px 0 60px 0;
+      box-shadow: 0 3px 22px #a68d5055;
+      max-width: 1350px;
+      margin: 0 auto 1.1rem auto;      /* menos espaço embaixo */
+      position: relative;
+    }
+
+    .pro-content-elegant {
+      flex: 1 1 440px;
+      padding: 15px 2vw 12px 2vw;     /* padding reduzido */
+      background: #f8f6eeef;
+      border-radius: 32px;
+      box-shadow: 0 3px 20px #b79b6320;
+      border-bottom: 4px solid #ede6c6;
+      min-width: 300px;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .pro-title-bg {
+      display: inline-block;
+      background: linear-gradient(100deg, #b79b63 85%, #29455c 120%);
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      padding: 8px 24px 8px 15px;
+      border-radius: 10px 28px 15px 5px;
+      margin-bottom: 13px;        /* menos espaço embaixo */
+      letter-spacing: 0.05em;
+      box-shadow: 0 1px 12px #b79b6322;
+    }
+
+    .pro-list-elegant {
+      list-style: none;
+      padding: 0;
+      margin: 18px 0 16px 0;  /* bem mais compacto */
+    }
+
+    .pro-list-elegant li {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+      color: #735e38;
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      letter-spacing: 0.016em;
+      transition: color 0.18s;
+      line-height: 1.55;
+    }
+
+    .pro-bullet {
+      width: 17px;
+      height: 17px;
+      background: radial-gradient(circle at 60% 40%, #29455c 30%, #b79b63 95%);
+      border: 2px solid #b79b63;
+      margin-top: 4px;
+      box-shadow: 0 2px 8px #b79b6345;
+      flex-shrink: 0;
+    }
+
+    .pro-btn-elegant {
+      background: linear-gradient(90deg, #29455c 50%, #b79b63 100%);
+      color: #fff;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 22px;
+      padding: 1rem 1.8rem;
+      text-decoration: none;
+      box-shadow: 0 5px 14px #b79b6322;
+      margin-top: 14px;
+      display: inline-block;
+      letter-spacing: 0.02em;
+      transition: background 0.18s, color 0.18s;
+    }
+    .pro-btn-elegant:hover {
+      background: #193045;
+      color: #f9d880;
+    }
+
+    .purpose-collage {
+      width: 100%;
+      max-width: 410px;
+      margin: 0 auto 24px auto;
+      position: relative;
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 200px;
+    }
+
+    .collage-bg {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 110%;
+      height: 110%;
+      transform: translate(-50%, -50%);
+      object-fit: contain;
+      z-index: 1;
+      filter: drop-shadow(0 4px 18px #b79b6344);
+    }
+
+    .collage-itens {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 85%;
+      height: 85%;
+      transform: translate(-50%, -50%);
+      object-fit: contain;
+      z-index: 2;
+      pointer-events: none;
+      filter: drop-shadow(0 8px 20px #29455c26);
+    }
+    .pro-list-elegant {
+      margin-bottom: 3px;
+    }
+    .pro-btn-elegant {
+      margin-bottom: 0;
+    }
+
+    .pro-blue {
+      color: #29455c;
+      font-weight: bold;
+      letter-spacing: 0.01em;
+    }
+
+    .faq-section {
+      background: #faf2d9;
+      padding: 30px 0 45px 0;
+      margin-bottom: 2.5rem;
+    }
+    .faq-title {
+      color: #33820e;
+      font-size: 2.1rem;
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: bold;
+    }
+    .faq-list {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .faq-item {
+      margin-bottom: 13px;
+      border-radius: 10px;
+      background: #bda164;
+      padding: 10px 17px;
+      font-size: 1.7rem;
+      color: #262202;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      cursor: pointer;
+      transition: background 0.16s;
+      font-weight: 500;
+    }
+    .faq-item strong {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+    .faq-item.open {
+      background: #ede6c6;
+    }
+    .faq-answer {
+      margin-top: 7px;
+      font-size: 1.5rem;
+      color: #484209;
+      display: none;
+    }
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    .footer {
+      text-align: center;
+      background: var(--cor-principal);
+      color: #fff;
+      padding: 1.2rem;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .feedbacks-carousel {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+    margin: 42px auto 44px auto;
+    overflow: hidden;
+    padding: 0 36px;
+    background: #f8f6ee;
+    border-radius: 22px;
+    box-shadow: 0 4px 30px #29455c19;
+    min-height: 184px;
+  }
+  .feedbacks-track {
+    display: flex;
+    transition: transform 0.42s cubic-bezier(.77,.13,.27,.87);
+    will-change: transform;
+  }
+  .feedback-card {
+    min-width: 100%;
+    max-width: 100%;
+    padding: 36px 22px 28px 22px;
+    box-sizing: border-box;
+    text-align: center;
+    color: #19416b;
+    font-size: 1.5rem;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    line-height: 1.5;
+    background: transparent;
+    opacity: 0.97;
+    transition: box-shadow 0.18s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .feedback-card span {
+    margin-top: 19px;
+    font-size: 1.18rem;
+    color: #5a5a3a;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .feedback-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #2670b7;
+    color: #fff;
+    border: none;
+    font-size: 1.7rem;
+    width: 39px;
+    height: 39px;
+    border-radius: 50%;
+    box-shadow: 0 2px 12px #2670b725;
+    cursor: pointer;
+    transition: background 0.18s;
+    z-index: 2;
+    opacity: 0.83;
+  }
+  .feedback-arrow:hover {
+    background: #18518a;
+  }
+  .feedback-prev { left: 6px; }
+  .feedback-next { right: 6px; }
+
+  @media (pointer: coarse), (hover: none) {
+    .integral-text p {
+      font-size: 1.8rem;
+    }
+    .feedback-card {
+      font-size: 1.22rem;
+      padding: 26px 3vw 20px 3vw;
+    }
+    .feedback-card span {
+      font-size: 1.07rem;
+    }
+    .faq-item {
+      font-size: 0.9rem;
+    }
+    .faq-item strong {
+      font-size: 0.8rem;
+    }
+    .faq-answer {
+      font-size: 0.8rem;
+    }
+    .faq-title {
+      font-size: 1rem;
+    }
+    .hero-overlay h1 {
+      font-size: 3.5rem;
+      margin-bottom: 2.2rem;
+      letter-spacing: 0.01em;
+    }
+    .hero-overlay p {
+      font-size: 2rem;
+    }
+    .btn-primary {
+      font-size: 1.6rem;
+    }
+    .pro-list-elegant li {
+      font-size: 1.5rem;
+    }
+  }
+ #btn-agendar-fixo {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 9999;
+  background: linear-gradient(90deg, #264a85 15%, #4793c7 100%);
+  color: #fff;
+  font-size: 1.23rem;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 700;
+  border: none;
+  border-radius: 999px;  /* ultra arredondado */
+  padding: 1.1rem 2.25rem 1.1rem 2.35rem;
+  box-shadow: 0 6px 24px #264a8533;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.16s, transform 0.13s;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  letter-spacing: 0.01em;
+}
+#btn-agendar-fixo:hover {
+  background: linear-gradient(90deg, #4793c7 5%, #264a85 85%);
+  color: #ffe89a;
+  box-shadow: 0 10px 36px #264a8575;
+  transform: scale(1.08);
+}
+#btn-agendar-fixo i {
+  font-size: 1.47rem;
+  background: #fff3;
+  border-radius: 50%;
+  padding: 0.33rem 0.36rem;
+  transition: background 0.13s;
+}
+#btn-agendar-fixo:hover i {
+  background: #fff6;
+}
+@media (max-width: 600px) {
+  #btn-agendar-fixo {
+    font-size: 1.07rem;
+    padding: 0.77rem 1.25rem 0.77rem 1.27rem;
+    right: 12px;
+    bottom: 12px;
+    border-radius: 999px;
+    gap: 0.35rem;
+  }
+  #btn-agendar-fixo i {
+    font-size: 1.08rem;
+    padding: 0.22rem 0.23rem;
+  }
+}
+
+
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-logo-central">
+      <img src="img/logo.png" alt="Consultório de Terapia Corporal Sistêmica" />
+      <span>Virlene Figueiredo</span>
+    </div>
+    <button class="navbar-toggle" aria-label="Abrir menu">&#9776;</button>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="espaco.html">O Espaço</a></li>
+      <li><a href="servicos.html">Serviços</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contato.html">Contato</a></li>
+      <li id="li-perfil-login"><a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a></li>
+    </ul>
+  </nav>
+
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-overlay">
+        <h1>Consultório de Terapia Corporal Sistêmica</h1>
+        <p>Reconecte-se com seu corpo em um espaço onde cada detalhe traduz equilíbrio e presença.</p>
+        <a href="agendamento.php" class="btn-primary">Agendar uma consulta</a>
+        <br>
+        <a href="pacotes.html" class="btn-pacote">Comprar pacote de sessões</a>
+
+    </div>
+  </header>
+
+  <!-- Estatísticas -->
+  <section class="stats">
+    <div class="stat"><span>35</span>ANOS<small>de atuação</small></div>
+    <div class="stat"><span>8</span>TERAPIAS<small>disponíveis </small></div>
+    <div class="stat"><span>+20</span>CURSOS<small>concluídos</small></div>
+    <div class="stat"><span>+15.000</span>ATENDIMENTOS<small>realizados </small></div>
+  </section>
+
+  <!-- Seção Cuidado Integral e Foto -->
+  <section class="integral-section">
+    <div class="integral-text">
+      <h2>Cuidado Integral e Sabedoria Corporal: descubra terapias que conectam corpo e essência.</h2>
+      <p>No Consultório de Terapia Corporal Sistêmica, cada atendimento é guiado por escuta sensível, técnica apurada e o saber ancestral da medicina chinesa. Aqui, o toque terapêutico se torna ponte para o autoconhecimento e a harmonia entre corpo, mente e emoções.</p>
+    </div>
+    <div class="integral-image">
+      <img src="img/virlene.png" alt="Virlene Figueiredo" />
+      <!-- Substitua virlene.png pelo nome correto da imagem da Virlene -->
+    </div>
+  </section>
+
+  <!-- Propósito -->
+  <section class="purpose-section pro-section-elegant">
+    <div class="purpose-content pro-content-elegant">
+      <h3>
+        <span class="pro-title-bg">Nosso Propósito</span>
+      </h3>
+      <ul class="pro-list pro-list-elegant">
+        <li>
+          <span class="pro-bullet"></span>
+          <span><span class="pro-blue">Acolher</span> o ser humano por inteiro.</span>
+        </li>
+        <li>
+          <span class="pro-bullet"></span>
+          <span>Utilizamos técnicas como <span class="pro-blue">massoterapia</span>, <span class="pro-blue">acupuntura</span> e outras práticas integrativas.</span>
+        </li>
+        <li>
+          <span class="pro-bullet"></span>
+          <span>Buscamos <span class="pro-blue">aliviar dores</span>, restaurar fluxos energéticos e promover a reconexão com a própria natureza interna.</span>
+        </li>
+        <li>
+          <span class="pro-bullet"></span>
+          <span>O corpo guarda memórias e a nossa intenção é um cuidar atento, com <span class="pro-blue">respeito</span>, <span class="pro-blue">presença</span> e <span class="pro-blue">sensibilidade</span>.</span>
+        </li>
+      </ul>
+      <a href="sobre.html" class="btn-main pro-btn-elegant">Mais sobre Virlene &rarr;</a> 
+    </div>
+      <div class="purpose-collage">
+        <img src="img/pincelada.png" alt="Pincelada abstrata" class="collage-bg">
+        <img src="img/itens.png" alt="Itens de terapia corporal" class="collage-itens">
+      </div>
+  </section>
+
+  <!-- Carrossel de Feedbacks -->
+  <section class="feedbacks-carousel">
+    <div class="feedbacks-track">
+      <div class="feedback-card">
+        <p>“A sessão foi além do que eu esperava! A Virlene tem um toque muito acolhedor e me explicou cada etapa do tratamento. Saí com a sensação de leveza e de que realmente fui ouvida. Recomendo de olhos fechados!”</p>
+        <span>— Fernanda Amaral</span>
+      </div>
+      <div class="feedback-card">
+        <p>“O ambiente do consultório é incrível: tranquilo, cheiroso e transmite muita paz. Dá pra sentir o cuidado em cada detalhe. Desde a recepção até a finalização da sessão, tudo impecável.”</p>
+        <span>— Marcos Goulart</span>
+      </div>
+      <div class="feedback-card">
+        <p>“Já passei por vários profissionais, mas nunca encontrei alguém tão atenciosa quanto a Virlene. Ela percebeu nuances do meu corpo que nem eu sabia e montou um tratamento personalizado. Meu sono e meu humor melhoraram muito!”</p>
+        <span>— Lúcia Andrade</span>
+      </div>
+      <div class="feedback-card">
+        <p>“A facilidade de agendar pelo site faz toda diferença pra mim, que tenho rotina corrida. Recebi o lembrete por e-mail, cheguei no horário certo e fui atendida sem esperas. Atendimento muito profissional.”</p>
+        <span>— João Ricardo Diniz</span>
+      </div>
+      <div class="feedback-card">
+        <p>“Fiz acupuntura e massagem e senti o efeito já na primeira semana. As dores diminuíram e me senti muito mais disposta para o dia a dia. Virlene realmente entende do que faz, indico para todos meus amigos!”</p>
+        <span>— Silvia Mattos</span>
+      </div>
+      <div class="feedback-card">
+        <p>“Nunca tinha feito terapia corporal antes e estava um pouco insegura, mas a Virlene explicou tudo com muita paciência e me deixou super à vontade. Senti uma conexão muito forte e percebi melhoras rápidas tanto no corpo quanto na mente.”</p>
+        <span>— Patrícia Souza</span>
+      </div>
+    </div>
+    <button class="feedback-arrow feedback-prev" aria-label="Depoimento anterior">&lt;</button>
+    <button class="feedback-arrow feedback-next" aria-label="Próximo depoimento">&gt;</button>
+  </section>
+
+  <!-- Perguntas Frequentes -->
+  <section class="faq-section">
+    <div class="faq-title">Perguntas frequentes sobre terapia corporal</div>
+    <div class="faq-list">
+      <div class="faq-item open"><strong>1. Terei resultados com apenas 1 sessão?</strong>
+        <div class="faq-answer">
+          Cada organismo responde de uma maneira, mas de modo geral, na primeira sessão você se sente mais leve e disposto e com uma sensação maior de presença corporal. O ideal é que tenha uma frequência semanal, ou seja, uma vez por semana, pois desta forma o seu corpo guarda a memória do relaxamento e da evolução do trabalho realizado. A cada sessão estes resultados se aprofundam.
+        </div>
+      </div>
+      <div class="faq-item"><strong>2. Com qual frequência devo receber uma massagem?</strong>
+        <div class="faq-answer">
+          A frequência ideal depende das necessidades individuais, mas sessões semanais trazem benefícios contínuos para corpo e mente.
+        </div>
+      </div>
+      <div class="faq-item"><strong>3. Gestantes podem receber massagem?</strong>
+        <div class="faq-answer">
+          Sim, mas é fundamental informar a terapeuta sobre a gestação e seguir orientações específicas para segurança da mãe e do bebê.
+        </div>
+      </div>
+      <div class="faq-item"><strong>4. Uma massagem   também traz benefícios psicológicos?</strong>
+        <div class="faq-answer">
+          Sim. A massagem promove bem-estar mental, reduz ansiedade, estresse e melhora a qualidade do sono.
+        </div>
+      </div>
+      <div class="faq-item"><strong>5. O tratamento da massagem é definitivo?</strong>
+        <div class="faq-answer">
+          Os benefícios da massagem são duradouros, mas sessões regulares são recomendadas para manutenção do bem-estar.
+        </div>
+      </div>
+      <div class="faq-item"><strong>6. Quais produtos são utilizados na massagem?</strong>
+        <div class="faq-answer">
+          São utilizados óleos vegetais, cremes neutros e essências naturais, sempre de alta qualidade e adequados ao seu perfil.
+        </div>
+      </div>
+      <div class="faq-item"><strong>7. Pessoas com problemas de varizes podem receber massagem  ?</strong>
+        <div class="faq-answer">
+          Em geral, sim. No entanto, a avaliação prévia de um profissional é importante para ajustar as técnicas conforme a necessidade.
+        </div>
+      </div>
+      <div class="faq-item"><strong>8. Na massagem é utilizada alguma música?</strong>
+        <div class="faq-answer">
+          Sim, músicas relaxantes são usadas para potencializar o efeito terapêutico e criar um ambiente de tranquilidade.
+        </div>
+      </div>
+      <div class="faq-item"><strong>9. Na massagem é normal sentirmos dor em alguma parte do corpo?</strong>
+        <div class="faq-answer">
+          Leve desconforto pode ocorrer se houver tensão muscular, mas o objetivo é sempre o relaxamento e o bem-estar.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rodapé -->
+  <footer class="footer">
+    <p>Consultório de Terapia Corporal Sistêmica</p>
+  </footer>
+  <a href="agendamento.php" id="btn-agendar-fixo" title="Agendar Consulta">
+  <i class="fa-solid fa-calendar-check"></i>
+  Agendar Consulta
+</a>
+  <script>
+    // FAQ interativo: abre/fecha respostas
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.addEventListener('click', function() {
+        if (this.classList.contains('open')) {
+          this.classList.remove('open');
+        } else {
+          document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+          this.classList.add('open');
+        }
+      });
+    });
+
+    // Menu responsivo sanduíche
+    const navbarToggle = document.querySelector('.navbar-toggle');
+    const navbarMenu = document.querySelector('.navbar-menu');
+    navbarToggle.addEventListener('click', () => {
+      navbarMenu.classList.toggle('open');
+    });
+    // Fechar menu ao clicar em um item
+    document.querySelectorAll('.navbar-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        navbarMenu.classList.remove('open');
+      });
+    });
+
+    // Feedbacks Carousel
+    const track = document.querySelector('.feedbacks-track');
+    const cards = document.querySelectorAll('.feedback-card');
+    const prevBtn = document.querySelector('.feedback-prev');
+    const nextBtn = document.querySelector('.feedback-next');
+    let feedbackIndex = 0;
+    let feedbackTimer;
+
+    function showFeedback(idx) {
+      feedbackIndex = (idx + cards.length) % cards.length;
+      track.style.transform = `translateX(-${feedbackIndex * 100}%)`;
+      restartTimer();
+    }
+    function nextFeedback() { showFeedback(feedbackIndex + 1); }
+    function prevFeedback() { showFeedback(feedbackIndex - 1); }
+    function restartTimer() {
+      clearInterval(feedbackTimer);
+      feedbackTimer = setInterval(nextFeedback, 10000);
+    }
+    nextBtn.addEventListener('click', nextFeedback);
+    prevBtn.addEventListener('click', prevFeedback);
+    // Swipe (touch) para mobile
+    let startX = null;
+    track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+    track.addEventListener('touchend', e => {
+      if (startX === null) return;
+      let deltaX = e.changedTouches[0].clientX - startX;
+      if (deltaX > 50) prevFeedback();
+      else if (deltaX < -50) nextFeedback();
+      startX = null;
+    });
+    // Inicia carrossel
+    showFeedback(0);
+    
+    fetch('header.php')
+  .then(res => res.text())
+  .then(html => { document.getElementById('header').innerHTML = html; });
+
+    // --- Troca "Perfil" ou "Login" no menu, conforme login ---
+    fetch('getPerfil.php', { credentials: 'include' })
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(data => {
+          if (data.usuario && data.usuario.nome) {
+              if (data.usuario.tipo === 'terapeuta' || data.usuario.is_admin == 1) {
+                  document.getElementById('li-perfil-login').innerHTML =
+                      '<a href="admin/index.php"><i class="fa-solid fa-lock"></i> Painel Adm.</a>';
+              } else {
+                  document.getElementById('li-perfil-login').innerHTML =
+                      '<a href="perfil.html"><i class="fa-solid fa-user"></i> Perfil</a>';
+              }
+          } else {
+              document.getElementById('li-perfil-login').innerHTML =
+                  '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+          }
+      })
+      .catch(() => {
+          document.getElementById('li-perfil-login').innerHTML =
+              '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+      });
+  </script>
+
+</body>
+</html>

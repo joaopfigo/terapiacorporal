@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+      <link rel="icon" type="image/png" href="/favicon-transparente.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login ou Registro | Consultório Terapias</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    /* Torna todos os campos do mesmo tamanho e centraliza o olho */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative; /* garante contexto para o olho */
+}
+
+.campo input[type="email"],
+.campo input[type="password"] {
+  font-size: 1.04rem;
+  padding: 9px 11px;
+  border-radius: 6px;
+  border: 1.1px solid #dac9b7;
+  background: #f8f7f5;
+  outline: none;
+  height: 44px;
+  box-sizing: border-box;
+  width: 100%;
+  display: block;
+}
+
+
+
+    body {
+      background: #f6f2ee;
+      margin: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-registro-container {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 28px rgba(86,70,50,0.14);
+      width: 100%;
+      max-width: 420px;
+      padding: 38px 32px 32px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 19px;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 9px;
+    }
+    .logo img {
+      height: 54px;
+    }
+    .titulo-principal {
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #4c3523;
+      margin-bottom: 3px;
+      letter-spacing: 0.02em;
+    }
+    .toggle-link {
+      text-align: center;
+      font-size: 1.07rem;
+      color: #856749;
+      margin-bottom: 5px;
+    }
+    .toggle-link a {
+      color: #2c7b63;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .social-btn {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1.09rem;
+      padding: 12px 0;
+      font-weight: 600;
+      cursor: pointer;
+      justify-content: center;
+      margin-bottom: 6px;
+      transition: background .16s;
+    }
+    .btn-google {
+      background: #fff;
+      border: 1.3px solid #d7d7d7;
+      color: #444;
+    }
+    .btn-google img {
+      width: 21px;
+      height: 21px;
+    }
+    .btn-microsoft {
+      background: #f5f5f5;
+      color: #24292f;
+      border: 1.3px solid #e0e0e0;
+    }
+    .btn-microsoft img {
+      width: 19px;
+      height: 19px;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #b8b0ad;
+      font-size: 1.03rem;
+      margin: 12px 0 2px 0;
+    }
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #e7ded8;
+    }
+    .login-form, .register-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .campo {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: relative; /* garante contexto para o olho */
+    }
+    .campo label {
+      font-size: 0.98rem;
+      color: #6b5952;
+    }
+    .campo input, .campo select {
+      font-size: 1.04rem;
+      padding: 9px 11px;
+      border-radius: 6px;
+      border: 1.1px solid #dac9b7;
+      background: #f8f7f5;
+      outline: none;
+    }
+    .login-btn, .register-btn, .guest-btn {
+      background: #2c7b63;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 12px 0;
+      font-size: 1.09rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 2px;
+      margin-bottom: 3px;
+      transition: background 0.15s;
+    }
+    .login-btn:hover, .register-btn:hover, .guest-btn:hover {
+      background: #175344;
+    }
+    .guest-btn {
+      background: #a3865a;
+      margin-top: 8px;
+    }
+    .error-msg, .success-msg {
+      font-size: 1.04rem;
+      padding: 8px 0 2px 0;
+      color: #d84c3d;
+      text-align: center;
+      display: none;
+    }
+    .success-msg { color: #1a7c3a; }
+    @media (max-width: 600px) {
+      .login-registro-container {
+        max-width: 98vw;
+        padding: 17px 3vw 20px 3vw;
+      }
+      .titulo-principal {
+        font-size: 1.27rem;
+      }
+      .campo input[type="email"],
+      .campo input[type="password"] {
+        height: 40px;
+        font-size: 1rem;
+      }
+      .olho-senha-btn {
+        height: 40px;
+        width: 40px;
+        right: 6px;
+      }
+    }
+    .campo-senha {
+  position: relative;
+  width: 100%;
+}
+.campo-senha input[type="password"] {
+  padding-right: 44px;
+  width: 100%;
+  box-sizing: border-box;
+  height: 44px;
+}
+.campo-senha .olho-senha-btn {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 10px;
+  margin: auto;
+  height: 32px;
+  width: 36px;
+  padding: 0;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.campo-senha .olho-senha-btn svg {
+  width: 23px;
+  height: 23px;
+  display: block;
+}
+  </style>
+</head>
+<body>
+  <div class="login-registro-container">
+    <div class="logo">
+      <img src="img/logo.png" alt="Logo Consultório">
+    </div>
+    <div class="titulo-principal" id="tituloForm">Entrar</div>
+    <div class="toggle-link" id="toggleLink">
+      Não tem conta? <a onclick="showRegister()">Registrar-se</a>
+    </div>
+    <!-- Social login (Google, Apple, Facebook, Microsoft) -->
+    <button class="social-btn btn-google"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"> Entrar com Google</button>
+    <button class="social-btn btn-microsoft"><img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg"> Entrar com Microsoft</button>
+    <div class="divider"><span>ou</span></div>
+
+    <!-- Formulário de Login -->
+    <form class="login-form" id="formLogin">
+      <div class="campo">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" required autocomplete="email">
+      </div>
+      <div class="campo">
+  <label for="login-senha">Senha</label>
+  <div class="campo-senha">
+    <input type="password" id="login-senha" required autocomplete="current-password">
+    <button type="button" tabindex="-1" onclick="toggleSenha('login-senha', this)" class="olho-senha-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#4c3523;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1.5 12s4.5-7 10.5-7 10.5 7 10.5 7-4.5 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3.5" /></svg>
+    </button>
+  </div>
+</div>
+      <div style="text-align:center; margin-top:-7px; margin-bottom:8px; font-size:0.96rem; color:#856749;">
+        Esqueceu senha?
+        <a href="senha.html" style="color:#2c7b63; font-weight:bold; text-decoration:none;">Altere aqui</a>
+      </div>
+      <button type="submit" class="login-btn">Entrar</button>
+      <button type="button" class="guest-btn" onclick="loginVisitante()">Entrar como Visitante</button>
+      <div class="error-msg" id="loginError"></div>
+    </form>
+
+    <!-- Formulário de Registro -->
+    <form class="register-form" id="formRegister" style="display: none;">
+      <div class="campo">
+        <label for="register-nome">Nome completo</label>
+        <input type="text" id="register-nome" required autocomplete="name">
+      </div>
+      <div class="campo">
+        <label for="register-email">Email</label>
+        <input type="email" id="register-email" required autocomplete="email">
+      </div>
+      <div class="campo">
+        <label for="register-telefone">Telefone (opcional)</label>
+        <input type="text" id="register-telefone" autocomplete="tel">
+      </div>
+      <div class="campo">
+  <label for="register-senha">Senha</label>
+  <div class="campo-senha">
+    <input type="password" id="register-senha" required autocomplete="new-password">
+    <button type="button" tabindex="-1" onclick="toggleSenha('register-senha', this)" class="olho-senha-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#4c3523;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1.5 12s4.5-7 10.5-7 10.5 7 10.5 7-4.5 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3.5" /></svg>
+    </button>
+  </div>
+</div>
+<div class="campo">
+  <label for="register-senha2">Confirmar senha</label>
+  <div class="campo-senha">
+    <input type="password" id="register-senha2" required autocomplete="new-password">
+    <button type="button" tabindex="-1" onclick="toggleSenha('register-senha2', this)" class="olho-senha-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#4c3523;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1.5 12s4.5-7 10.5-7 10.5 7 10.5 7-4.5 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3.5" /></svg>
+    </button>
+  </div>
+</div>
+      <div class="campo">
+        <label for="register-nascimento">Data de nascimento</label>
+        <input type="date" id="register-nascimento" required>
+      </div>
+      <div class="campo">
+        <label for="register-sexo">Sexo</label>
+        <select id="register-sexo" required>
+          <option value="">Selecione...</option>
+          <option value="feminino">Feminino</option>
+          <option value="masculino">Masculino</option>
+          <option value="outro">Outro</option>
+          <option value="prefiro_nao_dizer">Prefiro não dizer</option>
+        </select>
+      </div>
+      <button type="submit" class="register-btn">Registrar</button>
+      <div class="error-msg" id="registerError"></div>
+      <div class="success-msg" id="registerSuccess"></div>
+    </form>
+  </div>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    // Troca entre formulários login/registro
+    function showRegister() {
+      document.getElementById('formLogin').style.display = 'none';
+      document.getElementById('formRegister').style.display = 'flex';
+      document.getElementById('tituloForm').innerText = 'Criar Conta';
+      document.getElementById('toggleLink').innerHTML = 'Já é membro? <a onclick="showLogin()">Entrar</a>';
+    }
+    function showLogin() {
+      document.getElementById('formLogin').style.display = 'flex';
+      document.getElementById('formRegister').style.display = 'none';
+      document.getElementById('tituloForm').innerText = 'Entrar';
+      document.getElementById('toggleLink').innerHTML = 'Não tem conta? <a onclick="showRegister()">Registrar-se</a>';
+    }
+    // Guest Login - só redireciona para home como visitante
+    function loginVisitante() {
+      window.location.href = 'index.html';
+    }
+    // Ajax para login/registro (exemplo, precisa ajustar para PHP real depois)
+    document.getElementById('formLogin').onsubmit = function(e) {
+      e.preventDefault();
+
+      // DADOS
+      const email = document.getElementById('login-email').value;
+      const senha = document.getElementById('login-senha').value;
+
+      // AJAX
+      fetch('login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `email=${encodeURIComponent(email)}&senha=${encodeURIComponent(senha)}`
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          // NOVO: redirecionamento conforme o tipo de usuário
+          if (res.tipo === 'terapeuta') {
+            window.location.href = 'admin/index.php';
+          } else {
+            window.location.href = 'perfil.html'; // ou index.html, como preferir para usuário normal
+          }
+        } else {
+          document.getElementById('loginError').style.display = 'block';
+          document.getElementById('loginError').innerText = res.message || 'Email ou senha inválidos.';
+        }
+      })
+      .catch((err) => {
+        document.getElementById('loginError').style.display = 'block';
+        document.getElementById('loginError').innerText = 'Erro ao conectar ao servidor: ' + (err.message || err);
+      });
+    }
+
+    document.getElementById('formRegister').onsubmit = function(e) {
+      e.preventDefault();
+
+      const nome = document.getElementById('register-nome').value;
+      const email = document.getElementById('register-email').value;
+      const telefone = document.getElementById('register-telefone').value;
+      const senha = document.getElementById('register-senha').value;
+      const senha2 = document.getElementById('register-senha2').value;
+      const nascimento = document.getElementById('register-nascimento').value;
+      const sexo = document.getElementById('register-sexo').value;
+
+      if (senha !== senha2) {
+        document.getElementById('registerError').style.display = 'block';
+        document.getElementById('registerError').innerText = 'As senhas não coincidem.';
+        return;
+      }
+
+      // AJAX
+      fetch('register.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `nome=${encodeURIComponent(nome)}&email=${encodeURIComponent(email)}&telefone=${encodeURIComponent(telefone)}&senha=${encodeURIComponent(senha)}&nascimento=${encodeURIComponent(nascimento)}&sexo=${encodeURIComponent(sexo)}`
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          document.getElementById('registerSuccess').style.display = 'block';
+          document.getElementById('registerSuccess').innerText = 'Registro bem-sucedido! Agora faça login.';
+          setTimeout(showLogin, 2000);
+        } else {
+          document.getElementById('registerError').style.display = 'block';
+          document.getElementById('registerError').innerText = res.message || 'Erro ao registrar.';
+        }
+      })
+      .catch((err) => {
+        document.getElementById('registerError').style.display = 'block';
+        document.getElementById('registerError').innerText = 'Erro ao conectar ao servidor: ' + (err.message || err);
+      });
+    }
+    // Troque pelo seu CLIENT_ID do Google Cloud Console
+    const GOOGLE_CLIENT_ID = "1051863779401-v2k79mfrrut3c0ffebc1466utn46443c.apps.googleusercontent.com";
+    // Renderiza o botão Google "One Tap" (opcional, mas deixa o botão mais visual)
+    window.onload = function() {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredentialResponse
+      });
+      // Se quiser, pode renderizar o botão Google automaticamente:
+      // google.accounts.id.renderButton(
+      //   document.querySelector('.btn-google'),
+      //   { theme: "outline", size: "large" } // customization
+      // );
+    }
+
+    function handleGoogleCredentialResponse(response) {
+      // Pega o JWT do Google e manda para o backend
+      fetch('login_google.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'credential=' + encodeURIComponent(response.credential)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          window.location.href = 'index.html';
+        } else {
+          alert(res.message || 'Erro ao fazer login com Google');
+        }
+      })
+      .catch(err => {
+        alert('Erro na comunicação com o backend: ' + err);
+      });
+    }
+
+    // Ao clicar no botão Google (da interface que já existe), dispara o login Google
+    document.querySelector('.btn-google').onclick = function(e) {
+      e.preventDefault();
+      google.accounts.id.prompt(); // abre o One Tap login do Google
+    };
+  </script>
+  <script>
+function toggleSenha(id, btn) {
+  var campo = document.getElementById(id);
+  var svg = btn.querySelector('svg');
+  if (campo.type === "password") {
+    campo.type = "text";
+    // Olho riscado (olho fechado)
+    svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1.5 12s4.5-7 10.5-7 10.5 7 10.5 7-4.5 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3.5" /><line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="2"/>';
+  } else {
+    campo.type = "password";
+    // Olho normal
+    svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1.5 12s4.5-7 10.5-7 10.5 7 10.5 7-4.5 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3.5" />';
+  }
+}
+</script>
+</body>
+</html>

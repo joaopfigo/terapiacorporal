@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+      <link rel="icon" type="image/png" href="/favicon-transparente.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog | Virlene Figueiredo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&amp;display=swap" rel="stylesheet">
+  <style>
+    /* --- Inline, cards em linha --- */
+    body { background: #fcfaf7; margin: 0; font-family: 'Roboto', Arial, sans-serif; color: #423d38; }
+    .navbar { display: flex; align-items: center; justify-content: space-between; background: #57643a; color: #fff; padding: 0.4rem 2vw; height: 72px; min-height: 60px; }
+    .navbar-logo-central { height: 100%; display: flex; align-items: center; }
+    .navbar-logo-central img { height: 54px; width: auto; max-width: 110px; object-fit: contain; display: block; margin-right: 12px; }
+    .navbar-logo-central span { font-family: 'Dancing Script', cursive; font-size: 1.52rem; color: #fff2c6; font-weight: 700; margin-left: 10px; text-shadow: 0 2px 7px #b79b6350;}
+    .navbar-menu { display: flex; gap: 1.4rem; list-style: none; margin: 0; padding: 0; align-items: center;}
+    .navbar-menu a { color: #fff; text-decoration: none; font-weight: 600; font-size: 1rem; transition: color 0.18s;}
+    .navbar-menu a:hover { color: #ffd970;}
+    .navbar-toggle { display: none; }
+    @media (max-width: 900px) {
+      .blog-container { flex-direction: column; gap: 24px; }
+      .sidebar { width: 98vw; }
+      .post-card { flex-direction: column; align-items: flex-start; }
+      .post-img { width: 100%; height: 170px; }
+    }
+    .banner-blog-card {
+      max-width: 660px;
+      margin: 38px auto 32px auto;
+      background: linear-gradient(90deg, #6A5036 0%, #44331E 100%);
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem; font-weight: 700; letter-spacing: 0.01em;
+      border-radius: 19px; padding: 31px 0 21px 46px;
+      box-shadow: 0 5px 38px rgba(106,80,54,0.10);
+      border-left: 6px solid #e4c7a6;
+      display: flex; align-items: center; justify-content: flex-start;
+    }
+    .blog-container { max-width: 1200px; margin: 30px auto 50px auto; display: flex; gap: 44px; padding: 0 2vw; }
+    .posts-main { display: flex; flex-direction: column; gap: 30px; overflow-x: unset; flex: 1; align-items: stretch; }
+    .post-card {
+      min-width: 500px; max-width: 900px;
+      display: flex; flex-direction: column;
+      background: #fff; border-radius: 17px; margin-bottom: 20px;
+      box-shadow: 0 2px 26px rgba(106,80,54,0.06);
+      padding: 23px 26px; align-items: flex-start;
+      margin-right: 24px; width: 100%;
+    }
+    .post-img { width: 100%; height: 142px; object-fit: cover; border-radius: 12px; margin-bottom: 10px;}
+    .post-title { color: #30795b; font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; margin: 0 0 7px 0; text-decoration: none; cursor: pointer; }
+    .post-title:hover { text-decoration: underline; }
+    .post-cat { color: #9ac7b3; font-size: 0.98rem; font-weight: 600; margin-bottom: 2px;}
+    .post-desc { color: #564e46; font-size: 1rem; margin-bottom: 8px; margin-top: 3px;}
+    .btn-continuar { background: #e06350; color: #fff; border: none; border-radius: 8px; padding: 9px 19px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .16s;}
+    .btn-continuar:hover { background: #c9513a;}
+    .btn-edit-admin { background: #666; color: #fff; border-radius: 6px; border: none; padding: 5px 9px; font-size: 0.97em; margin-right: 6px; cursor:pointer;}
+    .btn-toggle-admin { background: #ae3829; color: #fff; border-radius: 6px; border: none; padding: 5px 9px; font-size: 0.97em; cursor:pointer;}
+    .sidebar { background: #f4f5f2; border-radius: 17px; padding: 28px 20px 21px 20px; box-shadow: 0 2px 20px rgba(48,121,91,0.04); width: 320px; max-width: 94vw; height: fit-content; }
+    .search-bar { display: flex; gap: 6px; margin-bottom: 21px;}
+    .search-input { flex: 1; border: 1.1px solid #cce6da; border-radius: 6px; padding: 7px 12px; font-size: 1rem; }
+    .search-btn { background: #30795b; color: #fff; border: none; border-radius: 6px; padding: 7px 16px; font-size: 1rem; cursor: pointer; font-weight: 600; }
+    .sidebar-titulo { color: #6a9080; font-size: 1.09rem; font-weight: 700; margin: 13px 0 9px 0; font-family: 'Roboto', sans-serif;}
+    .cat-list { list-style: none; padding: 0; margin: 0 0 13px 0;}
+    .cat-list li { margin-bottom: 6px;}
+    .cat-link { color: #30795b; text-decoration: none; font-size: 1.01rem;}
+    .cat-link:hover { text-decoration: underline;}
+    /* Detalhe SPA */
+    #detalhe-post {
+      display:none; max-width:790px; margin:38px auto 60px auto; background:#fff; border-radius:18px; box-shadow:0 4px 32px rgba(106,80,54,0.09); padding:46px 6vw 40px 6vw;
+    }
+    #detalhe-titulo { color: #30795b; font-family:'Playfair Display',serif; font-size:2.0rem; font-weight:700; text-align:left; margin:0 0 19px 0; }
+    #detalhe-cat { color: #9ac7b3; font-size: 1rem; font-weight: 600; margin-bottom: 14px;}
+    #detalhe-img { width: 100%; max-width: 550px; border-radius: 13px; object-fit:cover; box-shadow: 0 2px 8px rgba(106,80,54,0.09); margin-bottom:20px; display: block; }
+    #detalhe-body { color: #423d38; font-size: 1.15rem; margin-bottom:32px; text-align:left; line-height: 1.7;}
+    .btn-voltar { background: none; border: 2px solid #57643a; color: #57643a; border-radius: 8px; padding: 9px 24px; font-size: 1.07rem; font-weight: 600; cursor: pointer; transition: background .16s, color .16s; margin-top:10px;}
+    .btn-voltar:hover { background: #57643a; color:#fff; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-logo-central">
+      <img src="img/logo.png" alt="Consultório de Terapia Corporal Sistêmica" />
+      <span>Virlene Figueiredo</span>
+    </div>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="espaco.html">O Espaço</a></li>
+      <li><a href="servicos.html">Serviços</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contato.html">Contato</a></li>
+      <li id="li-perfil-login"><a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a></li>
+    </ul>
+  </nav>
+  <div class="banner-blog-card">Blog</div>
+  <div class="blog-container">
+    <main class="posts-main" id="posts-main">
+      <!-- Cards serão renderizados aqui -->
+    </main>
+    <aside class="sidebar">
+      <form class="search-bar" onsubmit="buscarBlog(event)">
+        <input type="text" class="search-input" id="blog-search" placeholder="O que você procura?">
+        <button class="search-btn" type="submit">Buscar</button>
+      </form>
+      <div class="sidebar-titulo">CATEGORIAS</div>
+      <ul class="cat-list" id="cat-list">
+        <!-- Categorias renderizadas via JS -->
+      </ul>
+    </aside>
+  </div>
+  <!-- Página Detalhada -->
+  <div id="detalhe-post">
+    <button class="btn-voltar" onclick="voltarParaBlog()">&larr; Voltar ao Blog</button>
+    <h1 id="detalhe-titulo">Título do Post</h1>
+    <div id="detalhe-cat"></div>
+    <img id="detalhe-img" src="" alt="" />
+    <div id="detalhe-body">Conteúdo detalhado aqui...</div>
+  </div>
+  <script>
+    let postsBlog = [];
+    let allCategories = [];
+    let isAdmin = false;
+    // Busca dados do blog do backend
+    fetch('getPostsBlog.php')
+      .then(res => res.json())
+      .then(data => {
+        postsBlog = data.posts;
+        allCategories = [...new Set(postsBlog.map(p => p.categoria))];
+        renderPosts(postsBlog);
+        renderCategories(allCategories);
+      });
+
+    // Checa se usuário logado é admin (para mostrar botões especiais)
+    fetch('getPerfil.php', { credentials: 'include' })
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(data => {
+        if (data.usuario && data.usuario.is_admin == 1) isAdmin = true;
+        if (data.usuario && data.usuario.nome) {
+          document.getElementById('li-perfil-login').innerHTML =
+            '<a href="perfil.html"><i class="fa-solid fa-user"></i> Perfil</a>';
+        } else {
+          document.getElementById('li-perfil-login').innerHTML =
+            '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+        }
+      }).catch(() => {
+        document.getElementById('li-perfil-login').innerHTML =
+          '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+      });
+
+    function renderPosts(lista) {
+      const main = document.getElementById('posts-main');
+      main.innerHTML = '';
+      if (!lista.length) {
+        main.innerHTML = '<p style="margin:46px 0; color:#a0522d; font-size:1.16rem;">Nenhum post encontrado.</p>';
+        return;
+      }
+      lista.forEach((post, idx) => {
+        main.innerHTML += `
+        <div class="post-card">
+          <img src="${post.imagem ? post.imagem : 'img/blog-placeholder.jpg'}" class="post-img" alt="${post.titulo}">
+          <div class="post-content">
+            <a href="#" class="post-title" data-idx="${idx}">${post.titulo}</a>
+            <div class="post-cat">Categoria: ${post.categoria}</div>
+            <div class="post-desc">${post.desc}</div>
+            <button class="btn-continuar" data-idx="${idx}">Continue Lendo</button>
+            ${isAdmin ? `<br>
+            <button class="btn-edit-admin" onclick="window.location.href='admin/blog.php?edit=${post.id}'">Editar</button>
+            <button class="btn-toggle-admin" onclick="togglePost(${post.id})">${post.publicado ? 'Arquivar' : 'Publicar'}</button>` : ''}
+          </div>
+        </div>`;
+      });
+      addPostsEvent(lista);
+    }
+
+    function addPostsEvent(lista) {
+      document.querySelectorAll('.btn-continuar, .post-title').forEach(btn => {
+        btn.onclick = function(e) {
+          e.preventDefault();
+          const idx = +btn.getAttribute('data-idx');
+          mostrarDetalhe(idx, lista);
+        };
+      });
+    }
+
+    function mostrarDetalhe(idx, lista) {
+      document.querySelector('.blog-container').style.display = 'none';
+      const post = (lista || postsBlog)[idx];
+      document.getElementById('detalhe-titulo').innerText = post.titulo;
+      document.getElementById('detalhe-cat').innerText = 'Categoria: ' + post.categoria;
+      document.getElementById('detalhe-img').src = post.imagem ? post.imagem : 'img/blog-placeholder.jpg';
+      document.getElementById('detalhe-img').alt = post.titulo;
+      document.getElementById('detalhe-body').innerHTML = post.conteudo;
+      document.getElementById('detalhe-post').style.display = 'block';
+      window.scrollTo({top:0});
+    }
+
+    function voltarParaBlog() {
+      document.getElementById('detalhe-post').style.display = 'none';
+      document.querySelector('.blog-container').style.display = 'flex';
+      window.scrollTo({top:0});
+    }
+
+    function renderCategories(cats) {
+      const catList = document.getElementById('cat-list');
+      catList.innerHTML = '';
+      cats.forEach(cat => {
+        catList.innerHTML += `<li><a href="#" class="cat-link" onclick="filtrarCategoria('${cat}')">${cat}</a></li>`;
+      });
+    }
+
+    function filtrarCategoria(cat) {
+      renderPosts(postsBlog.filter(p => p.categoria === cat));
+    }
+
+    function buscarBlog(e) {
+      e.preventDefault();
+      const termo = document.getElementById('blog-search').value.trim().toLowerCase();
+      if (!termo) {
+        renderPosts(postsBlog);
+        return;
+      }
+      renderPosts(postsBlog.filter(p => (
+        p.titulo.toLowerCase().includes(termo) ||
+        p.desc.toLowerCase().includes(termo) ||
+        p.categoria.toLowerCase().includes(termo) ||
+        (p.conteudo && p.conteudo.toLowerCase().includes(termo))
+      )));
+    }
+
+    // Admin: Publicar/Arquivar post sem recarregar página
+    function togglePost(postId) {
+      if (!confirm('Tem certeza que deseja alterar o status deste post?')) return;
+      fetch('admin/blog.php', {
+        method: 'POST',
+        headers: {'Content-Type':'application/x-www-form-urlencoded'},
+        body: 'toggle_id=' + encodeURIComponent(postId)
+      })
+      .then(res => res.text())
+      .then(() => location.reload());
+    }
+  </script>
+</body>
+</html>

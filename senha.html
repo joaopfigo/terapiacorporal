@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+      <link rel="icon" type="image/png" href="/favicon-transparente.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar Senha</title>
+  <style>
+    body { background: #f6f2ee; font-family: 'Roboto', Arial, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .container { background: #fff; border-radius: 18px; box-shadow: 0 4px 28px rgba(86,70,50,0.14); width: 100%; max-width: 370px; padding: 38px 32px 32px 32px; display: flex; flex-direction: column; align-items: center; }
+    h2 { color: #2c7b63; margin-bottom: 18px; }
+    .campo { width: 100%; margin-bottom: 16px; }
+    .campo input { width: 100%; padding: 10px; border-radius: 7px; border: 1px solid #dac9b7; font-size: 1rem; }
+    .botao { width: 100%; background: #2c7b63; color: #fff; border: none; border-radius: 7px; padding: 12px 0; font-size: 1.05rem; font-weight: bold; cursor: pointer; margin-bottom: 12px; }
+    .botao:hover { background: #175344; }
+    .mensagem { color: #d84c3d; margin-bottom: 10px; text-align: center; font-size: 1rem; }
+    .link { color: #2c7b63; font-weight: bold; text-decoration: none; }
+    .sucesso { color: #1a7c3a; margin-bottom: 10px; text-align: center; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Tela 1: Solicitação de email -->
+    <div id="tela-email">
+      <h2>Recuperar Senha</h2>
+      <div class="campo">
+        <input type="email" id="input-email" placeholder="Seu email cadastrado" required>
+      </div>
+      <button class="botao" id="btn-enviar">Enviar email de redefinição</button>
+      <div class="mensagem" id="mensagem-email"></div>
+      <a href="registrar.html" id="link-criar-conta" class="link" style="display:none;">Criar conta</a>
+      <a href="registrar.html" class="link">Voltar ao login</a>
+    </div>
+    <!-- Tela 2: Redefinir senha -->
+    <div id="tela-senha" style="display:none;">
+      <h2>Definir nova senha</h2>
+      <div class="campo">
+        <input type="password" id="nova-senha" placeholder="Nova senha" required>
+      </div>
+      <div class="campo">
+        <input type="password" id="confirma-senha" placeholder="Confirmar nova senha" required>
+      </div>
+      <button class="botao" id="btn-alterar">Alterar senha</button>
+      <div class="mensagem" id="mensagem-senha"></div>
+      <a href="registrar.html" class="link">Voltar ao login</a>
+    </div>
+    <div id="sucesso" class="sucesso" style="display:none;"></div>
+  </div>
+  <script>
+    // Função para alternar telas
+    function mostrarTelaSenha() {
+      document.getElementById('tela-email').style.display = 'none';
+      document.getElementById('tela-senha').style.display = 'block';
+    }
+    function mostrarTelaEmail() {
+      document.getElementById('tela-email').style.display = 'block';
+      document.getElementById('tela-senha').style.display = 'none';
+    }
+    // Verifica token na URL
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('token')) {
+      mostrarTelaSenha();
+    }
+    // Envio do email
+    document.getElementById('btn-enviar').onclick = function() {
+      const email = document.getElementById('input-email').value;
+      document.getElementById('mensagem-email').innerText = '';
+      fetch('esqueciSenha.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `email=${encodeURIComponent(email)}`
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          document.getElementById('mensagem-email').style.color = '#1a7c3a';
+          document.getElementById('mensagem-email').innerText = res.message;
+        } else {
+          document.getElementById('mensagem-email').style.color = '#d84c3d';
+          document.getElementById('mensagem-email').innerText = res.message || 'Erro ao enviar email.';
+          if(res.cadastro === false) {
+            document.getElementById('link-criar-conta').style.display = 'block';
+          }
+        }
+      });
+    };
+    // Redefinição da senha
+    if(document.getElementById('btn-alterar')){
+      document.getElementById('btn-alterar').onclick = function() {
+        const senha = document.getElementById('nova-senha').value;
+        const confirma = document.getElementById('confirma-senha').value;
+        const token = params.get('token');
+        if (senha !== confirma) {
+          document.getElementById('mensagem-senha').innerText = 'Senhas não coincidem.';
+          return;
+        }
+        fetch('resetSenha.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `token=${encodeURIComponent(token)}&senha=${encodeURIComponent(senha)}`
+        })
+        .then(res => res.json())
+        .then(res => {
+          if (res.success) {
+            document.getElementById('tela-senha').style.display = 'none';
+            document.getElementById('sucesso').style.display = 'block';
+            document.getElementById('sucesso').innerHTML = res.message + ' <a href="registrar.html" class="link">Clique aqui para voltar ao login.</a>';
+          } else {
+            document.getElementById('mensagem-senha').innerText = res.message || 'Erro ao trocar senha.';
+          }
+        });
+      };
+    }
+  </script>
+</body>
+</html>

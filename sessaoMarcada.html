@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+      <link rel="icon" type="image/png" href="/favicon-transparente.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sessão Agendada | Consultório de Terapia Corporal Sistêmica</title>
+  <style>
+    html, body {
+      width: 100%;
+      min-width: 0;
+      max-width: 100vw;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+    :root {
+      --cor-principal: #57643a;
+      --cor-secundaria: #e3decf;
+      --cor-destaque: #b79b63;
+      --cor-btn: #f9b233;
+      --fonte: 'Montserrat', Arial, sans-serif;
+    }
+    body {
+      margin: 0;
+      font-family: var(--fonte);
+      background: var(--cor-secundaria);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--cor-principal);
+      color: #fff;
+      padding: 0.8rem 3vw;
+      height: 96px;
+      min-height: 72px;
+      box-shadow: 0 2px 16px #0003;
+      z-index: 1000;
+    }
+    .navbar-logo-central span {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.52rem;
+      color: #fff2c6;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-left: 10px;
+      text-shadow: 0 2px 7px #b79b6350;
+      transition: color 0.18s;
+    }
+    .navbar-logo-central {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .navbar-logo-central img {
+      height: 200px;
+      width: auto;
+      max-width: 210px;
+      object-fit: contain;
+      display: block;
+      margin-right: 12px;
+    }
+    .navbar-menu {
+      display: flex;
+      gap: 1.4rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      align-items: center;
+    }
+    .navbar-menu a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: color 0.18s;
+    }
+    .navbar-menu a:hover {
+      color: #ffd970;
+    }
+    .navbar-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 2.2rem;
+      cursor: pointer;
+      margin-left: auto;
+    }
+    @media (max-width: 1050px) {
+  .navbar-menu {
+    position: fixed;
+    top: 72px;
+    right: 0;
+    width: 68vw;
+    max-width: 320px;
+    height: 100vh;
+    background: var(--cor-principal);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+    padding: 2.4rem 1.3rem;
+    box-shadow: -2px 0 18px #2222;
+    transform: translateX(110%);
+    transition: transform 0.28s;
+    z-index: 999;
+  }
+  .navbar-menu.open {
+    transform: translateX(0%);
+  }
+  .navbar-toggle {
+    display: block;
+    font-size: 2.2rem;
+  }
+  .navbar-menu a {
+    font-size: 1.2rem;
+    padding: 0.7rem 0;
+    width: 100%;
+    font-weight: 700;
+  }
+  .navbar-logo-central img {
+    height: 110px;
+    max-width: 120px;
+  }
+}
+
+    @media (max-width: 700px) {
+  .navbar { padding: 0.3rem 2vw; height: 54px; }
+  .navbar-logo-central img { height: 150px; max-width: 105px; }
+  .navbar-menu { gap: 0.6rem; padding: 1.2rem 2vw; top: 54px; }
+}
+    @media (max-width: 650px) {
+      .navbar-logo-central img {height: 82px;}
+    }
+    .main-content-confirmacao {
+      flex: 1 1 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 50vh;
+      padding: 6vw 0;
+    }
+    .confirm-card {
+      background: #fff8e7;
+      border-radius: 24px;
+      box-shadow: 0 4px 30px #29455c19;
+      padding: 42px 30px 33px 30px;
+      text-align: center;
+      max-width: 440px;
+      margin: 60px auto 40px auto;
+      border: 2.5px solid #b79b6377;
+      width: 96vw;
+    }
+    .confirm-card img {
+      width: 76px;
+      margin-bottom: 22px;
+      background: #e9f8f0;
+      border-radius: 50%;
+      box-shadow: 0 2px 10px #b79b6345;
+    }
+    .confirm-card h1 {
+      color: #57643a;
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+      margin: 0 0 15px 0;
+      letter-spacing: 0.01em;
+    }
+    .confirm-card p {
+      font-size: 1.19rem;
+      color: #60451a;
+      margin-bottom: 26px;
+      line-height: 1.65;
+      font-family: var(--fonte);
+    }
+    .btn-continue {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 13px 34px;
+      border-radius: 13px;
+      font-size: 1.13rem;
+      font-weight: bold;
+      background: var(--cor-principal);
+      color: #fff;
+      text-decoration: none;
+      transition: background 0.18s, color 0.18s;
+      border: none;
+      box-shadow: 0 2px 6px #57643a30;
+    }
+    .btn-continue:hover {
+      background: #b79b63;
+      color: #fff8e7;
+    }
+    .footer {
+      text-align: center;
+      background: var(--cor-principal);
+      color: #fff;
+      padding: 1.2rem;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      margin-top: 44px;
+    }
+
+    /* RESPONSIVO */
+    @media (max-width: 700px) {
+      .main-content-confirmacao {
+        padding: 0;
+      }
+      .confirm-card {
+        margin: 24px auto 26px auto;
+        padding: 26px 8vw 20px 8vw;
+        border-radius: 16px;
+        max-width: 98vw;
+        width: 99vw;
+      }
+      .confirm-card h1 {
+        font-size: 1.37rem;
+      }
+      .confirm-card p {
+        font-size: 1.02rem;
+      }
+      .btn-continue {
+        font-size: 0.96rem;
+        padding: 10px 17px;
+      }
+      .confirm-card img {
+        width: 57px;
+        margin-bottom: 16px;
+      }
+    }
+    @media (max-width: 420px) {
+      .confirm-card {
+        padding: 17px 2vw 11px 2vw;
+      }
+      .confirm-card h1 {
+        font-size: 1.04rem;
+      }
+      .confirm-card p {
+        font-size: 0.92rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-logo-central">
+      <img src="img/logo.png" alt="Consultório de Terapia Corporal Sistêmica" />
+      <span>Virlene Figueiredo</span>
+    </div>
+    <button class="navbar-toggle" aria-label="Abrir menu">&#9776;</button>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="espaco.html">O Espaço</a></li>
+      <li><a href="servicos.html">Serviços</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contato.html">Contato</a></li>
+      <li id="li-perfil-login"><a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a></li>
+    </ul>
+  </nav>
+
+  <main class="main-content-confirmacao">
+    <main class="main-content-confirmacao">
+  <!-- MENSAGEM PARA USUÁRIO LOGADO -->
+  <section class="confirm-card" id="card-logado" style="display:none;">
+    <img src="https://cdn-icons-png.flaticon.com/512/845/845646.png" alt="Sucesso">
+    <h1>Consulta requisitada com sucesso!</h1>
+    <p>
+      Sua consulta foi solicitada e agora aguarda <b>confirmação da massoterapeuta</b>.<br><br>
+      <b>Atenção:</b> Caso não esteja utilizando pacote ou seja sua primeira consulta após comprar um pacote, <b>o pagamento deverá ser feito no dia da consulta</b>.<br><br>
+      Você pode verificar o status da sua solicitação pela página de <a href="perfil.html" style="color:#57643a;text-decoration:underline;">Perfil</a>.<br>
+      Em caso de dúvidas, entre em contato pelo WhatsApp.
+    </p>
+    <a href="perfil.html" class="btn-continue"><i class="fa-solid fa-user"></i> Ir para o Perfil</a>
+  </section>
+  <!-- MENSAGEM PARA USUÁRIO NÃO LOGADO -->
+  <section class="confirm-card" id="card-guest" style="display:none;">
+    <img src="https://cdn-icons-png.flaticon.com/512/845/845646.png" alt="Sucesso">
+    <h1>Consulta requisitada com sucesso!</h1>
+    <p>
+      Sua consulta foi solicitada e agora aguarda <b>confirmação da massoterapeuta</b>.<br><br>
+      <b>Atenção:</b> Caso não esteja utilizando pacote ou seja sua primeira consulta após comprar um pacote, <b>o pagamento deverá ser feito no dia da consulta</b>.<br><br>
+      Você receberá um e-mail de confirmação assim que for aprovado.<br>
+      Em caso de dúvidas, entre em contato pelo WhatsApp.
+    </p>
+  </section>
+</main>
+  </main>
+
+  <footer class="footer">
+    <p>Consultório de Terapia Corporal Sistêmica</p>
+  </footer>
+  
+  <script>
+  // Menu responsivo sanduíche
+  const navbarToggle = document.querySelector('.navbar-toggle');
+  const navbarMenu = document.querySelector('.navbar-menu');
+  navbarToggle.addEventListener('click', () => {
+    navbarMenu.classList.toggle('open');
+  });
+  // Fechar menu ao clicar em um item
+  document.querySelectorAll('.navbar-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      navbarMenu.classList.remove('open');
+    });
+  });
+
+  // Troca "Perfil" ou "Login" no menu, conforme login
+  fetch('getPerfil.php', { credentials: 'include' })
+    .then(res => res.ok ? res.json() : Promise.reject())
+    .then(data => {
+      if (data.usuario && data.usuario.nome) {
+        // Usuário logado
+        document.getElementById('li-perfil-login').innerHTML =
+          '<a href="perfil.html"><i class="fa-solid fa-user"></i> Perfil</a>';
+        document.getElementById('card-logado').style.display = '';
+        document.getElementById('card-guest').style.display = 'none';
+      } else {
+        // Não logado
+        document.getElementById('li-perfil-login').innerHTML =
+          '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+        document.getElementById('card-logado').style.display = 'none';
+        document.getElementById('card-guest').style.display = '';
+      }
+    })
+    .catch(() => {
+      // Não logado ou erro de sessão
+      document.getElementById('li-perfil-login').innerHTML =
+        '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+      document.getElementById('card-logado').style.display = 'none';
+      document.getElementById('card-guest').style.display = '';
+    });
+</script>
+
+</body>
+</html>
+

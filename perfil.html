@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+      <link rel="icon" type="image/png" href="/favicon-transparente.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil | Consultório de Terapia Corporal Sistêmica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cor-principal: #57643a;
+      --cor-destaque: #f7e6bc;
+      --cor-fundo: #fcfaf7;
+      --cor-box: #fff;
+      --cor-btn: #6A5036;
+      --cor-btn-hover: #8b6f4e;
+      --cor-status-pendente: #c79b2c;
+      --cor-status-confirmada: #44a24b;
+      --cor-status-cancelada: #d95e4b;
+      --cor-anamnese: #a04eb7;
+    }
+    body {
+      background: var(--cor-fundo);
+      margin: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      color: #222;
+      font-size: 1.08rem;
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--cor-principal);
+      color: #fff;
+      padding: 0.4rem 2vw;
+      height: 72px;
+      min-height: 60px;
+      position: relative;
+      z-index: 1000;
+    }
+    .navbar-logo-central span {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.52rem;
+      color: #fff2c6;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-left: 10px;
+      text-shadow: 0 2px 7px #b79b6350;
+      transition: color 0.18s;
+    }
+
+    /* LOGO CENTRAL */
+    .navbar-logo-central {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .navbar-logo-central img {
+      height: 200px; /* Aqui aumentei um pouco a logo, ajuste conforme seu gosto, mas sem passar de 72px */
+      width: auto;
+      max-width: 210px;
+      object-fit: contain;
+      display: block;
+      margin-right: 12px;
+    }
+
+    /* MENU */
+    .navbar-menu {
+      display: flex;
+      gap: 1.4rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      align-items: center;
+    }
+
+    .navbar-menu a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: color 0.18s;
+    }
+    .navbar-menu a:hover {
+      color: #ffd970;
+    }
+
+    /* Botão do menu sanduíche só aparece em telas pequenas */
+    .navbar-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 2.2rem;
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    /* RESPONSIVO */
+    @media (max-width: 1050px) {
+      .navbar-menu {
+        position: fixed;
+        top: 72px;
+        right: 0;
+        width: 68vw;
+        max-width: 320px;
+        height: 100vh;
+        background: var(--cor-principal);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.2rem;
+        padding: 2.4rem 1.3rem;
+        box-shadow: -2px 0 18px #2222;
+        transform: translateX(110%);
+        transition: transform 0.28s;
+        z-index: 999;
+      }
+      .navbar-menu.open {
+        transform: translateX(0%);
+      }
+      .navbar-toggle {
+        display: block;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .navbar { padding: 0.3rem 2vw; height: 54px; }
+      .navbar-logo-central img { height: 150px; max-width: 105px; }
+      .navbar-menu { gap: 0.6rem; padding: 1.2rem 2vw; top: 54px; }
+    }
+    .banner-terra {
+    max-width: 660px;
+    margin: 38px auto 32px auto;
+    background: linear-gradient(90deg, #6A5036 0%, #44331E 100%);
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    border-radius: 19px;
+    padding: 31px 0 21px 46px;
+    box-shadow: 0 5px 38px rgba(106,80,54,0.10);
+    border-left: 6px solid #e4c7a6;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    }
+    @media (max-width: 800px) {
+    .banner-terra { font-size: 1.22rem; padding: 18px 0 13px 18px; }
+    }
+
+    .perfil-container {
+      max-width: 740px;
+      background: var(--cor-box);
+      margin: 34px auto 48px auto;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(106,80,54,0.09);
+      padding: 36px 3vw 32px 3vw;
+    }
+    .perfil-info {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+    .perfil-avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #e4f1e6;
+      box-shadow: 0 2px 18px rgba(48,121,91,0.12);
+    }
+    .perfil-dados {
+      flex: 1;
+      min-width: 240px;
+    }
+    .perfil-nome {
+      font-size: 1.36rem;
+      font-weight: 700;
+      color: var(--cor-principal);
+      font-family: 'Playfair Display', serif;
+    }
+    .perfil-email { color: #444; margin-top: 5px; margin-bottom: 7px; }
+    .perfil-editar {
+      padding: 5px 11px;
+      font-size: 1rem;
+      border-radius: 50%;
+      width: 44px; height: 44px;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+    }
+    .status-sessoes {
+      margin-bottom: 28px;
+      padding: 16px 18px;
+      background: #f9f6f1;
+      border-radius: 13px;
+      box-shadow: 0 2px 12px rgba(106,80,54,0.06);
+      color: #423d38;
+    }
+    .sessoes-lista {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 17px;
+    }
+    .sessao-card {
+      background: #f8f6f2;
+      border-radius: 13px;
+      box-shadow: 0 1px 6px rgba(106,80,54,0.07);
+      padding: 17px 18px 13px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      border-left: 5px solid #e4c7a6;
+      transition: box-shadow .13s;
+      position: relative;
+    }
+    .sessao-card:hover {
+      box-shadow: 0 5px 18px rgba(48,121,91,0.12);
+    }
+    .sessao-info {
+      flex: 1;
+    }
+    .sessao-tratamento {
+      font-size: 1.11rem;
+      color: var(--cor-btn);
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+    }
+    .sessao-data {
+      font-size: 0.99rem;
+      color: #4e4360;
+      margin-bottom: 3px;
+    }
+    .sessao-status {
+      font-size: 0.97rem;
+      font-weight: bold;
+      border-radius: 6px;
+      padding: 3px 13px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+    .status-pendente {
+      background: #fcf3d4;
+      color: var(--cor-status-pendente);
+      border: 1.2px solid #e3ce95;
+    }
+    .status-confirmada {
+      background: #e0f6e3;
+      color: var(--cor-status-confirmada);
+      border: 1.2px solid #74d295;
+    }
+    .status-cancelada {
+      background: #ffe7e1;
+      color: var(--cor-status-cancelada);
+      border: 1.2px solid #efbfb5;
+    }
+    .icon-anamnese {
+      font-size: 1.43rem;
+      color: var(--cor-anamnese);
+      margin-left: 9px;
+      vertical-align: -2px;
+    }
+    .historico-title {
+      font-size: 1.15rem;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      color: var(--cor-principal);
+      margin: 37px 0 10px 0;
+    }
+    .nenhuma-sessao {
+      color: #bca870;
+      font-size: 1.08rem;
+      margin-top: 15px;
+    }
+    /* Página Detalhe da Sessão */
+    #detalhe-sessao {
+      display: none;
+      max-width: 700px;
+      margin: 38px auto 60px auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 32px rgba(106,80,54,0.09);
+      padding: 46px 6vw 40px 6vw;
+    }
+    #detalhe-titulo {
+      color: var(--cor-btn);
+      font-family:'Playfair Display',serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 0 0 19px 0;
+    }
+    #detalhe-formulario, #detalhe-anamnese {
+      background: #fcfaf7;
+      border-radius: 13px;
+      box-shadow: 0 0px 0px 1.5px #f2f0ea;
+      padding: 18px 15px 14px 15px;
+      margin-bottom: 21px;
+    }
+    #detalhe-formulario label, #detalhe-anamnese label {
+      font-weight: 700;
+      color: #30795b;
+      font-size: 1.06rem;
+    }
+    #detalhe-formulario .valor, #detalhe-anamnese .valor {
+      color: #423d38;
+      font-size: 1.04rem;
+      margin-bottom: 9px;
+      display: block;
+    }
+    .btn-voltar {
+      background: #ede6c6;
+      color: #6A5036;
+      border: none;
+      border-radius: 7px;
+      padding: 10px 27px;
+      font-size: 1.09rem;
+      font-weight: 700;
+      cursor: pointer;
+      float: right;
+      margin-left: 15px;
+    }
+    .btn-voltar:hover {
+      background: #e2d6b8;
+    }
+    @media (max-width: 900px) {
+      .perfil-container, #detalhe-sessao { max-width: 98vw; padding: 14px 2vw 18px 2vw; }
+      .perfil-avatar { width: 80px; height: 80px; }
+    }
+    .botao-upload {
+      display: block;
+      background-color: #ede6c6;
+      color: #6A5036;
+      margin: 12px auto 0 auto;
+      padding: 0.5rem 1.1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    .botao-upload:hover {
+      background: #e3ce95;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.4);
+      display: flex;  /* O padrão é sumido */
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 420px;
+      width: 92vw;
+      box-shadow: 0 0 30px #0004;
+    }
+    .avatar-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 120px;
+    }
+    .perfil-editar, .perfil-logout {
+      margin-right: 12px;
+      margin-top: 14px;
+    }
+    @media (max-width: 700px) {
+      .perfil-editar, .perfil-logout {
+        display: block;
+        margin: 10px 0 0 0;
+        width: 100%;
+      }
+    }
+    #modal-editar { display: none; }
+    .perfil-nome { font-size: 1.45rem; font-weight: 700; color: var(--cor-principal); font-family: 'Playfair Display', serif;}
+    .perfil-email { color: #444; margin: 6px 0 7px 0; font-size: 1.12rem;}
+    #perfil-idade { color: #706c66; font-size: 1.05rem; margin-bottom: 5px;}
+    .perfil-dados { display: flex; flex-direction: column; gap: 2px; }
+    .perfil-acoes {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .perfil-editar, .perfil-logout {
+      background: #f6f2e3;
+      color: var(--cor-principal);
+      border: none;
+      border-radius: 7px;
+      padding: 7px 13px;
+      font-size: 1.23rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.19s;
+      box-shadow: 0 1px 4px #bbb1;
+    }
+    .perfil-editar:hover, .perfil-logout:hover {
+      background: #f7e6bc;
+      color: #634d25;
+    }
+    @media (max-width: 700px) {
+      .perfil-acoes { gap: 7px; }
+      .perfil-editar, .perfil-logout { width: 44px; height: 44px; padding: 0; font-size: 1.12rem; }
+    }
+    .perfil-upload-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin: 10px 0 0 0;
+    }
+  </style>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-logo-central">
+      <img src="img/logo.png" alt="Consultório de Terapia Corporal Sistêmica" />
+      <span>Virlene Figueiredo</span>
+    </div>
+    <button class="navbar-toggle" aria-label="Abrir menu">&#9776;</button>
+    <ul class="navbar-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="espaco.html">O Espaço</a></li>
+      <li><a href="servicos.html">Serviços</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contato.html">Contato</a></li>
+      <li id="li-perfil-login"><a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a></li>
+      <li><a href="registrar.html" onclick="logout()">Sair</a></li>
+    </ul>
+  </nav>
+  <div class="banner-terra">Meu Perfil</div>
+
+  <div class="perfil-container" id="perfil-area">
+    <div class="perfil-info">
+      <div class="avatar-area">
+        <img src="img/avatar-user.jpg" class="perfil-avatar" alt="Usuário">
+        <label for="upload-foto" class="botao-upload">Carregar imagem</label>
+        <input type="file" id="upload-foto" accept="image/*" style="display: none;">
+        <label for="upload-foto-camera" class="botao-upload">Tirar foto</label>
+        <input type="file" id="upload-foto-camera" accept="image/*" capture="environment" style="display: none;">
+
+      </div>
+      <div class="perfil-dados">
+        <p class="perfil-nome" id="perfil-nome">--</p>
+        <p class="perfil-email" id="perfil-email">--</p>
+        <p id="perfil-idade" style="display: none !important;">--</p>
+
+        <div class="perfil-acoes">
+          <button class="perfil-editar" title="Editar dados">
+            <i class="fa-regular fa-pen-to-square"></i>
+          </button>
+          <button class="perfil-logout" onclick="logout()" title="Encerrar sessão">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+    <div id="pacote-info" style="margin-bottom:22px;font-size:1.14rem;color:#7a650f;"></div>
+    <div class="status-sessoes" id="status-sessoes">
+      <b>Sessão Agendada:</b><br>
+      <div class="sessoes-lista" id="proximas-sessoes"></div>
+    </div>
+    <div class="historico-title">Histórico de Consultas</div>
+    <div class="sessoes-lista" id="historico-sessoes"></div>
+  </div>
+
+  <!-- Modal Editar Perfil -->
+  <div id="modal-editar" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+      <h3>Editar Perfil</h3>
+      <label>
+        Nome:
+        <input type="text" id="editar-nome">
+      </label><br>
+      <label>
+        Email:
+        <input type="email" id="editar-email">
+      </label><br>
+      <label>
+        Data de nascimento:
+        <input type="date" id="editar-nascimento">
+      </label><br>
+      <label>
+        Telefone:
+        <input type="text" id="editar-telefone">
+      </label><br>
+      <label>
+        Sexo:
+        <select id="editar-sexo">
+          <option value="">Não informar</option>
+          <option value="Feminino">Feminino</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </label><br>
+      <button onclick="salvarEdicao()">Salvar</button>
+      <button onclick="fecharModal()">Cancelar</button>
+    </div>
+  </div>
+  <div id="feedback-msg" style="display:none;position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#88c275;padding:13px 29px;font-size:1.2rem;color:#fff;border-radius:9px;z-index:99999;box-shadow:0 2px 22px #2224;"></div>
+
+
+  <!-- Detalhe da sessão (abre como SPA) -->
+  <div id="detalhe-sessao">
+    <button class="btn-voltar" onclick="voltarParaPerfil()">&larr; Voltar ao Perfil</button>
+    <h1 id="detalhe-titulo">Detalhes da Sessão</h1>
+    <div id="detalhe-formulario"></div>
+    <div id="detalhe-anamnese"></div>
+  </div>
+
+  <script>
+    let sessoes = [];
+    let usuario = {};
+    // Preenche dados usuário
+    fetch("getPerfil.php")
+      .then(res => res.json())
+      .then(data => {
+        usuario = data.usuario;
+
+        document.querySelector("#perfil-nome").textContent = usuario.nome || "";
+        document.querySelector("#perfil-email").textContent = usuario.email || "";
+        document.querySelector(".perfil-avatar").src = usuario.foto || "img/avatar-user.jpg";
+        if (usuario.nascimento) {
+          const nascimento = new Date(usuario.nascimento);
+          const hoje = new Date();
+          let idade = hoje.getFullYear() - nascimento.getFullYear();
+          if (
+            hoje.getMonth() < nascimento.getMonth() ||
+            (hoje.getMonth() === nascimento.getMonth() && hoje.getDate() < nascimento.getDate())
+          ) {
+            idade--;
+          }
+          document.getElementById("perfil-idade").textContent = idade + " anos";
+        } else {
+          document.getElementById("perfil-idade").textContent = "--";
+        }
+
+        const pacote = data.pacote;
+        if (pacote && pacote.total > 0) {
+          document.getElementById('pacote-info').innerHTML =
+            `Você possui <b>${pacote.disponiveis}</b> de ${pacote.total} sessões do pacote disponíveis.`;
+        } else {
+          document.getElementById('pacote-info').innerHTML =
+            `Você não possui pacotes ativos. <a href="pacotes.php" style="color:#b48c1a;text-decoration:underline;">Clique aqui para comprar um pacote.</a>`;
+        }
+
+        const sessoes = data.sessoes;
+        renderProximasSessoes(sessoes);
+        renderHistoricoSessoes(sessoes);
+        const divProximas = document.getElementById("proximas-sessoes");
+        const divHistorico = document.getElementById("historico-sessoes");
+        divProximas.innerHTML = "";
+        divHistorico.innerHTML = "";
+
+        if (!sessoes.some(sessao => {
+            const data = new Date(sessao.data_horario || sessao.data || sessao.data_inicio);
+            return data > new Date();
+        })) {
+          document.getElementById("proximas-sessoes").innerHTML = `
+            <p>Nenhuma sessão agendada.<br>
+            <a href="agendamento.php" style="color:#b48c1a;text-decoration:underline;cursor:pointer;">Clique aqui para agendar uma consulta.</a>
+            </p>`;
+        }
+        
+
+        sessoes.forEach(sessao => {
+          const data = new Date(sessao.data_horario);
+          const agora = new Date();
+          const destino = data > agora ? divProximas : divHistorico;
+
+          const card = document.createElement("div");
+          card.classList.add("sessao-card");
+          card.innerHTML = `
+            <b>${sessao.tratamento}</b><br>
+            ${data.toLocaleString()} - ${sessao.duracao} min
+            ${sessao.status ? `<br>Status: ${sessao.status}` : ""}
+            ${sessao.reclamacao ? `<br><small>Queixa: ${sessao.reclamacao.sintomas} (${sessao.reclamacao.intensidade})</small>` : ""}
+            ${sessao.anamnese ? `<br><small>Anamnese: ${sessao.anamnese.geral}</small>` : ""}
+          `;
+          destino.appendChild(card);
+        });
+      })
+      .catch(err => console.error("Erro ao carregar perfil:", err));
+
+    // Próximas sessões (só mostra as não concluídas/canceladas)
+    function renderProximasSessoes(listaSessoes = sessoes) {
+      const lista = document.getElementById('proximas-sessoes');
+      lista.innerHTML = '';
+      // Verifica sessões futuras
+      const futuras = (listaSessoes || []).filter(s =>
+        s.status !== 'Cancelada' &&
+        new Date(s.data_horario || s.data || s.data_inicio) >= new Date()
+      );
+      if (!futuras.length) {
+        lista.innerHTML = `
+          <p>Nenhuma sessão agendada.<br>
+          <a href="agendamento.php" style="color:#b48c1a;text-decoration:underline;cursor:pointer;">Clique aqui para agendar uma consulta.</a>
+          </p>
+        `;
+        return;
+      }
+      futuras.forEach(sessao => {
+        const data = new Date(sessao.data_horario || sessao.data || sessao.data_inicio);
+        lista.innerHTML += `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">
+          <div class="sessao-info">
+            <div class="sessao-tratamento">${sessao.tratamento}</div>
+            <div class="sessao-data">${formataData(data.toISOString().slice(0,16).replace('T', ' '))}</div>
+            <span class="sessao-status ${statusClass(sessao.status)}">${sessao.status}</span>
+            ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
+          </div>
+        </div>`;
+      });
+    }
+    // Histórico de sessões (todas, exceto futuras agendadas)
+    function renderHistoricoSessoes() {
+      const lista = document.getElementById('historico-sessoes');
+      lista.innerHTML = '';
+      // Só mostra sessões confirmadas ou canceladas (nunca pendentes)
+      const passadas = sessoes.filter(s =>
+        (s.status === 'Confirmada' || s.status === 'Cancelada')
+      );
+      if (!passadas.length) {
+        lista.innerHTML = '<div class="nenhuma-sessao">Nenhuma sessão anterior encontrada.</div>';
+        return;
+      }
+      passadas.forEach(sessao => {
+        lista.innerHTML += `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">
+          <div class="sessao-info">
+            <div class="sessao-tratamento">${sessao.tratamento}</div>
+            <div class="sessao-data">${formataData(sessao.data)}</div>
+            <span class="sessao-status ${statusClass(sessao.status)}">${sessao.status}</span>
+            ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
+          </div>
+        </div>`;
+      });
+    }
+
+    function statusClass(status) {
+      if (status === 'Pendente') return 'status-pendente';
+      if (status === 'Confirmada') return 'status-confirmada';
+      if (status === 'Cancelada') return 'status-cancelada';
+      return '';
+    }
+
+    function formataData(dt) {
+      // Espera: "2024-06-04 14:00"
+      const dataObj = new Date(dt.replace(" ", "T"));
+      return dataObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+        " às " +
+        dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Mostra detalhes da sessão selecionada (SPA)
+    function abrirSessao(id) {
+      const s = sessoes.find(sessao => sessao.id === id);
+      document.getElementById('perfil-area').style.display = 'none';
+      document.getElementById('detalhe-sessao').style.display = 'block';
+      document.getElementById('detalhe-titulo').innerText = `Detalhes da Sessão - ${s.tratamento}`;
+      // Formulário de queixas (se houver)
+      if (s.reclamacao) {
+        document.getElementById('detalhe-formulario').innerHTML = `
+          <label>Formulário de Queixas:</label>
+          <div class="valor"><b>Sintomas:</b> ${s.reclamacao.sintomas}</div>
+          <div class="valor"><b>Tempo de sintomas:</b> ${s.reclamacao.tempo}</div>
+          <div class="valor"><b>Intensidade:</b> ${s.reclamacao.intensidade}</div>
+          <div class="valor"><b>Tratamento já realizado:</b> ${s.reclamacao.tratamento}</div>
+        `;
+      } else {
+        document.getElementById('detalhe-formulario').innerHTML = `<label>Formulário de Queixas:</label><div class="valor">Não preenchido.</div>`;
+      }
+      // Anamnese (se houver)
+      if (s.anamnese) {
+        document.getElementById('detalhe-anamnese').innerHTML = `
+          <label>Anamnese da Sessão:</label>
+          <div class="valor"><b>Resumo:</b> ${s.anamnese.geral}</div>
+          <div class="valor"><b>Orientações:</b> ${s.anamnese.orientacoes}</div>
+        `;
+        // Marca como visualizada (poderia ser atualizado no backend)
+        s.visualizada = true;
+      } else {
+        document.getElementById('detalhe-anamnese').innerHTML = `<label>Anamnese da Sessão:</label><div class="valor">Ainda não disponível.</div>`;
+      }
+    }
+
+    // Retorna do detalhe ao perfil principal
+    function voltarParaPerfil() {
+      document.getElementById('detalhe-sessao').style.display = 'none';
+      document.getElementById('perfil-area').style.display = 'block';
+      renderProximasSessoes(sessoes);
+      renderHistoricoSessoes(sessoes);
+    }
+
+        // Menu responsivo sanduíche
+    const navbarToggle = document.querySelector('.navbar-toggle');
+    const navbarMenu = document.querySelector('.navbar-menu');
+    navbarToggle.addEventListener('click', () => {
+      navbarMenu.classList.toggle('open');
+    });
+    // Fechar menu ao clicar em um item
+    document.querySelectorAll('.navbar-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        navbarMenu.classList.remove('open');
+      });
+    });
+
+    function uploadFotoPerfil(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      // Mostra preview imediato
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.querySelector('.perfil-avatar').src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      // Redimensiona e envia para backend
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        const max = 320;
+        let w = img.width, h = img.height;
+        if (w > h && w > max) { h *= max / w; w = max; }
+        else if (h > w && h > max) { w *= max / h; h = max; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(blob => {
+          const formData = new FormData();
+          formData.append('foto', blob, file.name);
+          fetch('uploadFoto.php', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+              if (data.sucesso) {
+                document.querySelector('.perfil-avatar').src = data.foto + '?v=' + Date.now();
+                showFeedback('Foto de perfil atualizada com sucesso!');
+              } else {
+                showFeedback('Erro ao enviar a foto', true);
+              }
+            });
+        }, 'image/jpeg', 0.84);
+      };
+      img.src = URL.createObjectURL(file);
+    }
+
+
+    // Eventos
+    document.getElementById('upload-foto').addEventListener('change', function() { uploadFotoPerfil(this); });
+    document.getElementById('upload-foto-camera').addEventListener('change', function() { uploadFotoPerfil(this); });
+
+
+    document.querySelector('.perfil-editar').addEventListener('click', () => {
+      document.getElementById('modal-editar').style.display = 'flex';
+      document.getElementById('editar-nome').value = usuario.nome || "";
+      document.getElementById('editar-email').value = usuario.email || "";
+      document.getElementById('editar-nascimento').value = usuario.nascimento || "";
+      document.getElementById('editar-telefone').value = usuario.telefone || "";
+      document.getElementById('editar-sexo').value = usuario.sexo || "";
+    });
+
+
+    // Para fechar o modal
+    function fecharModal() {
+      document.getElementById('modal-editar').style.display = 'none';
+    }
+
+
+    function salvarEdicao() {
+      const formData = new FormData();
+      formData.append('nome', document.getElementById('editar-nome').value);
+      formData.append('email', document.getElementById('editar-email').value);
+      formData.append('telefone', document.getElementById('editar-telefone').value);
+      formData.append('nascimento', document.getElementById('editar-nascimento').value); // Certo: nascimento
+      formData.append('sexo', document.getElementById('editar-sexo').value);
+
+      fetch('atualizarPerfil.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.sucesso) {
+          fecharModal();
+          // Atualiza imediatamente os campos visuais
+          document.getElementById("perfil-nome").textContent = document.getElementById('editar-nome').value;
+          document.getElementById("perfil-email").textContent = document.getElementById('editar-email').value;
+
+          // Atualiza idade
+          const nasc = document.getElementById('editar-nascimento').value;
+          if (nasc) {
+            const nascimento = new Date(nasc);
+            const hoje = new Date();
+            let idade = hoje.getFullYear() - nascimento.getFullYear();
+            if (
+              hoje.getMonth() < nascimento.getMonth() ||
+              (hoje.getMonth() === nascimento.getMonth() && hoje.getDate() < nascimento.getDate())
+            ) {
+              idade--;
+            }
+            document.getElementById("perfil-idade").textContent = idade + " anos";
+          } else {
+            document.getElementById("perfil-idade").textContent = "--";
+          }
+
+          // Atualiza o objeto usuario (sincroniza sexo etc.)
+          usuario.nome = document.getElementById('editar-nome').value;
+          usuario.email = document.getElementById('editar-email').value;
+          usuario.telefone = document.getElementById('editar-telefone').value;
+          usuario.nascimento = nasc;
+          usuario.sexo = document.getElementById('editar-sexo').value;
+
+          showFeedback("Dados salvos com sucesso!");
+        } else {
+          showFeedback("Erro ao salvar!", true);
+        }
+      });
+    }
+
+    function showFeedback(msg, erro = false) {
+      let el = document.getElementById('feedback-msg');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'feedback-msg';
+        el.style.cssText = 'display:none;position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#3b9855;padding:14px 32px;font-size:1.1rem;color:#fff;border-radius:8px;z-index:99999;box-shadow:0 3px 20px #2225;';
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      el.style.background = erro ? '#c33' : '#3b9855';
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 2100);
+    }
+    function logout() {
+      fetch("logout.php")
+        .then(() => window.location.href = "registrar.html");
+    }
+    // Mostra pacote de sessões
+// Mostra pacote de sessões do usuário (consultando no backend)
+fetch('getPacoteUsuario.php')
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('pacote-info').innerHTML = 
+      data.sessoes_restantes > 0
+        ? `<b>Você tem ${data.sessoes_restantes} sessão(ões) de pacote disponível(is).</b>`
+        : `Você não possui sessões de pacote disponíveis. <a href="pacotes.php" style="color:#b79b63;text-decoration:underline;">Adquira um pacote!</a>`;
+  });
+
+  </script>
+
+</body>
+</html>
