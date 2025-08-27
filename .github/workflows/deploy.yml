@@ -22,6 +22,7 @@ jobs:
           local-dir: ./
           # MUITO IMPORTANTE: não tocar nos uploads/imagens e em itens sensíveis
           exclude: |
+            **/.git/**
             **/.git*
             **/.github/**
             **/node_modules/**
