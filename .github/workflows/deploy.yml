@@ -6,37 +6,29 @@ on:
       - main
 
 jobs:
-  deploy:
+  ftp-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
     steps:
-      - name: Checkout
+      - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: FTP Deploy
+      - name: Enviar para Hostinger (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
-          server-dir: ${{ secrets.REMOTE_DIR }}/
-          local-dir: ./
+          server-dir: ${{ secrets.REMOTE_DIR }}
+          local-dir: ./  # envia tudo do repo
           exclude: |
-            **/.git/**
             **/.git*
             **/.github/**
             **/node_modules/**
             **/vendor/**
             **/PHPMailer-master/**
-            **/.vs/**
             **/.vscode/**
             **/*.sql
             **/*.zip
             **/.env
             **/*.log
-            **/uploads/**
-            **/img/**
-          log-level: verbose
