@@ -1,3 +1,4 @@
+<!-- deploy-test: 2025-08-27 -->
 <?php
 session_start();
 // Proteção: só terapeuta pode acessar
