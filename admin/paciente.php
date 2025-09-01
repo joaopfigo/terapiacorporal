@@ -34,6 +34,7 @@ while ($row = $res_agds->fetch_assoc()) {
     $ids_agendamentos[] = $row['id'];
 }
 $stmt_agds->close();
+$ultimo_agendamento_id = $ids_agendamentos ? max($ids_agendamentos) : 0;
 $anamneses = [];
 if ($ids_agendamentos) {
     $in = implode(',', array_map('intval', $ids_agendamentos));
@@ -59,46 +60,7 @@ if ($row = $res->fetch_assoc()) {
 <!DOCTYPE html>
 <html lang='pt-br'>
 <head>
-<meta charset='UTF-8'>
-<title>Paciente: <?= htmlspecialchars($pac['nome']) ?></title>
-<style>
-  body { font-family:Roboto,Arial,sans-serif; background:#f6f6fa; margin:0; }
-  .container { max-width:900px; margin:33px auto 0 auto; background:#fff; border-radius:18px; box-shadow:0 2px 32px #0001; padding:35px 3vw 33px 3vw; }
-  .h2-paciente { color:#30795b; font-size:2rem; font-family:Playfair Display,serif; }
-  .subtitulo { color:#444; font-size:1.17rem; margin:12px 0 3px 0; }
-  .dados { background:#f3f6f1; border-radius:8px; padding:19px 16px; margin-bottom:21px; font-size:1.03rem; }
-  .table-consultas { width:100%; border-collapse:collapse; margin-top:28px; }
-  .table-consultas th,.table-consultas td { border-bottom:1px solid #ece3d3; padding:11px 7px; text-align:left; }
-  .table-consultas th { background:#e7f0e6; color:#2c6246; font-size:1.05rem; }
-  .table-consultas tr:hover { background:#f4f8f7; }
-  .anamnese-form { margin-top:40px; background:#f8f5ea; border-radius:13px; padding:24px 18px; }
-  .anamnese-form textarea { width:99%; min-height:80px; resize:vertical; border-radius:6px; border:1px solid #ccc; padding:9px; }
-  .anamnese-form label { display:block; font-weight:600; margin-bottom:6px; color:#5c563f; }
-  .anamnese-form button { background:#30795b; color:#fff; padding:8px 24px; border-radius:7px; font-size:1rem; font-weight:600; border:none; margin-top:8px; cursor:pointer; }
-  .bloco-anamnese { background:#f4f4f7; border-radius:8px; padding:14px 14px 11px 14px; margin:15px 0; }
-</style>
-</head>
-<body>
-<div class='container'>
-  <h2 class='h2-paciente'>Paciente: <?= htmlspecialchars($pac['nome']) ?></h2>
-  <div class='dados'>
-    <strong>Email:</strong> <?= htmlspecialchars($pac['email']) ?> <br>
-    <strong>Telefone:</strong> <?= htmlspecialchars($pac['telefone']) ?> <br>
-    <strong>Nascimento:</strong> <?= htmlspecialchars($pac['nascimento']) ?> <br>
-    <strong>Sexo:</strong> <?= htmlspecialchars($pac['sexo']) ?> <br>
-    <div style="margin-top:10px;">
-      <strong>Pacote atual:</strong>
-      <span id="pacote-atual-text">
-        <?php if ($pacote_atual) {
-            $restantes = $pacote_atual['total_sessoes'] - $pacote_atual['sessoes_usadas'];
-            if ($restantes < 0) $restantes = 0;
-            echo $restantes . ' de ' . $pacote_atual['total_sessoes'] . ' sessões restantes';
-        } else {
-            echo 'Nenhum pacote ativo';
-        } ?>
-      </span>
-      <button id="btn-add-pacote" style="margin-left:10px;padding:4px 12px;background:#30795b;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.9rem;">Adicionar pacote</button>
-    </div>
+@@ -102,79 +103,79 @@ if ($row = $res->fetch_assoc()) {
   </div>
 
   <div class='subtitulo'>Histórico de Consultas</div>
@@ -124,7 +86,7 @@ if ($row = $res->fetch_assoc()) {
       <button onclick="toggleFormulario(<?= $agendamento_id ?>)" title="Ver formulário de queixa" style="background:none;border:none;cursor:pointer;font-size:1.2rem;">
         📋
       </button>
-@@ -101,57 +129,85 @@ if ($ids_agendamentos) {
+    <?php else: ?>
       <span title="Sem formulário">&mdash;</span>
     <?php endif; ?>
   </td>
@@ -152,7 +114,7 @@ if ($row = $res->fetch_assoc()) {
 </table>
   <div class='subtitulo' style='margin-top:40px;'>Anamnese</div>
   <form class='anamnese-form' method='post' action='salvarAnamnese.php'>
-    <input type='hidden' name='usuario_id' value='<?= $id_paciente ?>'>
+    <input type='hidden' name='agendamento_id' value='<?= $ultimo_agendamento_id ?>'>
     <label for='anamnese'>Preencher/Atualizar Anamnese:</label>
     <textarea name='anamnese' required></textarea>
     <button type='submit'>Salvar Anamnese</button>
@@ -176,7 +138,6 @@ if ($row = $res->fetch_assoc()) {
     <div style="margin-top:15px;"><button onclick="fecharModal()" style="padding:4px 12px;">Cancelar</button></div>
   </div>
 </div>
-
 <script>
 function toggleFormulario(id){
   const row = document.getElementById('formulario-' + id);
