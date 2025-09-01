@@ -31,9 +31,9 @@ $usuario = [
 ];
 
 // 3. Busca agendamentos do usuário (sessões)
-$sql = "SELECT ag.id, e.nome as servico, ag.data_horario, ag.duracao, ag.adicional_reflexo, ag.status,
+$sql = "SELECT ag.id, e.nome AS servico, ag.data_horario, ag.duracao, ag.adicional_reflexo, ag.status,
                fq.desconforto_principal, fq.tempo_desconforto, fq.classificacao_dor, fq.tratamento_medico,
-               an.resumo, an.orientacoes
+               an.anamnese
         FROM agendamentos ag
         JOIN especialidades e ON e.id = ag.especialidade_id
         LEFT JOIN formularios_queixa fq ON fq.agendamento_id = ag.id
@@ -58,10 +58,7 @@ while ($row = $result->fetch_assoc()) {
             "intensidade" => $row['classificacao_dor'],
             "tratamento"  => $row['tratamento_medico']
         ] : null),
-        "anamnese" => ($row['resumo'] ? [
-            "geral"       => $row['resumo'],
-            "orientacoes" => $row['orientacoes']
-        ] : null)
+        "anamnese" => ($row['anamnese'] ? $row['anamnese'] : null)
     ];
 }
 $stmt2->close();
