@@ -41,6 +41,20 @@ if ($ids_agendamentos) {
     $res_ana = $conn->query($sql_anamnese);
     while ($a = $res_ana->fetch_assoc()) $anamneses[] = $a;
 }
+// Pacote atual do paciente
+$stmt = $conn->prepare('SELECT total_sessoes, sessoes_usadas FROM pacotes WHERE usuario_id = ? ORDER BY id DESC LIMIT 1');
+$stmt->bind_param('i', $id_paciente);
+$stmt->execute();
+$pacote_atual = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+// Valores dos pacotes
+$precos = ['pacote5' => 0, 'pacote10' => 0];
+$res = $conn->query("SELECT pacote5, pacote10 FROM especialidades LIMIT 1");
+if ($row = $res->fetch_assoc()) {
+    $precos['pacote5'] = $row['pacote5'];
+    $precos['pacote10'] = $row['pacote10'];
+}
 ?>
 <!DOCTYPE html>
 <html lang='pt-br'>
@@ -71,7 +85,20 @@ if ($ids_agendamentos) {
     <strong>Email:</strong> <?= htmlspecialchars($pac['email']) ?> <br>
     <strong>Telefone:</strong> <?= htmlspecialchars($pac['telefone']) ?> <br>
     <strong>Nascimento:</strong> <?= htmlspecialchars($pac['nascimento']) ?> <br>
-    <strong>Sexo:</strong> <?= htmlspecialchars($pac['sexo']) ?>
+    <strong>Sexo:</strong> <?= htmlspecialchars($pac['sexo']) ?> <br>
+    <div style="margin-top:10px;">
+      <strong>Pacote atual:</strong>
+      <span id="pacote-atual-text">
+        <?php if ($pacote_atual) {
+            $restantes = $pacote_atual['total_sessoes'] - $pacote_atual['sessoes_usadas'];
+            if ($restantes < 0) $restantes = 0;
+            echo $restantes . ' de ' . $pacote_atual['total_sessoes'] . ' sessões restantes';
+        } else {
+            echo 'Nenhum pacote ativo';
+        } ?>
+      </span>
+      <button id="btn-add-pacote" style="margin-left:10px;padding:4px 12px;background:#30795b;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.9rem;">Adicionar pacote</button>
+    </div>
   </div>
 
   <div class='subtitulo'>Histórico de Consultas</div>
@@ -97,7 +124,7 @@ if ($ids_agendamentos) {
       <button onclick="toggleFormulario(<?= $agendamento_id ?>)" title="Ver formulário de queixa" style="background:none;border:none;cursor:pointer;font-size:1.2rem;">
         📋
       </button>
-    <?php else: ?>
+@@ -101,57 +129,85 @@ if ($ids_agendamentos) {
       <span title="Sem formulário">&mdash;</span>
     <?php endif; ?>
   </td>
@@ -123,19 +150,6 @@ if ($ids_agendamentos) {
 <?php endif; ?>
 <?php } ?>
 </table>
-
-<script>
-function toggleFormulario(id) {
-  const row = document.getElementById('formulario-' + id);
-  if (row.style.display === 'none') {
-    row.style.display = '';
-  } else {
-    row.style.display = 'none';
-  }
-}
-</script>
-
-
   <div class='subtitulo' style='margin-top:40px;'>Anamnese</div>
   <form class='anamnese-form' method='post' action='salvarAnamnese.php'>
     <input type='hidden' name='usuario_id' value='<?= $id_paciente ?>'>
@@ -153,5 +167,46 @@ function toggleFormulario(id) {
   <?php } ?>
 
 </div>
+
+<div id="modal-pacote" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;">
+  <div style="background:#fff;padding:20px;border-radius:8px;text-align:center;">
+    <p>Selecionar pacote:</p>
+    <button onclick="comprarPacote(5)" style="margin:5px 10px 5px 0;">5 sessões - R$ <?= htmlspecialchars($precos['pacote5']) ?></button>
+    <button onclick="comprarPacote(10)" style="margin:5px 0;">10 sessões - R$ <?= htmlspecialchars($precos['pacote10']) ?></button>
+    <div style="margin-top:15px;"><button onclick="fecharModal()" style="padding:4px 12px;">Cancelar</button></div>
+  </div>
+</div>
+
+<script>
+function toggleFormulario(id){
+  const row = document.getElementById('formulario-' + id);
+  if(row.style.display==='none'){
+    row.style.display='';
+  } else {
+    row.style.display='none';
+  }
+}
+const btnAdd = document.getElementById('btn-add-pacote');
+const modalPacote = document.getElementById('modal-pacote');
+btnAdd.addEventListener('click', ()=>{ modalPacote.style.display='flex'; });
+function fecharModal(){ modalPacote.style.display='none'; }
+function comprarPacote(qtd){
+  fetch('comprarPacotePaciente.php', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ paciente_id: <?= $id_paciente ?>, quantidade: qtd })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    if(d.sucesso){
+      alert('Pacote adicionado com sucesso!');
+      location.reload();
+    } else {
+      alert(d.mensagem || 'Erro ao adicionar pacote.');
+    }
+  });
+}
+</script>
+
 </body>
 </html>
