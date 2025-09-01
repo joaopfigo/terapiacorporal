@@ -2,6 +2,39 @@
 include 'conexao.php';
 session_start();
 
+/**
+ * Duplica a última anamnese do usuário (se existir) para o novo agendamento
+ * ou cria registro vazio para permitir edição posterior.
+ */
+function copiarAnamneseAnterior(mysqli $conn, ?int $usuario_id, int $agendamento_id): void {
+    $anamnese = '';
+
+    if ($usuario_id) {
+        $stmt = $conn->prepare(
+            "SELECT a.anamnese
+             FROM anamneses a
+             INNER JOIN agendamentos g ON g.id = a.agendamento_id
+             WHERE g.usuario_id = ?
+             ORDER BY g.data_horario DESC
+             LIMIT 1"
+        );
+        $stmt->bind_param('i', $usuario_id);
+        $stmt->execute();
+        $stmt->bind_result($ultimoTexto);
+        if ($stmt->fetch() && $ultimoTexto !== null) {
+            $anamnese = $ultimoTexto;
+        }
+        $stmt->close();
+    }
+
+    $stmt = $conn->prepare(
+        "INSERT INTO anamneses (agendamento_id, anamnese, data_escrita) VALUES (?, ?, NOW())"
+    );
+    $stmt->bind_param('is', $agendamento_id, $anamnese);
+    $stmt->execute();
+    $stmt->close();
+}
+
 // Coleta todos os campos necessários
 $user_id      = $_SESSION['usuario_id'] ?? null;
 $servico_id   = $_POST['servico_id'] ?? null;
@@ -35,6 +68,7 @@ if ($user_id) {
     $ok = $stmt->execute();
     if ($ok) {
         $id_agendamento = $stmt->insert_id;
+        copiarAnamneseAnterior($conn, $user_id, $id_agendamento);
         die("SUCESSO|$id_agendamento");
     } else {
         die("ERRO_AGENDAR");
@@ -60,13 +94,7 @@ if ($user_id) {
         }
         $stmt->close();
         // Criar usuário
-        $hash = password_hash($senha, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("INSERT INTO usuarios (nome, email, telefone, nascimento, sexo, senha_hash) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $nome, $email, $telefone, $nascimento, $sexo, $hash);
-        $ok = $stmt->execute();
-        if ($ok) {
-            $user_id = $stmt->insert_id;
-        } else {
+@@ -70,50 +104,51 @@ if ($user_id) {
             die("ERRO_CRIAR_USUARIO");
         }
         $stmt->close();
@@ -92,6 +120,7 @@ $stmt->bind_param(
     $ok = $stmt->execute();
     if ($ok) {
         $id_agendamento = $stmt->insert_id;
+        copiarAnamneseAnterior($conn, $user_id, $id_agendamento);
         die("SUCESSO|$id_agendamento");
     } else {
         die("ERRO_AGENDAR");
@@ -117,61 +146,7 @@ if ($row = $res->fetch_assoc()) {
     $precos['padrao_90'] = $row['preco_90'];
 }
 $res = $conn->query("SELECT preco_escalda FROM especialidades WHERE nome = 'Escalda Pés' LIMIT 1");
-if ($row = $res->fetch_assoc()) {
-    $precos['escalda'] = $row['preco_escalda'];
-}
-
-$res = $conn->query("SELECT pacote5, pacote10 FROM especialidades");
-while ($row = $res->fetch_assoc()) {
-    $precos['pacote5'] = $row['pacote5'];
-    $precos['pacote10'] = $row['pacote10'];
-}
-
-
-// 1. Verifica disponibilidade do horário
-$stmt = $conn->prepare("SELECT id FROM agendamentos WHERE data_horario = ? AND status <> 'Cancelada'");
-$stmt->bind_param("s", $datetime);
-$stmt->execute();
-$stmt->store_result();
-if ($stmt->num_rows > 0) {
-    die("HORARIO_OCUPADO");
-}
-$stmt->close();
-
-$conn->begin_transaction();
-try {
-    // 2. Se for pacote, verifica e debita sessão
-    $usou_pacote = false;
-    $pacote_id = null;
-    if ($user_id && $duracao === 'pacote') {
-        // Busca pacote ativo
-        $stmt = $conn->prepare("SELECT id, total_sessoes, sessoes_usadas FROM pacotes WHERE usuario_id = ? ORDER BY id DESC LIMIT 1");
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $stmt->bind_result($pacote_id, $total, $usadas);
-        if ($stmt->fetch()) {
-            if ($usadas >= $total) {
-                throw new Exception("Você não possui sessões de pacote disponíveis.");
-            }
-        } else {
-            throw new Exception("Nenhum pacote encontrado.");
-        }
-        $stmt->close();
-        // Debita sessão
-        $stmt = $conn->prepare("UPDATE pacotes SET sessoes_usadas = sessoes_usadas + 1 WHERE id = ?");
-        $stmt->bind_param("i", $pacote_id);
-        $stmt->execute();
-        $usou_pacote = true;
-        $duracao = 50; // ou o valor padrão do seu sistema
-    }
-    $duracao = (int)$duracao;
-
-    // 3. Cria o agendamento
-    if ($user_id) {
-        $null = null;
-        $stmt = $conn->prepare("INSERT INTO agendamentos 
-    (usuario_id, nome_visitante, email_visitante, telefone_visitante, idade_visitante, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, criado_em) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+@@ -175,33 +210,34 @@ try {
 $stmt->bind_param(
     "isssiisdiss",
     $user_id, $nome, $email, $telefone, $idade, $servico_id, $datetime, $duracao, $preco_final, $add_reflexo, $status
@@ -197,6 +172,7 @@ $stmt->bind_param(
         $stmt->execute();
         $stmt->close();
     }
+    copiarAnamneseAnterior($conn, $user_id, $agendamentoId);
 
     $conn->commit();
     echo "SUCESSO|$agendamentoId";
