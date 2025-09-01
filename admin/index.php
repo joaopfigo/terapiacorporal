@@ -1,14 +1,7 @@
 <?php
 session_start();
-// Proteção: só terapeuta pode acessar
-if (password_verify($senha, $usuario['senha_hash'])) {
-    $_SESSION['usuario_id'] = $usuario['id'];
-    $_SESSION['tipo'] = $usuario['is_admin'] == 1 ? 'terapeuta' : 'usuario';
-    if ($_SESSION['tipo'] === 'terapeuta') {
-        header('Location: /admin/index.php');
-    } else {
-        header('Location: perfil.html');
-    }
+if (!isset($_SESSION['usuario_id']) || ($_SESSION['tipo'] ?? '') !== 'terapeuta') {
+    header('Location: ../login.php');
     exit;
 }
 ?>
