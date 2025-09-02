@@ -43,5 +43,5 @@ jobs:
             **/*.log
             **/uploads/**
             **/img/**
-            **/storage/**
+            **/storage/** 
 
