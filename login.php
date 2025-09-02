@@ -46,6 +46,7 @@ if (!$usuario || !password_verify($senha, $usuario['senha_hash'])) {
     exit;
 }
 
+session_regenerate_id(true);
 $_SESSION['usuario_id'] = $usuario['id'];
 $_SESSION['tipo'] = $usuario['is_admin'] ? 'terapeuta' : 'usuario';
 $_SESSION['usuario_nome'] = $usuario['nome'];
