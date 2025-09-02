@@ -22,8 +22,11 @@ jobs:
           server-dir: ${{ secrets.REMOTE_DIR }}/ 
           local-dir: ./  # envia tudo do repo
           exclude: |
-            **/.git*
+            **/.git/**
             **/.github/**
+            **/.gitignore
+            **/.gitattributes
+            !**/.gitkeep
             **/node_modules/**
             **/vendor/**
             **/PHPMailer-master/**
@@ -32,3 +35,6 @@ jobs:
             **/*.zip
             **/.env
             **/*.log
+            **/uploads/**
+            **/img/**
+            **/storage/**
