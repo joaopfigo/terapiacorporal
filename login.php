@@ -50,10 +50,10 @@ $_SESSION['usuario_id'] = $usuario['id'];
 $_SESSION['tipo'] = $usuario['is_admin'] ? 'terapeuta' : 'usuario';
 $_SESSION['usuario_nome'] = $usuario['nome'];
 
-if ($usuario['is_admin']) {
-    header('Location: /admin/index.php');
-} else {
-    header('Location: /perfil.html');
-}
+header('Content-Type: application/json');
+echo json_encode([
+    'success' => true,
+    'tipo'    => $_SESSION['tipo']
+]);
 exit;
 ?>
