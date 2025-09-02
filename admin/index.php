@@ -170,7 +170,7 @@ function closeLogoutModal() {
   document.getElementById('logoutModal').style.display = 'none';
 }
 function proceedLogout() {
-  window.location.href = '../registrar.html';
+  window.location.href = '../logout.php';
 }
 </script>
 </body>
