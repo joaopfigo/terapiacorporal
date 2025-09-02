@@ -355,9 +355,9 @@
         if (res.success) {
           // NOVO: redirecionamento conforme o tipo de usuário
           if (res.tipo === 'terapeuta') {
-            window.location.href = 'admin/index.php';
+            window.location.href = '/admin/index.php';
           } else {
-            window.location.href = 'perfil.html'; // ou index.html, como preferir para usuário normal
+            window.location.href = '/perfil.html'; // ou index.html, como preferir para usuário normal
           }
         } else {
           document.getElementById('loginError').style.display = 'block';
