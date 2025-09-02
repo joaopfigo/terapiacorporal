@@ -28,11 +28,15 @@ jobs:
             **/.github/**
             **/.gitignore
             **/.gitattributes
+            **/.vs/**
+            **/.vscode/**
+            **/.idea/**
+            **/.DS_Store
+            Thumbs.db
             !**/.gitkeep
             **/node_modules/**
             **/vendor/**
             **/PHPMailer-master/**
-            **/.vscode/**
             **/*.sql
             **/*.zip
             **/.env
@@ -40,4 +44,3 @@ jobs:
             **/uploads/**
             **/img/**
             **/storage/**
-
