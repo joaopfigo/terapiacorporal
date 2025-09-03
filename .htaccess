@@ -1,0 +1,41 @@
+# =========================
+# Regras básicas de segurança
+# =========================
+
+# 1) Não listar diretórios e definir página inicial
+Options -Indexes
+DirectoryIndex index.php index.html
+
+# 2) Ligar mod_rewrite
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# 2.1) Bloquear qualquer arquivo/pasta que comece com ponto (ex.: .env, .git, .htaccess)
+# Em .htaccess, o caminho é relativo; (^|/) cobre subpastas também.
+RewriteRule (^|/)\. - [F,L]
+
+# 2.2) Bloquear acesso direto a pastas internas (ajuste a lista conforme seu projeto)
+RewriteRule ^(lib|database|storage|cron)(/|$) - [F,L]
+
+# 2.3) Proteger diretórios de VCS/CI se existirem
+RewriteRule ^(\.git|\.github)(/|$) - [F,L]
+</IfModule>
+
+# 3) Bloquear arquivos sensíveis por extensão/nomes comuns
+<FilesMatch "^(composer\.json|composer\.lock|package\.json|README.*|.*\.(env|ini|log|sql|md|zip|tar|gz))$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# 4) (Opcional) Forçar HTTPS
+# Descomente se quiser obrigar HTTPS
+# <IfModule mod_rewrite.c>
+#   RewriteEngine On
+#   RewriteCond %{HTTPS} !=on
+#   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
