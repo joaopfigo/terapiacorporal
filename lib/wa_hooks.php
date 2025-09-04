@@ -1,77 +1,78 @@
 <?php
+// lib/wa_hooks.php
 require_once __DIR__ . '/wa.php';
+require_once __DIR__ . '/../database/pdo.php';
 
-/** Notify therapist about a new booking. */
-function notifyTherapistNewBooking($bookingId)
-{
-    // TODO: Fetch booking + therapist phone from DB
-    // Example SQL:
-    // SELECT t.phone AS to_number, b.service, b.date_time
-    // FROM bookings b JOIN therapists t ON ...
-    // WHERE b.id = $bookingId;
-
-    $to        = getenv('WA_DEFAULT_THERAPIST_NUMBER'); // fallback
-    $service   = 'Serviço';                // from DB
-    $dateTime  = '00/00/0000 00:00';       // formatted date/time
-    $message   = "Novo agendamento: {$service} em {$dateTime} (ID {$bookingId}).";
-
-    return wa_send_text($to, $message);
+function wa_is_enabled(): bool {
+    $v = getenv('WA_ENABLED');
+    return !($v === '0' || strtolower((string)$v) === 'false');
 }
 
-/** Notify patient about approval or refusal. */
-function notifyPatientBookingStatus($bookingId, $approved)
-{
-    // TODO: Fetch patient phone, service, date/time from DB
-    $to       = ''; // patient phone
-    $service  = 'Serviço';
-    $dateTime = '00/00/0000 00:00';
+function getBookingBasic(int $bookingId): ?array {
+    $pdo = db();
+    $sql = "SELECT a.id, a.data_horario, a.status,
+                   e.nome        AS servico,
+                   u.nome        AS paciente_nome,
+                   u.telefone    AS paciente_tel
+            FROM agendamentos a
+            JOIN especialidades e ON e.id = a.especialidade_id
+            JOIN usuarios u  ON u.id = a.usuario_id
+            WHERE a.id = :id
+            LIMIT 1";
+    $st = $pdo->prepare($sql);
+    $st->execute([':id' => $bookingId]);
+    $r = $st->fetch(PDO::FETCH_ASSOC);
+    return $r ?: null;
+}
+
+function notifyTherapistNewBooking(int $bookingId): bool {
+    if (!wa_is_enabled()) return false;
+    $r = getBookingBasic($bookingId);
+    if (!$r) return false;
+    $therapist = getenv('WA_DEFAULT_THERAPIST_NUMBER');
+    if (!$therapist) return false;
+
+    // Abre janela (sandbox)
+    wa_send_template_simple($therapist, 'hello_world', [], 'en_US');
+
+    $msg = "Novo agendamento:\n".
+           "Serviço: {$r['servico']}\n".
+           "Quando: ".br_datetime($r['data_horario'])."\n".
+           "Paciente: {$r['paciente_nome']}\n".
+           "Telefone: ".e164($r['paciente_tel']);
+    $res = wa_send_text($therapist, $msg);
+    return !isset($res['error']);
+}
+
+function notifyPatientBookingStatus(int $bookingId, bool $approved): bool {
+    if (!wa_is_enabled()) return false;
+    $r = getBookingBasic($bookingId);
+    if (!$r) return false;
+
+    $to   = $r['paciente_tel'];
+    $lang = 'pt_BR';
 
     if ($approved) {
-        return wa_send_template(
-            $to,
-            'consulta_confirmacao',
-            'pt_BR',
-            [[
-                'type'       => 'body',
-                'parameters' => [
-                    ['type' => 'text', 'text' => $service],
-                    ['type' => 'text', 'text' => $dateTime],
-                ],
-            ]]
-        );
+        $tpl  = 'consulta_confirmacao';
+        $vars = [$r['servico'], br_datetime($r['data_horario'])];
+    } else {
+        $tpl  = 'consulta_recusa';
+        $vars = [$r['servico']];
     }
-
-    return wa_send_template(
-        $to,
-        'consulta_recusa',
-        'pt_BR',
-        [[
-            'type'       => 'body',
-            'parameters' => [
-                ['type' => 'text', 'text' => $service],
-            ],
-        ]]
-    );
+    $res = wa_send_template_simple($to, $tpl, $vars, $lang);
+    return !isset($res['error']);
 }
 
-/** Reminder one day before the session. */
-function notifyPatientReminder($bookingId)
-{
-    // TODO: Fetch patient phone, service, date/time from DB
-    $to       = ''; // patient phone
-    $service  = 'Serviço';
-    $dateTime = '00/00/0000 00:00';
+function notifyPatientReminder(int $bookingId): bool {
+    if (!wa_is_enabled()) return false;
+    $r = getBookingBasic($bookingId);
+    if (!$r) return false;
 
-    return wa_send_template(
-        $to,
-        'consulta_lembrete',
-        'pt_BR',
-        [[
-            'type'       => 'body',
-            'parameters' => [
-                ['type' => 'text', 'text' => $service],
-                ['type' => 'text', 'text' => $dateTime],
-            ],
-        ]]
-    );
+    $to    = $r['paciente_tel'];
+    $lang  = 'pt_BR';
+    $tpl   = 'consulta_lembrete';
+    $vars  = [$r['servico'], br_datetime($r['data_horario'])];
+
+    $res = wa_send_template_simple($to, $tpl, $vars, $lang);
+    return !isset($res['error']);
 }
