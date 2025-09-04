@@ -10,7 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['id'])) {
     $stmt = $conn->prepare("UPDATE agendamentos SET status = 'Confirmado' WHERE id = ?");
     $stmt->bind_param('i', $id);
     if ($stmt->execute()) {
-        // Opcional: enviar email p/ paciente avisando
+        require_once __DIR__ . '/../lib/wa_hooks.php';
+        $bookingId = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
+        $approved  = true;
+        notifyPatientBookingStatus($bookingId, $approved);
         header('Location: agendamentos.php?msg=confirmado'); exit;
     } else {
         header('Location: agendamentos.php?msg=erro'); exit;
