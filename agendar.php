@@ -69,6 +69,8 @@ if ($user_id) {
     if ($ok) {
         $id_agendamento = $stmt->insert_id;
         copiarAnamneseAnterior($conn, $user_id, $id_agendamento);
+        require_once __DIR__ . '/lib/wa_hooks.php';
+        notifyTherapistNewBooking($id_agendamento);
         die("SUCESSO|$id_agendamento");
     } else {
         die("ERRO_AGENDAR");
@@ -121,6 +123,8 @@ $stmt->bind_param(
     if ($ok) {
         $id_agendamento = $stmt->insert_id;
         copiarAnamneseAnterior($conn, $user_id, $id_agendamento);
+        require_once __DIR__ . '/lib/wa_hooks.php';
+        notifyTherapistNewBooking($id_agendamento);
         die("SUCESSO|$id_agendamento");
     } else {
         die("ERRO_AGENDAR");
