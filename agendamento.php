@@ -692,7 +692,7 @@ while ($row = $res->fetch_assoc()) {
         <label><input type="radio" name="duracao" value="pacote"> Utilizar pacote de sessões</label>
       </div>
       <div id="opcao-comprar-pacote" style="display:none;">
-        <button type="button" onclick="window.location.href='pacotes.html?origem=agendamento'">Comprar pacote</button>
+        <button type="button" onclick="window.location.href='pacotes.php?origem=agendamento'">Comprar pacote</button>
       </div>
       <div id="info-pacote"></div>
 
@@ -1191,12 +1191,12 @@ const dados = {
             labelPacote.innerHTML += ` <span id="pacote-info-agendamento" style="color:#30795b;">(${sessoesDisponiveis} sessões restantes)</span>`;
           } else {
             inputPacote.disabled = true;
-            labelPacote.innerHTML += ` <span id="pacote-info-agendamento" style="color:#b48c1a;">(Sem sessões de pacote. <a href="pacotes.html" style="text-decoration:underline;">Comprar pacote</a>)</span>`;
+            labelPacote.innerHTML += ` <span id="pacote-info-agendamento" style="color:#b48c1a;">(Sem sessões de pacote. <a href="pacotes.php" style="text-decoration:underline;">Comprar pacote</a>)</span>`;
             // Botão extra
             let promoDiv = document.querySelector('.promo');
             if (promoDiv && !document.getElementById('btn-comprar-pacote')) {
               promoDiv.innerHTML += `<div style="margin-top:8px;">
-                <button id="btn-comprar-pacote" onclick="window.location.href='pacotes.html'" style="background:#b79b63;color:#fff;padding:7px 20px;border-radius:8px;font-size:1rem;border:none;cursor:pointer;">
+                <button id="btn-comprar-pacote" onclick="window.location.href='pacotes.php'" style="background:#b79b63;color:#fff;padding:7px 20px;border-radius:8px;font-size:1rem;border:none;cursor:pointer;">
                   Comprar pacote de sessões
                 </button>
               </div>`;
