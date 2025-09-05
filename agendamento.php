@@ -1108,6 +1108,7 @@ const dados = {
     });
 
     window.addEventListener('DOMContentLoaded', function() {
+      atualizarDuracoes();
       const servicoEscolhido = localStorage.getItem('servicoSelecionado');
       if (servicoEscolhido) {
         // Considerando que cada tratamento tem um radio input ou card com texto igual ao nome do serviço
