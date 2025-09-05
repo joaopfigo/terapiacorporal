@@ -1,7 +1,7 @@
 <?php
 // lib/wa_hooks.php
 require_once __DIR__ . '/wa.php';
-require_once __DIR__ . '/../database/pdo.php';
+require_once __DIR__ . '/db_bootstrap.php';
 
 function wa_is_enabled(): bool {
     $v = getenv('WA_ENABLED');
@@ -9,19 +9,22 @@ function wa_is_enabled(): bool {
 }
 
 function getBookingBasic(int $bookingId): ?array {
-    $pdo = db();
+    $conn = db();
     $sql = "SELECT a.id, a.data_horario, a.status,
-                   e.nome        AS servico,
-                   u.nome        AS paciente_nome,
-                   u.telefone    AS paciente_tel
+                   e.nome AS servico,
+                   COALESCE(u.nome, a.nome_visitante) AS paciente_nome,
+                   COALESCE(u.telefone, a.telefone_visitante) AS paciente_tel
             FROM agendamentos a
             JOIN especialidades e ON e.id = a.especialidade_id
-            JOIN usuarios u  ON u.id = a.usuario_id
-            WHERE a.id = :id
+            LEFT JOIN usuarios u  ON u.id = a.usuario_id
+            WHERE a.id = ?
             LIMIT 1";
-    $st = $pdo->prepare($sql);
-    $st->execute([':id' => $bookingId]);
-    $r = $st->fetch(PDO::FETCH_ASSOC);
+    $st = $conn->prepare($sql);
+    $st->bind_param('i', $bookingId);
+    $st->execute();
+    $res = $st->get_result();
+    $r   = $res ? $res->fetch_assoc() : null;
+    $st->close();
     return $r ?: null;
 }
 
