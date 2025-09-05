@@ -2,6 +2,10 @@
 # Regras básicas de segurança
 # =========================
 
+# Canonicalizar páginas antigas .html para .php
+Redirect 301 /agendamento.html /agendamento.php
+Redirect 301 /pacotes.html     /pacotes.php
+
 # 1) Não listar diretórios e definir página inicial
 Options -Indexes
 DirectoryIndex index.php index.html
@@ -40,4 +44,3 @@ RewriteRule ^(\.git|\.github)(/|$) - [F,L]
 #   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # </IfModule>
 
-Redirect 301 /agendamento.html /agendamento.php
