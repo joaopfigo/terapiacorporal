@@ -39,3 +39,5 @@ RewriteRule ^(\.git|\.github)(/|$) - [F,L]
 #   RewriteCond %{HTTPS} !=on
 #   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # </IfModule>
+
+Redirect 301 /agendamento.html /agendamento.php
