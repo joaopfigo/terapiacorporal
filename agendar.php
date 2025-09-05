@@ -40,10 +40,9 @@ $user_id      = $_SESSION['usuario_id'] ?? null;
 $servico_id   = $_POST['servico_id'] ?? null;
 $data         = $_POST['data'] ?? null;
 $hora         = $_POST['hora'] ?? null;
-$duracao      = $_POST['duracao'] ?? null;
+$duracao      = $_POST['duracao'] ?? null; // pode vir 15/30/50/90 ou rótulos (escalda/pacote5/pacote10)
 $add_reflexo  = isset($_POST['add_reflexo']) ? 1 : 0;
 $status       = 'Pendente';
-$preco_final  = isset($_POST['preco_final']) ? floatval($_POST['preco_final']) : null;
 
 // Campos do formulário de visitante/conta
 $criarConta   = isset($_POST['criar_conta']) ? intval($_POST['criar_conta']) : 0;
@@ -75,38 +74,50 @@ if (!$result || $result->num_rows === 0) {
 }
 $servico = $result->fetch_assoc();
 $stmt->close();
+
 switch ((string)$duracao) {
-    case '15':
-        $preco_oficial = $servico['preco_15'];
-        break;
-    case '30':
-        $preco_oficial = $servico['preco_30'];
-        break;
-    case '50':
-        $preco_oficial = $servico['preco_50'];
-        break;
-    case '90':
-        $preco_oficial = $servico['preco_90'];
-        break;
-    case 'escalda':
-        $preco_oficial = $servico['preco_escalda'];
-        break;
-    case 'pacote5':
-        $preco_oficial = $servico['pacote5'];
-        break;
-    case 'pacote10':
-        $preco_oficial = $servico['pacote10'];
-        break;
-    default:
-        die("PRECO_INVALIDO");
+    case '15':       $preco_oficial = $servico['preco_15'];      break;
+    case '30':       $preco_oficial = $servico['preco_30'];      break;
+    case '50':       $preco_oficial = $servico['preco_50'];      break;
+    case '90':       $preco_oficial = $servico['preco_90'];      break;
+    case 'escalda':  $preco_oficial = $servico['preco_escalda']; break;
+    case 'pacote5':  $preco_oficial = $servico['pacote5'];       break;
+    case 'pacote10': $preco_oficial = $servico['pacote10'];      break;
+    default:         die("PRECO_INVALIDO");
 }
 if ($preco_oficial === null) {
     die("PRECO_INVALIDO");
 }
-if ($preco_final !== null && abs($preco_final - $preco_oficial) > 0.01) {
-    die("PRECO_DIVERGENTE");
+
+// Adicional de Reflexologia (opcional)
+$preco_reflexo = 0.0;
+if ($add_reflexo) {
+    $stmt = $conn->prepare("SELECT preco_15, preco_30, preco_50, preco_90, preco_escalda, pacote5, pacote10 FROM especialidades WHERE nome = 'Reflexologia Podal' LIMIT 1");
+    $stmt->execute();
+    $resRef = $stmt->get_result();
+    if ($resRef && $resRef->num_rows > 0) {
+        $reflexo = $resRef->fetch_assoc();
+        switch ((string)$duracao) {
+            case '15':       $preco_reflexo = $reflexo['preco_15'];      break;
+            case '30':       $preco_reflexo = $reflexo['preco_30'];      break;
+            case '50':       $preco_reflexo = $reflexo['preco_50'];      break;
+            case '90':       $preco_reflexo = $reflexo['preco_90'];      break;
+            case 'escalda':  $preco_reflexo = $reflexo['preco_escalda']; break;
+            case 'pacote5':  $preco_reflexo = $reflexo['pacote5'];       break;
+            case 'pacote10': $preco_reflexo = $reflexo['pacote10'];      break;
+        }
+    }
+    $stmt->close();
 }
-$preco_final = $preco_oficial;
+
+// Preço final (zera se usou pacote)
+$preco_final = (float)$preco_oficial + (float)$preco_reflexo;
+if ($usou_pacote) {
+    $preco_final = 0.0;
+}
+
+// Normaliza duração para o banco (schema = INT)
+$duracao_db = is_numeric($duracao) ? (int)$duracao : 0; // 0 como sentinela caso venha rótulo
 
 // Se for visitante, validar dados e criar conta se necessário
 if (!$user_id) {
@@ -153,10 +164,10 @@ try {
 
     if ($user_id) {
         $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->bind_param("iisidis", $user_id, $servico_id, $datetime, $duracao, $preco_final, $add_reflexo, $status);
+        $stmt->bind_param("iisidis", $user_id, $servico_id, $datetime, $duracao_db, $preco_final, $add_reflexo, $status);
     } else {
         $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, nome_visitante, email_visitante, telefone_visitante, idade_visitante, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->bind_param("isssiisidis", $user_id, $nome, $email, $telefone, $idade, $servico_id, $datetime, $duracao, $preco_final, $add_reflexo, $status);
+        $stmt->bind_param("isssiisidis", $user_id, $nome, $email, $telefone, $idade, $servico_id, $datetime, $duracao_db, $preco_final, $add_reflexo, $status);
     }
 
     if (!$stmt->execute()) {
