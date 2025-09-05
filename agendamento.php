@@ -687,8 +687,8 @@ while ($row = $res->fetch_assoc()) {
     <div class="step" id="step-duracao">
       <h2>3. Duração</h2>
       <div class="durations">
-        <label><input type="radio" name="duracao" value="150"> 50 min — R$ 150</label>
-        <label><input type="radio" name="duracao" value="200"> 90 min — R$ 200</label>
+        <label><input type="radio" name="duracao" value="<?= htmlspecialchars($precos['padrao_50']) ?>"> 50 min — R$ <?= htmlspecialchars($precos['padrao_50']) ?></label>
+        <label><input type="radio" name="duracao" value="<?= htmlspecialchars($precos['padrao_90']) ?>"> 90 min — R$ <?= htmlspecialchars($precos['padrao_90']) ?></label>
         <label><input type="radio" name="duracao" value="pacote"> Utilizar pacote de sessões</label>
       </div>
       <div id="opcao-comprar-pacote" style="display:none;">
