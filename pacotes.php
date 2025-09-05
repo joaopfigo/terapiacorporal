@@ -357,7 +357,7 @@ main {
       // Checa se veio de agendamento (parâmetro na URL)
       const params = new URLSearchParams(window.location.search);
       if (params.get('origem') === 'agendamento') {
-        window.location.href = "agendamento.html?pacote_sucesso=1";
+        window.location.href = "agendamento.php?pacote_sucesso=1";
       } else {
         window.location.href = "perfil.html";
       }
