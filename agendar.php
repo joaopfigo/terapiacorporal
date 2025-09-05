@@ -61,6 +61,49 @@ if (!$servico_id || !$data || !$hora || !$duracao) {
 }
 $datetime = "$data $hora:00";
 
+// Confere o preço oficial do serviço para evitar manipulação do cliente
+$stmt = $conn->prepare("SELECT preco_15, preco_30, preco_50, preco_90, preco_escalda, pacote5, pacote10 FROM especialidades WHERE id = ?");
+$stmt->bind_param('i', $servico_id);
+$stmt->execute();
+$result = $stmt->get_result();
+if (!$result || $result->num_rows === 0) {
+    die("SERVICO_INEXISTENTE");
+}
+$servico = $result->fetch_assoc();
+$stmt->close()
+switch ((string)$duracao) {
+    case '15':
+        $preco_oficial = $servico['preco_15'];
+        break;
+    case '30':
+        $preco_oficial = $servico['preco_30'];
+        break;
+    case '50':
+        $preco_oficial = $servico['preco_50'];
+        break;
+    case '90':
+        $preco_oficial = $servico['preco_90'];
+        break;
+    case 'escalda':
+        $preco_oficial = $servico['preco_escalda'];
+        break;
+    case 'pacote5':
+        $preco_oficial = $servico['pacote5'];
+        break;
+    case 'pacote10':
+        $preco_oficial = $servico['pacote10'];
+        break;
+    default:
+        die("PRECO_INVALIDO");
+}
+if ($preco_oficial === null) {
+    die("PRECO_INVALIDO");
+}
+if ($preco_final !== null && abs($preco_final - $preco_oficial) > 0.01) {
+    die("PRECO_DIVERGENTE");
+}
+$preco_final = $preco_oficial;
+
 if ($user_id) {
     // Usuário logado: crie o agendamento vinculado ao usuário
     $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
@@ -96,7 +139,15 @@ if ($user_id) {
         }
         $stmt->close();
         // Criar usuário
-@@ -70,50 +104,51 @@ if ($user_id) {
+        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("INSERT INTO usuarios (nome, email, telefone, nascimento, sexo, senha_hash) VALUES (?, ?, ?, ?, ?, ?)");
+        if (!$stmt) {
+            die("ERRO_CRIAR_USUARIO");
+        }
+        $stmt->bind_param("ssssss", $nome, $email, $telefone, $nascimento, $sexo, $senha_hash);
+        if ($stmt->execute()) {
+            $user_id = $stmt->insert_id;
+        } else {
             die("ERRO_CRIAR_USUARIO");
         }
         $stmt->close();
