@@ -153,10 +153,10 @@ try {
 
     if ($user_id) {
         $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->bind_param("iisdiss", $user_id, $servico_id, $datetime, $duracao, $preco_final, $add_reflexo, $status);
+        $stmt->bind_param("iisidis", $user_id, $servico_id, $datetime, $duracao, $preco_final, $add_reflexo, $status);
     } else {
         $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, nome_visitante, email_visitante, telefone_visitante, idade_visitante, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->bind_param("isssiisdiss", $user_id, $nome, $email, $telefone, $idade, $servico_id, $datetime, $duracao, $preco_final, $add_reflexo, $status);
+        $stmt->bind_param("isssiisidis", $user_id, $nome, $email, $telefone, $idade, $servico_id, $datetime, $duracao, $preco_final, $add_reflexo, $status);
     }
 
     if (!$stmt->execute()) {
