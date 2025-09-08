@@ -36,13 +36,14 @@ function copiarAnamneseAnterior(mysqli $conn, ?int $usuario_id, int $agendamento
 }
 
 // Coleta todos os campos necessários
-$user_id      = $_SESSION['usuario_id'] ?? null;
-$servico_id   = $_POST['servico_id'] ?? null;
-$data         = $_POST['data'] ?? null;
-$hora         = $_POST['hora'] ?? null;
-$duracao      = $_POST['duracao'] ?? null; // pode vir 15/30/50/90 ou rótulos (escalda/pacote5/pacote10)
-$add_reflexo  = isset($_POST['add_reflexo']) ? 1 : 0;
-$status       = 'Pendente';
+ $user_id      = $_SESSION['usuario_id'] ?? null;
+ $servico_id   = $_POST['servico_id'] ?? null;
+ $data         = $_POST['data'] ?? null;
+ $hora         = $_POST['hora'] ?? null;
+ $duracao      = $_POST['duracao'] ?? null; // pode vir 15/30/50/90 ou rótulos (escalda/pacote5/pacote10)
+ $add_reflexo  = isset($_POST['add_reflexo']) ? 1 : 0;
+ $aceitou_termo = isset($_POST['termo']) ? 1 : 0;
+ $status       = 'Pendente';
 
 // Campos do formulário de visitante/conta
 $criarConta   = isset($_POST['criar_conta']) ? intval($_POST['criar_conta']) : 0;
