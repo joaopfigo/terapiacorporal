@@ -978,6 +978,7 @@ if (termoEl) {
   })
   .then(res => res.text())
   .then(res => {
+  if (res.startsWith("ERRO_AGENDAR")) { alert(res); return; }
   if (res.startsWith("SUCESSO|")) {
     const partes = res.split('|');
     const agendamentoId = partes[1] || null;
