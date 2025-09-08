@@ -1,5 +1,5 @@
 <?php
-include 'conexao.php';
+require_once __DIR__ . '/conexao.php';
 session_start();
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT); // TEMP: detalhar erros do MySQLi
 
