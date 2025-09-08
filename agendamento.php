@@ -626,7 +626,7 @@ while ($row = $res->fetch_assoc()) {
         </div>
 
         <div class="formulario-fields" style="margin-top: 25px;">
-          <input type="checkbox" id="termo" name="termo" required>
+          <input type="checkbox" id="termo" name="termo">
           <label for="termo">
             Afirmo ter lido e discutido as informações acima com meu terapeuta. Estou ciente de que o tratamento não é diagnóstico e nem mesmo substituto para o meu tratamento médico. Afirmo não ter omitido nenhuma informação concernente à minha saúde que devesse ter sido revelada e me responsabilizo por comunicar à minha terapeuta qualquer alteração em minhas condições clínicas que possa ocorrer no futuro.
           </label>
@@ -956,14 +956,14 @@ document.getElementById('btn-agendar').onclick = function(e) {
   if (escaldaInput.checked) v += parseFloat(escaldaInput.dataset.preco);
   return v;
 })();
-const dados = {
-  servico_id: obterServicoSelecionado(),
-  data: obterDataSelecionada(),
-  hora: obterHoraSelecionada(),
-  duracao: duracao.value,
-  preco_final: valor // <-- Esse campo é o novo!
-};
-
+  const dados = {
+    servico_id: obterServicoSelecionado(),
+    data: obterDataSelecionada(),
+    hora: obterHoraSelecionada(),
+    duracao: duracao.value,
+    preco_final: valor // <-- Esse campo é o novo!
+  };
+  dados.termo = document.getElementById('termo').checked ? 1 : 0;
 
       // Se o bloco de guest estiver visível (usuário não logado), pega os campos obrigatórios de visitante
       if (document.getElementById('dados-guest').style.display !== 'none') {
@@ -1011,8 +1011,6 @@ const dados = {
     alert("Horário já ocupado. Escolha outro.");
   } else if (res.includes("DADOS_INCOMPLETOS")) {
     alert("Preencha todos os dados obrigatórios.");
-  } else if (res.includes("TERMO_NAO_ACEITO")) {
-    alert("Você deve aceitar o termo para agendar.");
   } else if (res.includes("SERVICO_SEM_PRECO")) {
     alert("Serviço sem preço definido. Entre em contato.");
   } else if (res.includes("PRECO_INVALIDO")) {
