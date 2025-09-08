@@ -91,23 +91,15 @@ if ($preco_oficial === null) {
     die("SERVICO_SEM_PRECO");
 }
 
-// Adicional de Reflexologia (opcional)
+// Adicional de Escalda Pés (opcional)
 $preco_reflexo = 0.0;
 if ($add_reflexo) {
-    $stmt = $conn->prepare("SELECT preco_15, preco_30, preco_50, preco_90, preco_escalda, pacote5, pacote10 FROM especialidades WHERE nome = 'Reflexologia Podal' LIMIT 1");
+    $stmt = $conn->prepare("SELECT preco_escalda FROM especialidades WHERE id = 9 LIMIT 1");
     $stmt->execute();
     $resRef = $stmt->get_result();
     if ($resRef && $resRef->num_rows > 0) {
-        $reflexo = $resRef->fetch_assoc();
-        switch ((string)$duracao) {
-            case '15':       $preco_reflexo = $reflexo['preco_15'];      break;
-            case '30':       $preco_reflexo = $reflexo['preco_30'];      break;
-            case '50':       $preco_reflexo = $reflexo['preco_50'];      break;
-            case '90':       $preco_reflexo = $reflexo['preco_90'];      break;
-            case 'escalda':  $preco_reflexo = $reflexo['preco_escalda']; break;
-            case 'pacote5':  $preco_reflexo = $reflexo['pacote5'];       break;
-            case 'pacote10': $preco_reflexo = $reflexo['pacote10'];      break;
-        }
+        $ref = $resRef->fetch_assoc();
+        $preco_reflexo = (float)$ref['preco_escalda']; // não depende de 15/30/50/90
     }
     $stmt->close();
 }
