@@ -63,6 +63,9 @@ $pacote_id   = isset($_POST['pacote_id']) ? intval($_POST['pacote_id']) : null;
 if (!$servico_id || !$data || !$hora || !$duracao) {
     die("DADOS_INCOMPLETOS");
 }
+if (!$aceitou_termo) {
+    die("TERMO_NAO_ACEITO");
+}
 $datetime = "$data $hora:00";
 
 // Confere o preço oficial do serviço para evitar manipulação do cliente
