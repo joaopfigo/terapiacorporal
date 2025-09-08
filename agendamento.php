@@ -945,9 +945,9 @@ const dados = {
 };
 
 // Checkbox da **Reflexologia Podal** (não é “Escalda Pés”)
-const reflexoEl = document.getElementById('add-reflexo'); // use o id real do seu checkbox
+const reflexoEl = document.getElementById('escalda-pes');
 if (reflexoEl && reflexoEl.checked) {
-  dados.add_reflexo = 1;            // o back-end espera exatamente esse nome
+  dados.add_reflexo = 1;
 }
 
 const termoEl = document.getElementById('termo');
