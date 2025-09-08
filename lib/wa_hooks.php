@@ -52,16 +52,20 @@ function notifyPatientBookingStatus(int $bookingId, bool $approved): bool {
     $r = getBookingBasic($bookingId);
     if (!$r) return false;
 
-    $to   = $r['paciente_tel'];
-    $lang = 'pt_BR';
+    $to = $r['paciente_tel'];
 
     if ($approved) {
+        // Template com APENAS {{1}} = serviço (pt_BR)
         $tpl  = 'consulta_confirmacao';
-        $vars = [$r['servico'], br_datetime($r['data_horario'])];
+        $lang = 'pt_BR';
+        $vars = [$r['servico']];
     } else {
+        // Template com APENAS {{1}} = serviço (en_US)
         $tpl  = 'consulta_recusa';
+        $lang = 'en_US';
         $vars = [$r['servico']];
     }
+
     $res = wa_send_template_simple($to, $tpl, $vars, $lang);
     return !isset($res['error']);
 }
@@ -71,10 +75,12 @@ function notifyPatientReminder(int $bookingId): bool {
     $r = getBookingBasic($bookingId);
     if (!$r) return false;
 
-    $to    = $r['paciente_tel'];
-    $lang  = 'pt_BR';
-    $tpl   = 'consulta_lembrete';
-    $vars  = [$r['servico'], br_datetime($r['data_horario'])];
+    $to   = $r['paciente_tel'];
+    $lang = 'pt_BR';
+    $tpl  = 'consulta_lembrete';
+
+    // Template com APENAS {{1}} = serviço
+    $vars = [$r['servico']];
 
     $res = wa_send_template_simple($to, $tpl, $vars, $lang);
     return !isset($res['error']);
