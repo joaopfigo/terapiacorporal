@@ -1012,6 +1012,8 @@ const dados = {
     alert("Preencha todos os dados obrigatórios.");
   } else if (res.includes("TERMO_NAO_ACEITO")) {
     alert("Você deve aceitar o termo para agendar.");
+  } else if (res.includes("PRECO_INVALIDO")) {
+    alert("Preço inválido para a duração selecionada");
   } else if (res.includes("ERRO_AGENDAR")) {
     alert("Erro ao agendar. Tente novamente.");
   } else {
