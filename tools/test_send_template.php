@@ -18,7 +18,7 @@ if ($to === '' || $name === '') {
 if ($lang === '') {
     $n = strtolower($name);
     if ($n === 'hello_world')         $lang = 'en_US';
-    elseif ($n === 'consulta_recusa') $lang = 'en_US';
+    elseif ($n === 'consulta_recusa') $lang = 'en';
     else                              $lang = 'pt_BR';
 }
 
