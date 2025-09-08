@@ -687,9 +687,9 @@ while ($row = $res->fetch_assoc()) {
     <div class="step" id="step-duracao">
       <h2>3. Duração</h2>
       <div class="durations">
-        <label><input type="radio" name="duracao" value="<?= htmlspecialchars($precos['padrao_50']) ?>"> 50 min — R$ <?= htmlspecialchars($precos['padrao_50']) ?></label>
-        <label><input type="radio" name="duracao" value="<?= htmlspecialchars($precos['padrao_90']) ?>"> 90 min — R$ <?= htmlspecialchars($precos['padrao_90']) ?></label>
-        <label><input type="radio" name="duracao" value="pacote"> Utilizar pacote de sessões</label>
+        <label><input type="radio" name="duracao" value="50" data-preco="<?= htmlspecialchars($precos['padrao_50']) ?>"> 50 min — R$ <?= htmlspecialchars($precos['padrao_50']) ?></label>
+        <label><input type="radio" name="duracao" value="90" data-preco="<?= htmlspecialchars($precos['padrao_90']) ?>"> 90 min — R$ <?= htmlspecialchars($precos['padrao_90']) ?></label>
+        <label><input type="radio" name="duracao" id="duracao-pacote" value="pacote5" data-preco="0"> Utilizar pacote de sessões</label>
       </div>
       <div id="opcao-comprar-pacote" style="display:none;">
         <button type="button" onclick="window.location.href='pacotes.php?origem=agendamento'">Comprar pacote</button>
@@ -701,7 +701,7 @@ while ($row = $res->fetch_assoc()) {
   <h3>PROMOÇÃO: ACRESCENTE UM ESCALDA PÉS!</h3>
   <div class="combo">
     <label>
-      <input type="checkbox" id="escalda-pes" onchange="calcularValorFinal();" name="escalda-pes" value="<?= htmlspecialchars($precos['escalda']) ?>" > Quero adicionar escalda pés (+ R$ <?= htmlspecialchars($precos['escalda']) ?>)
+      <input type="checkbox" id="escalda-pes" onchange="calcularValorFinal();" name="escalda-pes" value="escalda" data-preco="<?= htmlspecialchars($precos['escalda']) ?>" > Quero adicionar escalda pés (+ R$ <?= htmlspecialchars($precos['escalda']) ?>)
     </label>
   </div>
 </div>
@@ -768,16 +768,16 @@ while ($row = $res->fetch_assoc()) {
     let formularioEnviado = false;
     // HTML padrão (todas as opções exceto quick massage sozinho)
     const htmlDuracoesPadrao = `
-      <label><input type="radio" name="duracao" value="<?= htmlspecialchars($precos['padrao_50']) ?>"> 50 min — R$ <?= htmlspecialchars($precos['padrao_50']) ?></label>
-      <label><input type="radio" name="duracao" value="<?= htmlspecialchars($precos['padrao_90']) ?>"> 90 min — R$ <?= htmlspecialchars($precos['padrao_90']) ?></label>
-      <label><input type="radio" name="duracao" value="pacote"> Utilizar pacote de sessões</label>
+      <label><input type="radio" name="duracao" value="50" data-preco="<?= htmlspecialchars($precos['padrao_50']) ?>"> 50 min — R$ <?= htmlspecialchars($precos['padrao_50']) ?></label>
+      <label><input type="radio" name="duracao" value="90" data-preco="<?= htmlspecialchars($precos['padrao_90']) ?>"> 90 min — R$ <?= htmlspecialchars($precos['padrao_90']) ?></label>
+      <label><input type="radio" name="duracao" id="duracao-pacote" value="pacote5" data-preco="0"> Utilizar pacote de sessões</label>
     `;
 
     // HTML especial para quick massage sozinho
     const htmlDuracoesQuick = `
-  <label><input type="radio" name="duracao"  value="<?= htmlspecialchars($precos['quick_15']) ?>"> 15 min — R$ <?= htmlspecialchars($precos['quick_15']) ?></label>
-  <label><input type="radio" name="duracao" value="<?= htmlspecialchars($precos['quick_30']) ?>"> 30 min — R$ <?= htmlspecialchars($precos['quick_30']) ?></label>
-  <label><input type="radio" name="duracao" value="pacote"> Utilizar pacote de sessões</label>
+  <label><input type="radio" name="duracao" value="15" data-preco="<?= htmlspecialchars($precos['quick_15']) ?>"> 15 min — R$ <?= htmlspecialchars($precos['quick_15']) ?></label>
+  <label><input type="radio" name="duracao" value="30" data-preco="<?= htmlspecialchars($precos['quick_30']) ?>"> 30 min — R$ <?= htmlspecialchars($precos['quick_30']) ?></label>
+  <label><input type="radio" name="duracao" id="duracao-pacote" value="pacote5" data-preco="0"> Utilizar pacote de sessões</label>
     `;
     function atualizarDuracoes() {
       const cards = document.querySelectorAll('.treatment.selected');
@@ -797,6 +797,7 @@ while ($row = $res->fetch_assoc()) {
         radio.addEventListener('change', calcularValorFinal);
       });
       calcularValorFinal();
+      atualizarPacoteAgendamento();
     }
 
     document.getElementById('btn-formulario').onclick = function() {
@@ -947,8 +948,11 @@ document.getElementById('btn-agendar').onclick = function(e) {
       // Prepara os dados para envio
       const valor = (() => {
   let v = 0;
-  if (duracao.value !== "pacote") v = parseInt(duracao.value, 10);
-  if (document.getElementById('escalda-pes').checked) v += parseFloat(document.getElementById('escalda-pes').value) ;
+  const escaldaInput = document.getElementById('escalda-pes');
+  if (duracao.value !== "pacote5" && duracao.value !== "pacote10") {
+    v = parseFloat(duracao.dataset.preco);
+  }
+  if (escaldaInput.checked) v += parseFloat(escaldaInput.dataset.preco);
   return v;
 })();
 const dados = {
@@ -1135,13 +1139,14 @@ const dados = {
     function calcularValorFinal() {
       let valor = 0;
       const duracao = document.querySelector('input[name="duracao"]:checked');
-     
-      const escalda = document.getElementById('escalda-pes').checked ? parseFloat(document.getElementById('escalda-pes').value) : 0;
 
-      if (duracao && duracao.value === 'pacote') {
+      const escaldaInput = document.getElementById('escalda-pes');
+      const escalda = escaldaInput.checked ? parseFloat(escaldaInput.dataset.preco) : 0;
+
+      if (duracao && (duracao.value === 'pacote5' || duracao.value === 'pacote10')) {
         valor = 0;
       } else if (duracao) {
-        valor = parseInt(duracao.value, 10);
+        valor = parseFloat(duracao.dataset.preco);
       }
       valor += escalda;
 
@@ -1166,8 +1171,7 @@ const dados = {
 
     // Chama na inicialização
     calcularValorFinal();
-
-
+    
     // Ao carregar a página, verifica sessões restantes do usuário
     let sessoesDisponiveis = 0;
     // Função reutilizável
@@ -1177,7 +1181,7 @@ const dados = {
         .then((data) => {
           sessoesDisponiveis = data.sessoes_restantes || data.disponiveis || 0;
 
-          const inputPacote = document.querySelector('input[name="duracao"][value="pacote"]');
+          const inputPacote = document.getElementById('duracao-pacote');
           if (!inputPacote) return; // Não existe opção de pacote, não faz nada
           const labelPacote = inputPacote.parentElement;
 
@@ -1188,6 +1192,7 @@ const dados = {
           // Exibe ou bloqueia
           if (sessoesDisponiveis > 0) {
             inputPacote.disabled = false;
+            inputPacote.value = sessoesDisponiveis > 5 ? 'pacote10' : 'pacote5';
             labelPacote.innerHTML += ` <span id="pacote-info-agendamento" style="color:#30795b;">(${sessoesDisponiveis} sessões restantes)</span>`;
           } else {
             inputPacote.disabled = true;
