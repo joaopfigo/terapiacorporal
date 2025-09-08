@@ -45,7 +45,11 @@ function copiarAnamneseAnterior(mysqli $conn, ?int $usuario_id, int $agendamento
 
 // Coleta todos os campos necessários
  $user_id      = $_SESSION['usuario_id'] ?? null;
- $servico_id   = $_POST['servico_id'] ?? null;
+$servico_id = $_POST['servico_id'] ?? null;
+if (!$servico_id && isset($_POST['servicos'])) {
+    $tmp = array_filter(array_map('intval', explode(',', $_POST['servicos'])));
+    $servico_id = $tmp ? $tmp[0] : null;
+}
  $data         = $_POST['data'] ?? null;
  $hora         = $_POST['hora'] ?? null;
  $duracao      = $_POST['duracao'] ?? null; // pode vir 15/30/50/90 ou rótulos (escalda/pacote5/pacote10)
@@ -69,7 +73,14 @@ $pacote_id   = isset($_POST['pacote_id']) ? intval($_POST['pacote_id']) : null;
 
 // Validação obrigatória dos campos de agendamento
 if (!$servico_id || !$data || !$hora || !$duracao) {
-    die("DADOS_INCOMPLETOS");
+    // DEBUG TEMP: diga exatamente quais chaves faltaram
+$required = ['servico_id','data','hora','duracao'];
+$missing  = [];
+foreach ($required as $k) {
+  if (!isset($_POST[$k]) || $_POST[$k] === '') $missing[] = $k;
+}
+if ($missing) {
+  die("DADOS_INCOMPLETOS: ".implode(',', $missing));
 }
 $datetime = "$data $hora:00";
 
