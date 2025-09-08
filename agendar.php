@@ -1,6 +1,7 @@
 <?php
 include 'conexao.php';
 session_start();
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT); // TEMP: detalhar erros do MySQLi
 
 /**
  * Duplica a última anamnese do usuário (se existir) para o novo agendamento
