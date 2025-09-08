@@ -626,8 +626,9 @@ while ($row = $res->fetch_assoc()) {
         </div>
 
         <div class="formulario-fields" style="margin-top: 25px;">
-          <label>
-            <input type="checkbox" required> Afirmo ter lido e discutido as informações acima com meu terapeuta. Estou ciente de que o tratamento não é diagnóstico e nem mesmo substituto para o meu tratamento médico. Afirmo não ter omitido nenhuma informação concernente à minha saúde que devesse ter sido revelada e me responsabilizo por comunicar à minha terapeuta qualquer alteração em minhas condições clínicas que possa ocorrer no futuro.
+          <input type="checkbox" id="termo" name="termo" required>
+          <label for="termo">
+            Afirmo ter lido e discutido as informações acima com meu terapeuta. Estou ciente de que o tratamento não é diagnóstico e nem mesmo substituto para o meu tratamento médico. Afirmo não ter omitido nenhuma informação concernente à minha saúde que devesse ter sido revelada e me responsabilizo por comunicar à minha terapeuta qualquer alteração em minhas condições clínicas que possa ocorrer no futuro.
           </label>
         </div>
 
