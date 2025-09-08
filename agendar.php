@@ -1,8 +1,15 @@
 <?php
-require_once __DIR__ . '/conexao.php';
-session_start();
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT); // TEMP: detalhar erros do MySQLi
+session_start(); 
 
+// Habilita exceções do MySQLi ANTES de conectar (debug temporário)
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+require_once __DIR__ . '/conexao.php';
+
+// Sanidade: confirma que $conn existe e é mysqli
+if (!isset($conn) || !($conn instanceof mysqli)) {
+    die("ERRO_AGENDAR: conexao.php não definiu \$conn (mysqli).");
+}
 /**
  * Duplica a última anamnese do usuário (se existir) para o novo agendamento
  * ou cria registro vazio para permitir edição posterior.
