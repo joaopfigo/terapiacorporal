@@ -900,14 +900,8 @@ while ($row = $res->fetch_assoc()) {
   // O código correto para exibir os blocos será executado após a resposta do fetch('getPerfil.php')
     // Função para obter o serviço/tratamento selecionado
 function obterServicoSelecionado() {
-  const selected = document.querySelectorAll('.treatment.selected');
-  if (selected.length === 1) {
-    return selected[0].getAttribute('data-id');
-  }
-  if (selected.length === 2) {
-    return selected[0].getAttribute('data-id') + ',' + selected[1].getAttribute('data-id');
-  }
-  return null;
+  const selected = document.querySelector('.treatment.selected');
+  return selected ? selected.dataset.id : null;
 }
 
 // Função para pegar a data escolhida no calendário
@@ -926,71 +920,65 @@ document.getElementById('btn-agendar').onclick = function(e) {
   e.preventDefault();
 
   const duracao = document.querySelector('input[name="duracao"]:checked');
-  const slot = document.querySelector('.slot.selected');
+  const horaSelecionada = obterHoraSelecionada();
+  const dataSelecionada = obterDataSelecionada();
   const tratamento = obterServicoSelecionado();
   let guestValid = true;
 
   // Checa se bloco de guest está visível
   const guestVisible = document.getElementById('dados-guest').style.display !== 'none';
-
   if (guestVisible) {
     guestValid = [...document.querySelectorAll('#dados-guest input[required]')].every(f => f.value.trim() !== "");
-    if (!tratamento || !duracao || !slot || !guestValid) {
-      alert('Preencha todos os campos obrigatórios para agendar a sessão.');
-      return;
-    }
-  } else {
-    if (!tratamento || !duracao || !slot) {
-      alert('Preencha todos os campos obrigatórios para agendar a sessão.');
-      return;
+  }
+
+  if (!tratamento || !duracao || !horaSelecionada || !dataSelecionada || (guestVisible && !guestValid)) {
+    alert('Por favor, selecione serviço, data, horário e duração, preenchendo todos os campos obrigatórios.');
+    return;
+  }
+
+// Prepara os dados para envio
+const dados = {
+  servico_id: tratamento,
+  data: dataSelecionada,
+  hora: horaSelecionada,
+  duracao: duracao.value
+};
+
+// Checkbox da **Reflexologia Podal** (não é “Escalda Pés”)
+const reflexoEl = document.getElementById('add-reflexo'); // use o id real do seu checkbox
+if (reflexoEl && reflexoEl.checked) {
+  dados.add_reflexo = 1;            // o back-end espera exatamente esse nome
+}
+
+const termoEl = document.getElementById('termo');
+if (termoEl) {
+  dados.termo = termoEl.checked ? 1 : 0;
+}
+
+  // Se o bloco de guest estiver visível (usuário não logado), pega os campos obrigatórios de visitante
+  if (guestVisible) {
+    dados.guest_name = document.getElementById('guest-name').value;
+    dados.guest_email = document.getElementById('guest-email').value;
+    dados.guest_phone = document.getElementById('guest-phone').value;
+    dados.guest_nascimento = document.getElementById('guest-nascimento').value;
+    dados.guest_sexo = document.getElementById('guest-sexo').value;
+    dados.criar_conta = document.getElementById('criar-conta').checked ? 1 : 0;
+    if (dados.criar_conta) {
+      dados.guest_senha = document.getElementById('guest-senha').value;
+      dados.guest_senha2 = document.getElementById('guest-senha2').value;
     }
   }
 
-      // Prepara os dados para envio
-      const valor = (() => {
-  let v = 0;
-  const escaldaInput = document.getElementById('escalda-pes');
-  if (duracao.value !== "pacote5" && duracao.value !== "pacote10") {
-    v = parseFloat(duracao.dataset.preco);
-  }
-  if (escaldaInput.checked) v += parseFloat(escaldaInput.dataset.preco);
-  return v;
-})();
-  const dados = {
-    servico_id: obterServicoSelecionado(),
-    data: obterDataSelecionada(),
-    hora: obterHoraSelecionada(),
-    duracao: duracao.value,
-    preco_final: valor // <-- Esse campo é o novo!
-  };
-  dados.termo = document.getElementById('termo').checked ? 1 : 0;
-
-      // Se o bloco de guest estiver visível (usuário não logado), pega os campos obrigatórios de visitante
-      if (document.getElementById('dados-guest').style.display !== 'none') {
-          dados.guest_name = document.getElementById('guest-name').value;
-          dados.guest_email = document.getElementById('guest-email').value;
-          dados.guest_phone = document.getElementById('guest-phone').value;
-          dados.guest_nascimento = document.getElementById('guest-nascimento').value;
-          dados.guest_sexo = document.getElementById('guest-sexo').value;
-          dados.criar_conta = document.getElementById('criar-conta').checked ? 1 : 0;
-          if (dados.criar_conta) {
-              dados.guest_senha = document.getElementById('guest-senha').value;
-              dados.guest_senha2 = document.getElementById('guest-senha2').value;
-          }
-      }
-
-      // Adicione aqui a coleta dos outros campos do seu formulário!
-
-      // Envia ao PHP (AJAX)
-      fetch('agendar.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: new URLSearchParams(dados),
-        credentials: 'include'
-      })
-      .then(res => res.text())
-      .then(res => {
-  if (res.startsWith("SUCESSO")) {
+  // Envia ao PHP (AJAX)
+  fetch('agendar.php', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: new URLSearchParams(dados),
+    credentials: 'include'
+  })
+  .then(res => res.text())
+  .then(res => {
+  if (res.startsWith("SUCESSO|")) {
     const partes = res.split('|');
     const agendamentoId = partes[1] || null;
 
@@ -1007,19 +995,17 @@ document.getElementById('btn-agendar').onclick = function(e) {
 
     // Redireciona para a página de sessão marcada
     window.location.href = 'sessaoMarcada.html';
-  } else if (res.includes("HORARIO_OCUPADO")) {
-    alert("Horário já ocupado. Escolha outro.");
-  } else if (res.includes("DADOS_INCOMPLETOS")) {
-    alert("Preencha todos os dados obrigatórios.");
-  } else if (res.includes("SERVICO_SEM_PRECO")) {
-    alert("Serviço sem preço definido. Entre em contato.");
-  } else if (res.includes("PRECO_INVALIDO")) {
-    alert("Preço inválido para a duração selecionada");
-  } else if (res.includes("ERRO_AGENDAR")) {
-    alert("Erro ao agendar. Tente novamente.");
-  } else {
-    alert("Erro desconhecido: " + res);
-  }
+} else if (res.includes("DADOS_INCOMPLETOS")) {
+  alert("Preencha todos os dados obrigatórios.");
+} else if (res.includes("SERVICO_SEM_PRECO")) {
+  alert("Serviço sem preço definido. Entre em contato.");
+} else if (res.includes("PRECO_INVALIDO")) {
+  alert("Preço inválido para a duração selecionada.");
+} else if (res.includes("PACOTE_INVALIDO")) {
+  alert("Pacote inválido para este usuário ou indisponível.");
+} else {
+  alert("Erro ao agendar. Tente novamente");
+}
 })
       .catch(erro => {
         alert('Erro ao conectar ao servidor. Tente novamente mais tarde.');
