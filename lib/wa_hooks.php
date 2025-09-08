@@ -62,7 +62,7 @@ function notifyPatientBookingStatus(int $bookingId, bool $approved): bool {
     } else {
         // Template com APENAS {{1}} = serviço (en_US)
         $tpl  = 'consulta_recusa';
-        $lang = 'en_US';
+        $lang = 'en';
         $vars = [$r['servico']];
     }
 
