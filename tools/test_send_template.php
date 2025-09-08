@@ -1,43 +1,116 @@
 <?php
 // tools/test_send_template.php
-// Testa envio de TEMPLATE via seu servidor (usa lib/wa.php e o .env do servidor)
-
+// Teste de envio de TEMPLATE via seu servidor (usa lib/wa.php e o .env do servidor)
 require_once __DIR__ . '/../lib/wa.php';
 header('Content-Type: application/json; charset=utf-8');
 
-// Exemplo de uso:
-// /tools/test_send_template.php?to=5531999654279&name=hello_world
-// /tools/test_send_template.php?to=5531999654279&name=consulta_lembrete&service=Acupuntura&date=05/09/2025%2014:00
-
 $to   = $_GET['to']   ?? '';
-$name = $_GET['name'] ?? 'hello_world';
+$name = $_GET['name'] ?? '';
+$lang = $_GET['lang'] ?? null;
 
-if (!$to) {
+if ($to === '' || $name === '') {
     http_response_code(400);
-    echo json_encode(['error' => 'Informe ?to=55DDDNUMERO (E.164)'], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['error' => 'Informe ?to=55DDDNUMERO&name=template_name'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-// Idioma: hello_world é en_US; os seus templates serão pt_BR
-$lang = ($name === 'hello_world') ? 'en_US' : 'pt_BR';
-
-// Monte variáveis conforme o template
-$vars = [];
-if ($name === 'consulta_recusa') {
-    $service = $_GET['service'] ?? 'Acupuntura';
-    $vars = [$service]; // {{1}}
-} elseif ($name === 'consulta_confirmacao' || $name === 'consulta_lembrete') {
-    $service = $_GET['service'] ?? 'Acupuntura';
-    $date    = $_GET['date']    ?? date('d/m/Y H:i', time() + 3600);
-    $vars = [$service, $date]; // {{1}}, {{2}}
+// Idioma default por template (pode sobrescrever com &lang=)
+if ($lang === null) {
+    $n = strtolower($name);
+    if ($n === 'hello_world')        $lang = 'en_US';
+    elseif ($n === 'consulta_recusa') $lang = 'en_US';
+    else                              $lang = 'pt_BR';
 }
-// hello_world NÃO recebe variáveis → $vars = []
 
-// Envia: helper usa BODY com variáveis (se houver)
-$res = wa_send_template_simple($to, $name, $vars, $lang);
+// Monte as variáveis SOMENTE com o que vier na query string
+// Suporta ?vars[]=...&vars[]=... OU atalhos ?service=...&date=...
+$vars = [];
+if (isset($_GET['vars'])) {
+    $raw = $_GET['vars'];
+    if (is_array($raw)) {
+        foreach ($raw as $v) $vars[] = trim((string)$v);
+    } else {
+        $vars[] = trim((string)$raw);
+    }
+} else {
+    if (isset($_GET['service'])) $vars[] = trim((string)$_GET['service']);
+    if (isset($_GET['date']))    $vars[] = trim((string)$_GET['date']); // só se você mandar
+}
 
-// Retorno
+// Envia
+if (function_exists('wa_send_template_simple')) {
+    $res = wa_send_template_simple($to, $name, $vars, $lang);
+} else {
+    // Fallback se não existir o helper
+    $components = [];
+    if ($vars) {
+        $components[] = [
+            'type' => 'body',
+            'parameters' => array_map(fn($v) => ['type' => 'text', 'text' => $v], $vars),
+        ];
+    }
+    $res = wa_send_template($to, $name, $lang, $components);
+}
+
 echo json_encode([
-    'request'  => ['to' => $to, 'name' => $name, 'lang' => $lang, 'vars' => $vars],
+    'request'  => ['to'=>$to,'name'=>$name,'lang'=>$lang,'vars'=>$vars],
     'response' => $res
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+<?php
+// tools/test_send_template.php
+// Teste de envio de TEMPLATE via seu servidor (usa lib/wa.php e o .env do servidor)
+require_once __DIR__ . '/../lib/wa.php';
+header('Content-Type: application/json; charset=utf-8');
+
+$to   = $_GET['to']   ?? '';
+$name = $_GET['name'] ?? '';
+$lang = $_GET['lang'] ?? null;
+
+if ($to === '' || $name === '') {
+    http_response_code(400);
+    echo json_encode(['error' => 'Informe ?to=55DDDNUMERO&name=template_name'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// Idioma default por template (pode sobrescrever com &lang=)
+if ($lang === null) {
+    $n = strtolower($name);
+    if ($n === 'hello_world')        $lang = 'en_US';
+    elseif ($n === 'consulta_recusa') $lang = 'en_US';
+    else                              $lang = 'pt_BR';
+}
+
+// Monte as variáveis SOMENTE com o que vier na query string
+// Suporta ?vars[]=...&vars[]=... OU atalhos ?service=...&date=...
+$vars = [];
+if (isset($_GET['vars'])) {
+    $raw = $_GET['vars'];
+    if (is_array($raw)) {
+        foreach ($raw as $v) $vars[] = trim((string)$v);
+    } else {
+        $vars[] = trim((string)$raw);
+    }
+} else {
+    if (isset($_GET['service'])) $vars[] = trim((string)$_GET['service']);
+    if (isset($_GET['date']))    $vars[] = trim((string)$_GET['date']); // só se você mandar
+}
+
+// Envia
+if (function_exists('wa_send_template_simple')) {
+    $res = wa_send_template_simple($to, $name, $vars, $lang);
+} else {
+    // Fallback se não existir o helper
+    $components = [];
+    if ($vars) {
+        $components[] = [
+            'type' => 'body',
+            'parameters' => array_map(fn($v) => ['type' => 'text', 'text' => $v], $vars),
+        ];
+    }
+    $res = wa_send_template($to, $name, $lang, $components);
+}
+
+echo json_encode([
+    'request'  => ['to'=>$to,'name'=>$name,'lang'=>$lang,'vars'=>$vars],
+    'response' => $res
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
