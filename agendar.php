@@ -71,18 +71,18 @@ $senha2       = $_POST['guest_senha2'] ?? '';
 $usou_pacote = isset($_POST['usou_pacote']) ? intval($_POST['usou_pacote']) : 0;
 $pacote_id   = isset($_POST['pacote_id']) ? intval($_POST['pacote_id']) : null;
 
-// Validação obrigatória dos campos de agendamento
-if (!$servico_id || !$data || !$hora || !$duracao) {
-    // DEBUG TEMP: diga exatamente quais chaves faltaram
+// Validação obrigatória dos campos de agendamento (com debug)
 $required = ['servico_id','data','hora','duracao'];
 $missing  = [];
 foreach ($required as $k) {
-  if (!isset($_POST[$k]) || $_POST[$k] === '') $missing[] = $k;
+    if (!isset($_POST[$k]) || $_POST[$k] === '') $missing[] = $k;
 }
 if ($missing) {
-  die("DADOS_INCOMPLETOS: ".implode(',', $missing));
+    die("DADOS_INCOMPLETOS: " . implode(',', $missing));
 }
-$datetime = "$data $hora:00";
+
+// Se passou na validação, agora podemos montar o datetime
+$datetime = $_POST['data'] . ' ' . $_POST['hora'] . ':00';
 
 // Confere o preço oficial do serviço para evitar manipulação do cliente
 $stmt = $conn->prepare("SELECT preco_15, preco_30, preco_50, preco_90, preco_escalda, pacote5, pacote10 FROM especialidades WHERE id = ?");
