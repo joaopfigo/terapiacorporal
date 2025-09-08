@@ -86,7 +86,7 @@ switch ((string)$duracao) {
     default:         die("PRECO_INVALIDO");
 }
 if ($preco_oficial === null) {
-    die("PRECO_INVALIDO");
+    die("SERVICO_SEM_PRECO");
 }
 
 // Adicional de Reflexologia (opcional)
