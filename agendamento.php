@@ -938,22 +938,24 @@ document.getElementById('btn-agendar').onclick = function(e) {
 
 // Prepara os dados para envio
 const dados = {
-  servico_id: tratamento,
-  data: dataSelecionada,
-  hora: horaSelecionada,
-  duracao: duracao.value
+  servico_id: tratamento,     
+  data: dataSelecionada,     
+  hora: horaSelecionada,     
+  duracao: duracao.value      
 };
 
-// Checkbox da **Reflexologia Podal** (não é “Escalda Pés”)
-const reflexoEl = document.getElementById('escalda-pes');
-if (reflexoEl && reflexoEl.checked) {
+// Extra opcional: Escalda Pés  (mantemos a chave add_reflexo para não quebrar o PHP)
+const escaldaEl = document.getElementById('escalda-pes');
+if (escaldaEl && escaldaEl.checked) {
   dados.add_reflexo = 1;
 }
 
+// Termo (se existir no formulário)
 const termoEl = document.getElementById('termo');
-if (termoEl) {
-  dados.termo = termoEl.checked ? 1 : 0;
+if (termoEl && termoEl.checked) {
+  dados.termo = 1;
 }
+
 
   // Se o bloco de guest estiver visível (usuário não logado), pega os campos obrigatórios de visitante
   if (guestVisible) {
