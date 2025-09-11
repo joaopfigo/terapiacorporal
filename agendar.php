@@ -71,18 +71,43 @@ $senha2       = $_POST['guest_senha2'] ?? '';
 $usou_pacote = isset($_POST['usou_pacote']) ? intval($_POST['usou_pacote']) : 0;
 $pacote_id   = isset($_POST['pacote_id']) ? intval($_POST['pacote_id']) : null;
 
-// Validação obrigatória dos campos de agendamento (com debug)
+// --- Fallback de serviço + validação obrigatória ---
+$servico_id = $_POST['servico_id'] ?? null;
+if (!$servico_id && !empty($_POST['servicos'])) {
+    $ids = array_filter(array_map('intval', explode(',', $_POST['servicos'])));
+    $servico_id = $ids ? $ids[0] : null;
+    $_POST['servico_id'] = $servico_id; // normaliza para o restante do código
+}
+
+$data    = trim($_POST['data']    ?? '');
+$hora    = trim($_POST['hora']    ?? '');
+$duracao = trim($_POST['duracao'] ?? '');
+
+// Lista e reporta exatamente o que faltou
 $required = ['servico_id','data','hora','duracao'];
 $missing  = [];
 foreach ($required as $k) {
     if (!isset($_POST[$k]) || $_POST[$k] === '') $missing[] = $k;
 }
 if ($missing) {
-    die("DADOS_INCOMPLETOS: " . implode(',', $missing));
+    // Se veio via 'servicos', não acuse 'servico_id' como faltando
+    if (isset($_POST['servicos'])) {
+        $missing = array_values(array_diff($missing, ['servico_id']));
+    }
+    if ($missing) {
+        die('DADOS_INCOMPLETOS: ' . implode(',', $missing));
+    }
 }
 
-// Se passou na validação, agora podemos montar o datetime
-$datetime = $_POST['data'] . ' ' . $_POST['hora'] . ':00';
+// (opcional) checagem simples de formato de data/hora
+if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $data) || !preg_match('/^\d{2}:\d{2}$/', $hora)) {
+    die('DADOS_INCOMPLETOS: data/hora inválidas');
+}
+
+// Normalizações finais
+$servico_id = (int)$servico_id;
+$datetime   = $data . ' ' . $hora . ':00';
+
 
 // Confere o preço oficial do serviço para evitar manipulação do cliente
 $stmt = $conn->prepare("SELECT preco_15, preco_30, preco_50, preco_90, preco_escalda, pacote5, pacote10 FROM especialidades WHERE id = ?");
