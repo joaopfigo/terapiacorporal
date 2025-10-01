@@ -3,6 +3,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 require_once '../conexao.php';
+require_once __DIR__ . '/../lib/booking_helpers.php';
 // Função auxiliar para labels 
 function getStatusLabel($status)
 {
@@ -151,6 +152,17 @@ LEFT JOIN especialidades e ON a.especialidade_id = e.id
 ORDER BY a.data_horario DESC";
 $result = $conn->query($query);
 $agendamentos = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+foreach ($agendamentos as &$ag) {
+  [$tituloServicos, $listaServicos] = descreverServicos(
+    $conn,
+    isset($ag['especialidade_id']) ? (int)$ag['especialidade_id'] : 0,
+    $ag['servicos_csv'] ?? null,
+    $ag['servico_nome'] ?? ''
+  );
+  $ag['servico_exibicao'] = $tituloServicos;
+  $ag['servicos_lista'] = $listaServicos;
+}
+unset($ag);
 // Separar eventos para o calendário 
 $eventos_calendario = [];
 foreach ($agendamentos as $a) {
@@ -605,8 +617,7 @@ foreach ($agendamentos as $a) {
         <div class="ag-card-header">
           <div class="ag-card-title">
             <?= $a['usuario_nome'] ? htmlspecialchars($a['usuario_nome']) : '<span class="bloqueado">Indisponível</span>' ?>
-            <span
-              style="font-weight:400;color:#b3a76c;font-size:.97rem;margin-left:9px;"><?= htmlspecialchars($a['servico_nome'] ?? '-') ?></span>
+            style="font-weight:400;color:#b3a76c;font-size:.97rem;margin-left:9px;"><?= htmlspecialchars($a['servico_exibicao'] ?? $a['servico_nome'] ?? '-') ?></span>
           </div>
           <div class="ag-card-status" data-status="<?= strtolower($a['status']) ?>">
             <?= getStatusLabel($a['status']) ?>
