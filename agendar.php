@@ -5,7 +5,17 @@ session_start();
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 require_once __DIR__ . '/conexao.php';
-require_once __DIR__ . '/lib/booking_constants.php';
+$bookingConstantsPath = __DIR__ . '/lib/booking_constants.php';
+if (file_exists($bookingConstantsPath)) {
+    require_once $bookingConstantsPath;
+} else {
+    if (!defined('DUO_SERVICE_ID')) {
+        define('DUO_SERVICE_ID', 10);
+    }
+    if (!defined('DUO_PRECO')) {
+        define('DUO_PRECO', 260.00);
+    }
+}
 
 // Sanidade: confirma que $conn existe e é mysqli
 if (!isset($conn) || !($conn instanceof mysqli)) {
