@@ -4,6 +4,7 @@
 
 session_start();
 require_once 'conexao.php'; // ajuste o caminho se necessário
+require_once __DIR__ . '/lib/booking_constants.php';
 
 
 // Buscar valores atuais
@@ -32,7 +33,17 @@ while ($row = $res->fetch_assoc()) {
     $precos['pacote5'] = $row['pacote5'];
     $precos['pacote10'] = $row['pacote10'];
 }
-
+$duoPreco = DUO_PRECO;
+if ($stmt = $conn->prepare('SELECT preco_30 FROM especialidades WHERE id = ? LIMIT 1')) {
+    $stmt->bind_param('i', $duoId = DUO_SERVICE_ID);
+    if ($stmt->execute()) {
+        $stmt->bind_result($precoComboDb);
+        if ($stmt->fetch() && $precoComboDb !== null) {
+            $duoPreco = (float) $precoComboDb;
+        }
+    }
+    $stmt->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -276,6 +287,10 @@ while ($row = $res->fetch_assoc()) {
       margin-bottom: 9px;
       color: #4e4360;
       cursor: pointer;
+    }
+    .durations label.duracao-disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
     .promo {
       background: #f6f0fd;
@@ -766,6 +781,8 @@ while ($row = $res->fetch_assoc()) {
   </div>
 
   <script>
+    const DUO_SERVICE_ID = <?= (int) DUO_SERVICE_ID ?>;
+    const DUO_PRECO = Number(<?= json_encode($duoPreco) ?>);
     let formularioEnviado = false;
     // HTML padrão (todas as opções exceto quick massage sozinho)
     const htmlDuracoesPadrao = `
@@ -794,8 +811,17 @@ while ($row = $res->fetch_assoc()) {
         durationsDiv.innerHTML = htmlDuracoesPadrao;
       }
       // Recoloca os eventos nos radios (importante para funcionar o valor total!)
+      const isCombo = cards.length === 2;
       document.querySelectorAll('input[name="duracao"]').forEach(function(radio) {
         radio.addEventListener('change', calcularValorFinal);
+        radio.disabled = isCombo;
+        const label = radio.closest('label');
+        if (label) {
+          label.classList.toggle('duracao-disabled', isCombo);
+        }
+        if (isCombo && radio.checked) {
+          radio.checked = false;
+        }
       });
       calcularValorFinal();
       atualizarPacoteAgendamento();
@@ -898,10 +924,13 @@ while ($row = $res->fetch_assoc()) {
   // O estado de login será determinado via AJAX abaixo, então inicialize como false
   let usuarioLogado = false;
   // O código correto para exibir os blocos será executado após a resposta do fetch('getPerfil.php')
-    // Função para obter o serviço/tratamento selecionado
-function obterServicoSelecionado() {
-  const selected = document.querySelector('.treatment.selected');
-  return selected ? selected.dataset.id : null;
+      
+// Função para obter até dois serviços selecionados
+function getServicosSelecionados() {
+  return Array.from(document.querySelectorAll('.treatment.selected'))
+    .map(card => card.dataset.id)
+    .filter(Boolean)
+    .slice(0, 2);
 }
 
 // Função para pegar a data escolhida no calendário
@@ -919,10 +948,11 @@ function obterHoraSelecionada() {
 document.getElementById('btn-agendar').onclick = function(e) {
   e.preventDefault();
 
-  const duracao = document.querySelector('input[name="duracao"]:checked');
+  const duracaoSelecionada = document.querySelector('input[name="duracao"]:checked');
   const horaSelecionada = obterHoraSelecionada();
   const dataSelecionada = obterDataSelecionada();
-  const tratamento = obterServicoSelecionado();
+  const servicosSelecionados = getServicosSelecionados();
+  const isCombo = servicosSelecionados.length === 2;
   let guestValid = true;
 
   // Checa se bloco de guest está visível
@@ -931,18 +961,27 @@ document.getElementById('btn-agendar').onclick = function(e) {
     guestValid = [...document.querySelectorAll('#dados-guest input[required]')].every(f => f.value.trim() !== "");
   }
 
-  if (!tratamento || !duracao || !horaSelecionada || !dataSelecionada || (guestVisible && !guestValid)) {
+  if (!servicosSelecionados.length || (!isCombo && !duracaoSelecionada) || !horaSelecionada || !dataSelecionada || (guestVisible && !guestValid)) {
     alert('Por favor, selecione serviço, data, horário e duração, preenchendo todos os campos obrigatórios.');
     return;
   }
 
 // Prepara os dados para envio
 const dados = {
-  servico_id: tratamento,     
-  data: dataSelecionada,     
-  hora: horaSelecionada,     
-  duracao: duracao.value      
+  data: dataSelecionada,
+  hora: horaSelecionada
 };
+
+if (isCombo) {
+  dados.servico_id = String(DUO_SERVICE_ID);
+  dados.duracao = '30';
+  dados.servicos = servicosSelecionados.join(',');
+} else {
+  const servicoEscolhido = servicosSelecionados[0];
+  dados.servico_id = servicoEscolhido;
+  dados.duracao = duracaoSelecionada.value;
+  dados.servicos = servicoEscolhido;
+}
 
 // Extra opcional: Escalda Pés  (mantemos a chave add_reflexo para não quebrar o PHP)
 const escaldaEl = document.getElementById('escalda-pes');
@@ -1131,11 +1170,15 @@ if (termoEl && termoEl.checked) {
     function calcularValorFinal() {
       let valor = 0;
       const duracao = document.querySelector('input[name="duracao"]:checked');
+      const servicosSelecionados = getServicosSelecionados();
+      const isCombo = servicosSelecionados.length === 2;
 
       const escaldaInput = document.getElementById('escalda-pes');
-      const escalda = escaldaInput.checked ? parseFloat(escaldaInput.dataset.preco) : 0;
+      const escalda = escaldaInput && escaldaInput.checked ? parseFloat(escaldaInput.dataset.preco) : 0;
 
-      if (duracao && (duracao.value === 'pacote5' || duracao.value === 'pacote10')) {
+      if (isCombo) {
+        valor = isNaN(DUO_PRECO) ? 0 : DUO_PRECO;
+      } else if (duracao && (duracao.value === 'pacote5' || duracao.value === 'pacote10')) {
         valor = 0;
       } else if (duracao) {
         valor = parseFloat(duracao.dataset.preco);
@@ -1159,7 +1202,10 @@ if (termoEl && termoEl.checked) {
     document.querySelectorAll('input[name="duracao"]').forEach(function(radio) {
       radio.addEventListener('change', calcularValorFinal);
     });
-    document.getElementById('escalda-pes').addEventListener('change', calcularValorFinal);
+    const escaldaCheckbox = document.getElementById('escalda-pes');
+    if (escaldaCheckbox) {
+      escaldaCheckbox.addEventListener('change', calcularValorFinal);
+    }
 
     // Chama na inicialização
     calcularValorFinal();
@@ -1176,6 +1222,7 @@ if (termoEl && termoEl.checked) {
           const inputPacote = document.getElementById('duracao-pacote');
           if (!inputPacote) return; // Não existe opção de pacote, não faz nada
           const labelPacote = inputPacote.parentElement;
+          const comboAtivo = getServicosSelecionados().length === 2;
 
           // Remove info duplicada se recarregar
           const info = document.getElementById('pacote-info-agendamento');
@@ -1197,6 +1244,13 @@ if (termoEl && termoEl.checked) {
                   Comprar pacote de sessões
                 </button>
               </div>`;
+            }
+          }
+
+          if (comboAtivo) {
+            inputPacote.disabled = true;
+            if (labelPacote) {
+              labelPacote.classList.add('duracao-disabled');
             }
           }
         });
