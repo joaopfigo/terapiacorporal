@@ -2,6 +2,7 @@
 // lib/wa_hooks.php
 require_once __DIR__ . '/wa.php';
 require_once __DIR__ . '/db_bootstrap.php';
+require_once __DIR__ . '/booking_helpers.php';
 
 function wa_is_enabled(): bool {
     $v = getenv('WA_ENABLED');
@@ -11,6 +12,7 @@ function wa_is_enabled(): bool {
 function getBookingBasic(int $bookingId): ?array {
     $conn = db();
     $sql = "SELECT a.id, a.data_horario, a.status,
+                   a.especialidade_id, a.servicos_csv,
                    e.nome AS servico,
                    COALESCE(u.nome, a.nome_visitante) AS paciente_nome,
                    COALESCE(u.telefone, a.telefone_visitante) AS paciente_tel
@@ -25,6 +27,17 @@ function getBookingBasic(int $bookingId): ?array {
     $res = $st->get_result();
     $r   = $res ? $res->fetch_assoc() : null;
     $st->close();
+    if ($r) {
+        [$tituloServicos, $listaServicos] = descreverServicos(
+            $conn,
+            (int) $r['especialidade_id'],
+            $r['servicos_csv'],
+            $r['servico']
+        );
+        $r['servico'] = $tituloServicos;
+        $r['servicos_lista'] = $listaServicos;
+    }
+
     return $r ?: null;
 }
 
