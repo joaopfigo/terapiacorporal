@@ -5,6 +5,7 @@ session_start();
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 require_once __DIR__ . '/conexao.php';
+require_once __DIR__ . '/lib/booking_constants.php';
 
 // Sanidade: confirma que $conn existe e é mysqli
 if (!isset($conn) || !($conn instanceof mysqli)) {
@@ -44,18 +45,48 @@ function copiarAnamneseAnterior(mysqli $conn, ?int $usuario_id, int $agendamento
 }
 
 // Coleta todos os campos necessários
- $user_id      = $_SESSION['usuario_id'] ?? null;
-$servico_id = $_POST['servico_id'] ?? null;
-if (!$servico_id && isset($_POST['servicos'])) {
-    $tmp = array_filter(array_map('intval', explode(',', $_POST['servicos'])));
-    $servico_id = $tmp ? $tmp[0] : null;
+$user_id       = $_SESSION['usuario_id'] ?? null;
+$rawServicos   = isset($_POST['servicos']) ? (string) $_POST['servicos'] : '';
+$servicosLista = [];
+if ($rawServicos !== '') {
+    $servicosLista = array_values(array_unique(array_filter(array_map('intval', explode(',', $rawServicos)))));
 }
- $data         = $_POST['data'] ?? null;
- $hora         = $_POST['hora'] ?? null;
- $duracao      = $_POST['duracao'] ?? null; // pode vir 15/30/50/90 ou rótulos (escalda/pacote5/pacote10)
- $add_reflexo  = isset($_POST['add_reflexo']) ? 1 : 0;
- $aceitou_termo = isset($_POST['termo']) ? 1 : 0;
- $status       = 'Pendente';
+if (count($servicosLista) > 2) {
+    die('SERVICOS_INVALIDOS');
+}
+
+$servico_id = isset($_POST['servico_id']) ? (int) $_POST['servico_id'] : 0;
+if (!$servico_id && $servicosLista) {
+    $servico_id = (int) $servicosLista[0];
+    $_POST['servico_id'] = (string) $servico_id;
+}
+
+$isCombo      = count($servicosLista) === 2;
+$data         = trim($_POST['data'] ?? '');
+$hora         = trim($_POST['hora'] ?? '');
+$duracao      = trim($_POST['duracao'] ?? '');
+$add_reflexo  = isset($_POST['add_reflexo']) ? 1 : 0;
+$aceitou_termo = isset($_POST['termo']) ? 1 : 0;
+$status       = 'Pendente';
+
+if ($isCombo) {
+    if ($servico_id !== DUO_SERVICE_ID) {
+        die('SERVICO_COMBO_INVALIDO');
+    }
+    if (in_array(DUO_SERVICE_ID, $servicosLista, true)) {
+        die('SERVICOS_INVALIDOS');
+    }
+    if ($duracao === '') {
+        $duracao = '30';
+    }
+}
+
+if (!$servico_id) {
+    die('SERVICO_OBRIGATORIO');
+}
+if ($servico_id === DUO_SERVICE_ID && !$isCombo) {
+    die('SERVICOS_INVALIDOS');
+}
 
 // Campos do formulário de visitante/conta
 $criarConta   = isset($_POST['criar_conta']) ? intval($_POST['criar_conta']) : 0;
@@ -70,33 +101,23 @@ $senha2       = $_POST['guest_senha2'] ?? '';
 // Campos relacionados a pacotes
 $usou_pacote = isset($_POST['usou_pacote']) ? intval($_POST['usou_pacote']) : 0;
 $pacote_id   = isset($_POST['pacote_id']) ? intval($_POST['pacote_id']) : null;
-
-// --- Fallback de serviço + validação obrigatória ---
-$servico_id = $_POST['servico_id'] ?? null;
-if (!$servico_id && !empty($_POST['servicos'])) {
-    $ids = array_filter(array_map('intval', explode(',', $_POST['servicos'])));
-    $servico_id = $ids ? $ids[0] : null;
-    $_POST['servico_id'] = $servico_id; // normaliza para o restante do código
+if ($isCombo) {
+    $usou_pacote = 0;
+    $pacote_id   = null;
 }
 
-$data    = trim($_POST['data']    ?? '');
-$hora    = trim($_POST['hora']    ?? '');
-$duracao = trim($_POST['duracao'] ?? '');
-
-// Lista e reporta exatamente o que faltou
-$required = ['servico_id','data','hora','duracao'];
-$missing  = [];
-foreach ($required as $k) {
-    if (!isset($_POST[$k]) || $_POST[$k] === '') $missing[] = $k;
+$required = ['data' => $data, 'hora' => $hora];
+if (!$isCombo) {
+    $required['duracao'] = $duracao;
+}
+$missing = [];
+foreach ($required as $campo => $valor) {
+    if ($valor === '' || $valor === null) {
+        $missing[] = $campo;
+    }
 }
 if ($missing) {
-    // Se veio via 'servicos', não acuse 'servico_id' como faltando
-    if (isset($_POST['servicos'])) {
-        $missing = array_values(array_diff($missing, ['servico_id']));
-    }
-    if ($missing) {
-        die('DADOS_INCOMPLETOS: ' . implode(',', $missing));
-    }
+    die('DADOS_INCOMPLETOS: ' . implode(',', $missing));
 }
 
 // (opcional) checagem simples de formato de data/hora
@@ -105,8 +126,8 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $data) || !preg_match('/^\d{2}:\d{2}$/'
 }
 
 // Normalizações finais
-$servico_id = (int)$servico_id;
-$datetime   = $data . ' ' . $hora . ':00';
+$datetime     = $data . ' ' . $hora . ':00';
+$servicosCsv  = $isCombo && $servicosLista ? implode(',', $servicosLista) : null;
 
 
 // Confere o preço oficial do serviço para evitar manipulação do cliente
@@ -120,18 +141,38 @@ if (!$result || $result->num_rows === 0) {
 $servico = $result->fetch_assoc();
 $stmt->close();
 
-switch ((string)$duracao) {
-    case '15':       $preco_oficial = $servico['preco_15'];      break;
-    case '30':       $preco_oficial = $servico['preco_30'];      break;
-    case '50':       $preco_oficial = $servico['preco_50'];      break;
-    case '90':       $preco_oficial = $servico['preco_90'];      break;
-    case 'escalda':  $preco_oficial = $servico['preco_escalda']; break;
-    case 'pacote5':  $preco_oficial = $servico['pacote5'];       break;
-    case 'pacote10': $preco_oficial = $servico['pacote10'];      break;
-    default:         die("PRECO_INVALIDO");
-}
-if ($preco_oficial === null) {
-    die("SERVICO_SEM_PRECO");
+if ($isCombo) {
+    $preco_oficial = DUO_PRECO;
+    if ($servicosLista) {
+        if (count($servicosLista) === 2) {
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM especialidades WHERE id IN (?, ?)");
+            $stmt->bind_param('ii', $servicosLista[0], $servicosLista[1]);
+        } else {
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM especialidades WHERE id = ?");
+            $stmt->bind_param('i', $servicosLista[0]);
+        }
+        $stmt->execute();
+        $stmt->bind_result($qtdValidas);
+        $stmt->fetch();
+        $stmt->close();
+        if ((int)$qtdValidas !== count($servicosLista)) {
+            die('SERVICOS_INVALIDOS');
+        }
+    }
+} else {
+    switch ((string)$duracao) {
+        case '15':       $preco_oficial = $servico['preco_15'];      break;
+        case '30':       $preco_oficial = $servico['preco_30'];      break;
+        case '50':       $preco_oficial = $servico['preco_50'];      break;
+        case '90':       $preco_oficial = $servico['preco_90'];      break;
+        case 'escalda':  $preco_oficial = $servico['preco_escalda']; break;
+        case 'pacote5':  $preco_oficial = $servico['pacote5'];       break;
+        case 'pacote10': $preco_oficial = $servico['pacote10'];      break;
+        default:         die("PRECO_INVALIDO");
+    }
+    if ($preco_oficial === null) {
+        die("SERVICO_SEM_PRECO");
+    }
 }
 
 // Adicional de Escalda Pés (opcional)
@@ -158,23 +199,6 @@ $duracao_db = is_numeric($duracao) ? (int)$duracao : 0; // 0 como sentinela caso
 
 // Se for visitante, validar dados e criar conta se necessário
 if (!$user_id) {
-    if (!$nome || !$email || !$telefone || !$nascimento || !$sexo) {
-        die("DADOS_INCOMPLETOS");
-    }
-    if ($criarConta) {
-        if (!$senha || !$senha2 || $senha !== $senha2) {
-            die("SENHA_INVALIDA");
-        }
-        $stmt = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            die("EMAIL_EXISTENTE");
-        }
-        $stmt->close();
-        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("INSERT INTO usuarios (nome, email, telefone, nascimento, sexo, senha_hash) VALUES (?, ?, ?, ?, ?, ?)");
         if (!$stmt) {
             die("ERRO_CRIAR_USUARIO");
         }
@@ -200,11 +224,11 @@ try {
     $conn->begin_transaction();
 
     if ($user_id) {
-        $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->bind_param("iisidis", $user_id, $servico_id, $datetime, $duracao_db, $preco_final, $add_reflexo, $status);
+        $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, servicos_csv, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+        $stmt->bind_param("iisidiss", $user_id, $servico_id, $datetime, $duracao_db, $preco_final, $add_reflexo, $status, $servicosCsv);
     } else {
-        $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, nome_visitante, email_visitante, telefone_visitante, idade_visitante, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->bind_param("isssiisidis", $user_id, $nome, $email, $telefone, $idade, $servico_id, $datetime, $duracao_db, $preco_final, $add_reflexo, $status);
+        $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, nome_visitante, email_visitante, telefone_visitante, idade_visitante, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, servicos_csv, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+        $stmt->bind_param("isssiisidiss", $user_id, $nome, $email, $telefone, $idade, $servico_id, $datetime, $duracao_db, $preco_final, $add_reflexo, $status, $servicosCsv);
     }
 
     if (!$stmt->execute()) {
@@ -212,6 +236,13 @@ try {
     }
     $id_agendamento = $stmt->insert_id;
     $stmt->close();
+
+    if ($isCombo && $servicosCsv) {
+        $stmt = $conn->prepare("UPDATE agendamentos SET servicos_csv = ? WHERE id = ?");
+        $stmt->bind_param('si', $servicosCsv, $id_agendamento);
+        $stmt->execute();
+        $stmt->close();
+    }
 
     if ($usou_pacote && $pacote_id) {
         $stmt = $conn->prepare("UPDATE pacotes SET sessoes_usadas = sessoes_usadas + 1 WHERE id = ?");
