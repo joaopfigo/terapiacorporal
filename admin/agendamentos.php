@@ -7,6 +7,7 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] !== 'terapeuta') {
 }
 
 require_once '../conexao.php';
+require_once __DIR__ . '/../lib/booking_helpers.php';
 header('Content-Type: text/html; charset=utf-8');
 
 // Utilitário para status display
@@ -80,10 +81,11 @@ function get_nome_paciente($row) {
             </thead>
             <tbody>
                 <?php while($row = $res->fetch_assoc()): ?>
+                    <?php [$servicoTitulo] = descreverServicos($conn, (int)($row['especialidade_id'] ?? 0), $row['servicos_csv'] ?? null, $row['especialidade'] ?? ''); ?>
                     <tr>
                         <td><?= $row['id'] ?></td>
                         <td><?= get_nome_paciente($row) ?></td>
-                        <td><?= htmlspecialchars($row['especialidade']) ?></td>
+                        <td><?= htmlspecialchars($servicoTitulo) ?></td>
                         <td><?= date('d/m/Y H:i', strtotime($row['data_horario'])) ?></td>
                         <td><?= $row['duracao'] ?> min</td>
                         <td><?= badge_status($row['status']) ?></td>
