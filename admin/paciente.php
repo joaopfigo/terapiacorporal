@@ -5,6 +5,7 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] !== 'terapeuta') {
     header('Location: ../login.php'); exit;
 }
 require_once '../conexao.php';
+require_once __DIR__ . '/../lib/booking_helpers.php';
 $id_paciente = intval($_GET['id'] ?? 0);
 if ($id_paciente <= 0) { die('Paciente não encontrado.'); }
 // Buscar dados do paciente
@@ -112,12 +113,18 @@ us:6px;cursor:pointer;font-size:0.9rem;">Adicionar pacote</button>
       <th>Anamnese</th>
     </tr>
     <?php while ($cons = $historico->fetch_assoc()) {
+    [$servicoTitulo] = descreverServicos(
+        $conn,
+        (int)($cons['especialidade_id'] ?? 0),
+        $cons['servicos_csv'] ?? null,
+        $cons['especialidade'] ?? ''
+      );
       $agendamento_id = $cons['id'];
       $tem_formulario = $conn->query("SELECT 1 FROM formularios_queixa WHERE agendamento_id = $agendamento_id LIMIT 1")->num_rows > 0;
     ?>
     <tr>
       <td><?= date('d/m/Y H:i', strtotime($cons['data_horario'])) ?></td>
-      <td><?= htmlspecialchars($cons['especialidade']) ?></td>
+      <td><?= htmlspecialchars($servicoTitulo) ?></td>
       <td><?= $cons['duracao'] ?> min</td>
       <td><?= htmlspecialchars($cons['status']) ?></td>
       <td style="text-align:center;">
