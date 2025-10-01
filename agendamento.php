@@ -24,29 +24,59 @@ $precos = [
     'escalda' => '', 'pacote5' => '', 'pacote10' => ''
 ];
 $res = $conn->query("SELECT preco_15, preco_30 FROM especialidades WHERE nome = 'Quick Massage' LIMIT 1");
-if ($row = $res->fetch_assoc()) {
-    $precos['quick_15'] = $row['preco_15'];
-    $precos['quick_30'] = $row['preco_30'];
+if ($res instanceof mysqli_result) {
+    if ($row = $res->fetch_assoc()) {
+        $precos['quick_15'] = $row['preco_15'];
+        $precos['quick_30'] = $row['preco_30'];
+    }
+    $res->free();
+} else {
+    error_log(mysqli_error($conn));
 }
+
 $res = $conn->query("SELECT preco_50, preco_90 FROM especialidades WHERE nome != 'Quick Massage' LIMIT 1");
-if ($row = $res->fetch_assoc()) {
-    $precos['padrao_50'] = $row['preco_50'];
-    $precos['padrao_90'] = $row['preco_90'];
+if ($res instanceof mysqli_result) {
+    if ($row = $res->fetch_assoc()) {
+        $precos['padrao_50'] = $row['preco_50'];
+        $precos['padrao_90'] = $row['preco_90'];
+    }
+    $res->free();
+} else {
+    error_log(mysqli_error($conn));
 }
+
 $res = $conn->query("SELECT preco_escalda FROM especialidades WHERE nome = 'Escalda Pés' LIMIT 1");
-if ($row = $res->fetch_assoc()) {
-    $precos['escalda'] = $row['preco_escalda'];
+if ($res instanceof mysqli_result) {
+    if ($row = $res->fetch_assoc()) {
+        $precos['escalda'] = $row['preco_escalda'];
+    }
+    $res->free();
+} else {
+    error_log(mysqli_error($conn));
 }
 
 $res = $conn->query("SELECT pacote5, pacote10 FROM especialidades");
-while ($row = $res->fetch_assoc()) {
-    $precos['pacote5'] = $row['pacote5'];
-    $precos['pacote10'] = $row['pacote10'];
+if ($res instanceof mysqli_result) {
+    while ($row = $res->fetch_assoc()) {
+        $precos['pacote5'] = $row['pacote5'];
+        $precos['pacote10'] = $row['pacote10'];
+    }
+    $res->free();
+} else {
+    error_log(mysqli_error($conn));
 }
+
 $duoPreco = DUO_PRECO;
-if ($stmt = $conn->prepare('SELECT preco_30 FROM especialidades WHERE id = ? LIMIT 1')) {
-    $stmt->bind_param('i', $duoId = DUO_SERVICE_ID);
-    if ($stmt->execute()) {
+$duoId = DUO_SERVICE_ID;
+$stmt = $conn->prepare('SELECT preco_30 FROM especialidades WHERE id = ? LIMIT 1');
+if ($stmt === false) {
+    error_log(mysqli_error($conn));
+} else {
+    if (!$stmt->bind_param('i', $duoId)) {
+        error_log($stmt->error);
+    } elseif (!$stmt->execute()) {
+        error_log($stmt->error);
+    } else {
         $stmt->bind_result($precoComboDb);
         if ($stmt->fetch() && $precoComboDb !== null) {
             $duoPreco = (float) $precoComboDb;
