@@ -2,6 +2,7 @@
 session_start();
 header('Content-Type: application/json');
 require_once 'conexao.php';
+require_once __DIR__ . '/lib/booking_helpers.php';
 
 // 1. Verifica autenticação
 if (!isset($_SESSION['usuario_id'])) {
@@ -31,7 +32,7 @@ $usuario = [
 ];
 
 // 3. Busca agendamentos do usuário (sessões)
-$sql = "SELECT ag.id, e.nome AS servico, ag.data_horario, ag.duracao, ag.adicional_reflexo, ag.status,
+$sql = "SELECT ag.id, ag.especialidade_id, ag.servicos_csv, e.nome AS servico, ag.data_horario, ag.duracao, ag.adicional_reflexo, ag.status,
                fq.desconforto_principal, fq.tempo_desconforto, fq.classificacao_dor, fq.tratamento_medico,
                an.anamnese
         FROM agendamentos ag
@@ -46,9 +47,16 @@ $stmt2->execute();
 $result = $stmt2->get_result();
 $sessoes = [];
 while ($row = $result->fetch_assoc()) {
+    [$tituloServicos, $listaServicos] = descreverServicos(
+        $conn,
+        (int) $row['especialidade_id'],
+        $row['servicos_csv'],
+        $row['servico']
+    );
     $sessoes[] = [
         "id"         => $row['id'],
-        "tratamento" => $row['servico'],
+        "tratamento" => $tituloServicos,
+        "tratamentos" => $listaServicos,
         "data_horario" => $row['data_horario'],
         "duracao"    => $row['duracao'],
         "status"     => $row['status'],
