@@ -529,6 +529,13 @@
 
   <script>
     let sessoes = [];
+        
+    function nomeTratamentos(sessao) {
+      if (Array.isArray(sessao.tratamentos) && sessao.tratamentos.length) {
+        return sessao.tratamentos.join(' + ');
+      }
+      return sessao.tratamento;
+    }
     let usuario = {};
     // Preenche dados usuário
     fetch("getPerfil.php")
@@ -589,8 +596,9 @@
 
           const card = document.createElement("div");
           card.classList.add("sessao-card");
+          const tituloTratamento = nomeTratamentos(sessao);
           card.innerHTML = `
-            <b>${sessao.tratamento}</b><br>
+            <b>${tituloTratamento}</b><br>
             ${data.toLocaleString()} - ${sessao.duracao} min
             ${sessao.status ? `<br>Status: ${sessao.status}` : ""}
             ${sessao.reclamacao ? `<br><small>Queixa: ${sessao.reclamacao.sintomas} (${sessao.reclamacao.intensidade})</small>` : ""}
@@ -620,9 +628,10 @@
       }
       futuras.forEach(sessao => {
         const data = new Date(sessao.data_horario || sessao.data || sessao.data_inicio);
+        const tituloTratamento = nomeTratamentos(sessao);
         lista.innerHTML += `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">
           <div class="sessao-info">
-            <div class="sessao-tratamento">${sessao.tratamento}</div>
+            <div class="sessao-tratamento">${tituloTratamento}</div>
             <div class="sessao-data">${formataData(data.toISOString().slice(0,16).replace('T', ' '))}</div>
             <span class="sessao-status ${statusClass(sessao.status)}">${sessao.status}</span>
             ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
@@ -643,9 +652,10 @@
         return;
       }
       passadas.forEach(sessao => {
+        const tituloTratamento = nomeTratamentos(sessao);
         lista.innerHTML += `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">
           <div class="sessao-info">
-            <div class="sessao-tratamento">${sessao.tratamento}</div>
+            <div class="sessao-tratamento">${tituloTratamento}</div>
             <div class="sessao-data">${formataData(sessao.data)}</div>
             <span class="sessao-status ${statusClass(sessao.status)}">${sessao.status}</span>
             ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
