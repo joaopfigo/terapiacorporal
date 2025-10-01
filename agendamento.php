@@ -4,7 +4,17 @@
 
 session_start();
 require_once 'conexao.php'; // ajuste o caminho se necessário
-require_once __DIR__ . '/lib/booking_constants.php';
+$bookingConstantsPath = __DIR__ . '/lib/booking_constants.php';
+if (file_exists($bookingConstantsPath)) {
+    require_once $bookingConstantsPath;
+} else {
+    if (!defined('DUO_SERVICE_ID')) {
+        define('DUO_SERVICE_ID', 10);
+    }
+    if (!defined('DUO_PRECO')) {
+        define('DUO_PRECO', 260.00);
+    }
+}
 
 
 // Buscar valores atuais
