@@ -826,6 +826,10 @@ if ($stmt === false) {
     let formularioEnviado = false;
     let sessoesDisponiveis = 0;
     let pacoteId = null;
+    const mensagemPagamentoPadraoEl = document.querySelector('.total-container small');
+    const mensagemPagamentoPadrao = mensagemPagamentoPadraoEl
+      ? mensagemPagamentoPadraoEl.textContent.trim()
+      : 'O pagamento deve ser feito no dia da consulta através de Pix, dinheiro, cartão de crédito ou débito.';
     // HTML padrão (todas as opções exceto quick massage sozinho)
     const htmlDuracoesPadrao = `
       <label><input type="radio" name="duracao" value="50" data-preco="<?= htmlspecialchars($precos['padrao_50']) ?>"> 50 min — R$ <?= htmlspecialchars($precos['padrao_50']) ?></label>
@@ -859,37 +863,80 @@ if ($stmt === false) {
 
     function calcularValorFinal() {
       const servicosSelecionados = getServicosSelecionados();
-      const isCombo = servicosSelecionados.length === 2;
       const duracaoSelecionada = document.querySelector('input[name="duracao"]:checked');
+            const escaldaCheckbox = document.getElementById('escalda-pes');
+      const totalSpan = document.getElementById('valor-total');
+      const mensagemPagamento = document.querySelector('.total-container small');
+      const avisoTratamento = document.getElementById('aviso-tratamento');
+      const infoPacote = document.getElementById('info-pacote');
+
+      const isCombo = servicosSelecionados.length === 2;
       let valor = 0;
+      let usaPacote = false;
+      let mensagemAviso = '';
+      let mensagemPacote = '';
+      
 
       if (isCombo) {
-        valor = Number.isFinite(Number(DUO_PRECO)) ? Number(DUO_PRECO) : 0;
+        valor = Number.isFinite(DUO_PRECO) ? DUO_PRECO : Number(DUO_PRECO) || 0;
+        mensagemAviso = `Combo DUO selecionado: valor promocional de R$ ${formatarValorMonetario(valor)}.`;
       } else if (duracaoSelecionada) {
-        const usaPacote = duracaoSelecionada.value === 'pacote5' || duracaoSelecionada.value === 'pacote10';
-        if (!usaPacote) {
-          valor += obterPrecoNumerico(duracaoSelecionada);
+        usaPacote = duracaoSelecionada.value === 'pacote5' || duracaoSelecionada.value === 'pacote10';
+        if (usaPacote) {
+          if (pacoteId) {
+            const sessoesRestantesDepois = Math.max((sessoesDisponiveis || 0) - 1, 0);
+            const palavraSessao = sessoesRestantesDepois === 1 ? 'sessão' : 'sessões';
+            mensagemPacote = `Será debitada 1 sessão do seu pacote. Restarão ${sessoesRestantesDepois} ${palavraSessao}.`;
+          } else {
+            mensagemPacote = 'Nenhum pacote ativo identificado para utilizar esta opção.';
+          }
+        } else {
+          valor = obterPrecoNumerico(duracaoSelecionada);
         }
       }
 
-      const escaldaCheckbox = document.getElementById('escalda-pes');
+      let valorEscalda = 0;
       if (escaldaCheckbox && escaldaCheckbox.checked) {
-        valor += obterPrecoNumerico(escaldaCheckbox);
+        valorEscalda = obterPrecoNumerico(escaldaCheckbox);
+        valor += valorEscalda;
       }
 
-      const totalSpan = document.getElementById('valor-total');
+      if (valorEscalda > 0) {
+        const mensagemEscalda = `Escalda pés adicionado (+R$ ${formatarValorMonetario(valorEscalda)}).`;
+        mensagemAviso = mensagemAviso ? `${mensagemAviso} ${mensagemEscalda}` : mensagemEscalda;
+      }
+
       if (totalSpan) {
         totalSpan.textContent = formatarValorMonetario(valor);
       }
 
-      const mensagemPagamento = document.querySelector('.total-container small');
       if (mensagemPagamento) {
-        if (valor === 0) {
-          mensagemPagamento.textContent =
-            "O valor desta consulta será debitado do seu pacote. Nenhum pagamento é necessário.";
+        if (usaPacote && pacoteId) {
+          mensagemPagamento.textContent = 'O valor desta consulta será debitado do seu pacote. Nenhum pagamento é necessário.';
+        } else if (valor > 0) {
+          mensagemPagamento.textContent = mensagemPagamentoPadrao;
         } else {
-          mensagemPagamento.textContent =
-            "O pagamento deve ser feito no dia da consulta através de Pix, dinheiro, cartão de crédito ou débito.";
+          mensagemPagamento.textContent = mensagemPagamentoPadrao;
+        }
+      }
+
+      if (avisoTratamento) {
+        if (mensagemAviso) {
+          avisoTratamento.textContent = mensagemAviso;
+          avisoTratamento.style.display = 'block';
+        } else {
+          avisoTratamento.textContent = '';
+          avisoTratamento.style.display = 'none';
+        }
+      }
+
+      if (infoPacote) {
+        if (mensagemPacote) {
+          infoPacote.textContent = mensagemPacote;
+          infoPacote.style.display = 'block';
+        } else {
+          infoPacote.textContent = '';
+          infoPacote.style.display = 'none';
         }
       }
 
