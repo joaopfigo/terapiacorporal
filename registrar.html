@@ -529,46 +529,6 @@
         document.getElementById('registerError').innerText = 'Erro ao conectar ao servidor: ' + (err.message || err);
       });
     }
-    // Troque pelo seu CLIENT_ID do Google Cloud Console
-    const GOOGLE_CLIENT_ID = "1051863779401-v2k79mfrrut3c0ffebc1466utn46443c.apps.googleusercontent.com";
-    // Renderiza o botão Google "One Tap" (opcional, mas deixa o botão mais visual)
-    window.onload = function() {
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleCredentialResponse
-      });
-      // Se quiser, pode renderizar o botão Google automaticamente:
-      // google.accounts.id.renderButton(
-      //   document.querySelector('.btn-google'),
-      //   { theme: "outline", size: "large" } // customization
-      // );
-    }
-
-    function handleGoogleCredentialResponse(response) {
-      // Pega o JWT do Google e manda para o backend
-      fetch('login_google.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'credential=' + encodeURIComponent(response.credential)
-      })
-      .then(res => res.json())
-      .then(res => {
-        if (res.success) {
-          window.location.href = 'index.html';
-        } else {
-          alert(res.message || 'Erro ao fazer login com Google');
-        }
-      })
-      .catch(err => {
-        alert('Erro na comunicação com o backend: ' + err);
-      });
-    }
-
-    // Ao clicar no botão Google (da interface que já existe), dispara o login Google
-    document.querySelector('.btn-google').onclick = function(e) {
-      e.preventDefault();
-      google.accounts.id.prompt(); // abre o One Tap login do Google
-    };
   </script>
   <script>
 function toggleSenha(id, btn) {
