@@ -465,17 +465,17 @@ foreach ($agendamentos as $a) {
       }
 
       .agenda-card {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
         gap: 14px;
         padding: 16px 0;
       }
 
       .ag-card-header,
-      .ag-card-body,
-      .ag-card-actions {
-        width: 100%;
-        flex: 1 1 100%;
+      .ag-card-body {
+        flex: 1 1 50%;
+        min-width: 240px;
         align-items: flex-start;
       }
 
@@ -490,14 +490,18 @@ foreach ($agendamentos as $a) {
       }
 
       .ag-card-body {
-        flex-direction: column;
-        gap: 10px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 12px;
       }
 
       .ag-card-actions {
-        justify-content: flex-start;
-        flex-wrap: wrap;
-        gap: 10px;
+        order: 3;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
       }
 
       .ag-card-actions a,
