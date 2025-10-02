@@ -6,11 +6,49 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo'] !== 'terapeuta') {
 }
 require_once '../conexao.php';
 
-// 1. Buscar lista de pacientes (da tabela usuarios)
-$sql = "SELECT id, nome, email, telefone, nascimento, sexo FROM usuarios ORDER BY nome";
-$res = $conn->query($sql);
+// 1. Buscar lista de pacientes (da tabela usuarios) com filtros e ordenação
+$busca = isset($_GET['q']) ? trim($_GET['q']) : '';
+$ordenar = isset($_GET['ordenar']) ? $_GET['ordenar'] : 'alfabetica';
+
+$opcoesOrdenacao = [
+    'alfabetica' => 'nome ASC',
+    'recentes'   => 'criado_em DESC',
+    'antigos'    => 'criado_em ASC',
+];
+
+if (!array_key_exists($ordenar, $opcoesOrdenacao)) {
+    $ordenar = 'alfabetica';
+}
+
+$sql = "SELECT id, nome, email, telefone, nascimento, sexo FROM usuarios";
+$params = [];
+$types = '';
+
+if ($busca !== '') {
+    $sql .= " WHERE nome LIKE ? OR email LIKE ?";
+    $like = '%' . $busca . '%';
+    $params[] = $like;
+    $params[] = $like;
+    $types .= 'ss';
+}
+
+$sql .= " ORDER BY " . $opcoesOrdenacao[$ordenar];
+
+$stmt = $conn->prepare($sql);
+
+if ($stmt === false) {
+    die('Erro na preparação da consulta: ' . $conn->error);
+}
+
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+$res = $stmt->get_result();
 $pacientes = [];
 while ($row = $res->fetch_assoc()) { $pacientes[] = $row; }
+$stmt->close();
 
 ?>
 <!DOCTYPE html>
@@ -49,6 +87,15 @@ while ($row = $res->fetch_assoc()) { $pacientes[] = $row; }
 </div>
 <div class='container'>
   <h1>Pacientes</h1>
+  <form method="get" class="filtro-pacientes" style="display:flex; flex-wrap:wrap; gap:12px; margin:18px 0 4px 0; align-items:center;">
+    <input type="text" name="q" value="<?= htmlspecialchars($busca) ?>" placeholder="Buscar por nome ou email" style="flex:1; min-width:220px; padding:10px 12px; border:1px solid #d9cbb4; border-radius:10px; font-size:1rem;" />
+    <select name="ordenar" style="padding:10px 12px; border:1px solid #d9cbb4; border-radius:10px; font-size:1rem; background:#fff; color:#4b3f30;">
+      <option value="alfabetica" <?= $ordenar === 'alfabetica' ? 'selected' : '' ?>>Ordem alfabética</option>
+      <option value="recentes" <?= $ordenar === 'recentes' ? 'selected' : '' ?>>Mais recentes</option>
+      <option value="antigos" <?= $ordenar === 'antigos' ? 'selected' : '' ?>>Mais antigos</option>
+    </select>
+    <button type="submit" class="btn-ver" style="padding:10px 22px;">Aplicar</button>
+  </form>
   <a href='novo_paciente.php' class='btn-ver' style='background:#38b26d;margin-bottom:17px;display:inline-block;'>Criar paciente</a>
   <table class='table-pacientes'>
     <tr>
