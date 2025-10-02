@@ -458,6 +458,55 @@ foreach ($agendamentos as $a) {
       outline: none;
     }
 
+    @media (max-width: 600px) {
+      .agendas-list {
+        margin-left: 2vw;
+        margin-right: 2vw;
+      }
+
+      .agenda-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 16px 0;
+      }
+
+      .ag-card-header,
+      .ag-card-body,
+      .ag-card-actions {
+        width: 100%;
+        flex: 1 1 100%;
+        align-items: flex-start;
+      }
+
+      .ag-card-header {
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .ag-card-status {
+        margin-left: 0;
+        text-align: left;
+      }
+
+      .ag-card-body {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .ag-card-actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .ag-card-actions a,
+      .ag-card-actions button {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
     .ag-card-actions a:hover,
     .ag-card-actions button:hover {
       background: var(--accent);
