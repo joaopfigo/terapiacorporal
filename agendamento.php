@@ -1216,9 +1216,21 @@ if ($res instanceof mysqli_result) {
         dados.guest_phone = document.getElementById('guest-phone').value;
         dados.guest_nascimento = document.getElementById('guest-nascimento').value;
         dados.guest_sexo = document.getElementById('guest-sexo').value;
-        dados.criar_conta = document.getElementById('criar-conta').checked ? 1 : 0;
-        if (dados.criar_conta) {
-          dados.guest_senha = document.getElementById('guest-senha').value;
+        const criarContaMarcado = document.getElementById('criar-conta').checked;
+        dados.criar_conta = criarContaMarcado ? 1 : 0;
+        if (criarContaMarcado) {
+          const senha = document.getElementById('guest-senha').value;
+          const senha2 = document.getElementById('guest-senha2').value;
+          if (!senha || !senha2) {
+            alert('Por favor, preencha ambos os campos de senha.');
+            return;
+          }
+          if (senha !== senha2) {
+            alert('As senhas informadas não coincidem.');
+            return;
+          }
+          dados.guest_senha = senha;
+          dados.guest_senha2 = senha2;
         }
       }
 
