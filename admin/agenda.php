@@ -828,15 +828,20 @@ foreach ($agendamentos as $a) {
       }
 
       .calendar-nav {
-        gap: 8px;
+        justify-content: center;
+        gap: 6px;
+        flex-wrap: nowrap;
       }
 
       .calendar-nav button {
-        flex: 1 1 46px;
+        flex: 0 0 auto;
+        min-width: 34px;
+        padding: 0.35rem;
       }
 
       .calendar-nav-label {
-        flex: 1 1 100%;
+        flex: 0 0 auto;
+        margin: 0 8px;
         text-align: center;
         font-size: 1.1rem;
       }
