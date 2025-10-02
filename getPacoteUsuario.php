@@ -10,18 +10,24 @@ if (empty($_SESSION['usuario_id'])) {
 
 $user_id = $_SESSION['usuario_id'];
 
-$stmt = $conn->prepare("SELECT total_sessoes, sessoes_usadas FROM pacotes WHERE usuario_id = ? ORDER BY id DESC LIMIT 1");
+$stmt = $conn->prepare("SELECT id, total_sessoes, sessoes_usadas FROM pacotes WHERE usuario_id = ? AND sessoes_usadas < total_sessoes ORDER BY id DESC LIMIT 1");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$stmt->bind_result($total, $usadas);
+$stmt->bind_result($pacoteId, $total, $usadas);
 if ($stmt->fetch()) {
     $sessoes_restantes = $total - $usadas;
-    if ($sessoes_restantes < 0) $sessoes_restantes = 0;
+    if ($sessoes_restantes <= 0) {
+        $sessoes_restantes = 0;
+        $pacoteId = null;
+    }
 } else {
     $sessoes_restantes = 0;
+    $pacoteId = null;
 }
 $stmt->close();
 
-echo json_encode(['sessoes_restantes' => $sessoes_restantes]);
+echo json_encode([
+    'sessoes_restantes' => $sessoes_restantes,
+    'pacote_id' => $pacoteId,
+]);
 ?>
-
