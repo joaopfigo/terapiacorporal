@@ -317,7 +317,127 @@
       <div class="success-msg" id="registerSuccess"></div>
     </form>
   </div>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js';
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult
+    } from 'https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyDEZV1A7BxIY1CXpiZAn3RteuY0pNC9gsY',
+      authDomain: 'terapiacorporal.firebaseapp.com',
+      projectId: 'terapiacorporal',
+      storageBucket: 'terapiacorporal.appspot.com',
+      messagingSenderId: '1051863779401',
+      appId: '1:1051863779401:web:1234567890abcdef123456'
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    auth.useDeviceLanguage();
+    const provider = new GoogleAuthProvider();
+
+    const loginErrorEl = document.getElementById('loginError');
+    const googleButton = document.querySelector('.btn-google');
+
+    function showGoogleError(message) {
+      if (loginErrorEl) {
+        loginErrorEl.style.display = 'block';
+        loginErrorEl.innerText = message;
+      } else {
+        alert(message);
+      }
+    }
+
+    function clearGoogleError() {
+      if (loginErrorEl) {
+        loginErrorEl.style.display = 'none';
+        loginErrorEl.innerText = '';
+      }
+    }
+
+    async function finalizeAuthentication(user) {
+      if (!user) {
+        showGoogleError('Não foi possível identificar o usuário do Google. Tente novamente.');
+        return;
+      }
+
+      try {
+        const idToken = await user.getIdToken();
+        const response = await fetch('login_google_firebase.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `idToken=${encodeURIComponent(idToken)}`
+        });
+
+        const contentType = response.headers.get('Content-Type') || '';
+        if (!contentType.includes('application/json')) {
+          throw new Error('INVALID_RESPONSE');
+        }
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          window.location.href = 'perfil.html';
+          return;
+        }
+
+        const message = (data && data.message) ? data.message : 'Não foi possível concluir o login com Google.';
+        showGoogleError(message);
+      } catch (error) {
+        if (error?.message === 'INVALID_RESPONSE') {
+          showGoogleError('Resposta inválida do servidor. Tente novamente.');
+        } else {
+          showGoogleError('Erro na comunicação com o servidor. Tente novamente.');
+        }
+      }
+    }
+
+    async function attemptGoogleSignIn() {
+      clearGoogleError();
+
+      try {
+        const result = await signInWithPopup(auth, provider);
+        if (result?.user) {
+          await finalizeAuthentication(result.user);
+        }
+      } catch (error) {
+        if (error?.code && error.code.startsWith('auth/popup')) {
+          try {
+            await signInWithRedirect(auth, provider);
+          } catch (redirectError) {
+            showGoogleError('Não foi possível abrir o login do Google. Tente novamente.');
+          }
+        } else {
+          showGoogleError('Erro ao autenticar com Google. Tente novamente.');
+        }
+      }
+    }
+
+    async function handleRedirectLogin() {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          await finalizeAuthentication(result.user);
+        }
+      } catch (error) {
+        showGoogleError('Não foi possível concluir o login com Google. Tente novamente.');
+      }
+    }
+
+    if (googleButton) {
+      googleButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        attemptGoogleSignIn();
+      });
+    }
+
+    handleRedirectLogin();
+  </script>
   <script>
     // Troca entre formulários login/registro
     function showRegister() {
