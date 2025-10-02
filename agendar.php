@@ -43,6 +43,62 @@ function copiarAnamneseAnterior(mysqli $conn, ?int $usuario_id, int $agendamento
     $stmt->close();
 }
 
+/**
+ * Define qual serviço deve ser utilizado para calcular preço conforme a duração.
+ */
+function selecionarServicoPorDuracao(mysqli $conn, array $servicosLista, string $duracao, int $servicoAtual): int
+{
+    if (!$servicosLista) {
+        return $servicoAtual;
+    }
+
+    $colunas = [
+        '15'      => 'preco_15',
+        '30'      => 'preco_30',
+        '50'      => 'preco_50',
+        '90'      => 'preco_90',
+        'escalda' => 'preco_escalda',
+        'pacote5' => 'pacote5',
+        'pacote10'=> 'pacote10',
+    ];
+
+    if (!isset($colunas[$duracao])) {
+        return $servicoAtual ?: (int) $servicosLista[0];
+    }
+
+    $idsValidos = array_values(array_unique(array_map('intval', $servicosLista)));
+    if (!$idsValidos) {
+        return $servicoAtual;
+    }
+
+    $coluna = $colunas[$duracao];
+    if (count($idsValidos) === 1) {
+        $stmt = $conn->prepare("SELECT id, $coluna AS preco FROM especialidades WHERE id = ?");
+        $stmt->bind_param('i', $idsValidos[0]);
+    } else {
+        $stmt = $conn->prepare("SELECT id, $coluna AS preco FROM especialidades WHERE id IN (?, ?)");
+        $stmt->bind_param('ii', $idsValidos[0], $idsValidos[1]);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $precos = [];
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $precos[(int) $row['id']] = $row['preco'];
+        }
+    }
+    $stmt->close();
+
+    foreach ($idsValidos as $id) {
+        if (array_key_exists($id, $precos) && $precos[$id] !== null && $precos[$id] !== '') {
+            return $id;
+        }
+    }
+
+    return $servicoAtual ?: (int) $idsValidos[0];
+}
+
 // Coleta todos os campos necessários
 $user_id       = $_SESSION['usuario_id'] ?? null;
 $rawServicos   = isset($_POST['servicos']) ? (string) $_POST['servicos'] : '';
@@ -63,6 +119,12 @@ if (!$servico_id && $servicosLista) {
 $data         = trim($_POST['data'] ?? '');
 $hora         = trim($_POST['hora'] ?? '');
 $duracao      = trim($_POST['duracao'] ?? '');
+
+if ($servicosLista) {
+    $servico_id = selecionarServicoPorDuracao($conn, $servicosLista, $duracao, $servico_id);
+    $_POST['servico_id'] = (string) $servico_id;
+}
+
 $add_reflexo  = isset($_POST['add_reflexo']) ? 1 : 0;
 $status       = 'Pendente';
 

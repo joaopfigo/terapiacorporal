@@ -1032,6 +1032,51 @@ if ($res instanceof mysqli_result) {
         .filter(Boolean)
         .slice(0, 2);
     }
+
+    function obterNomeServicoPorId(id) {
+      if (!id) {
+        return '';
+      }
+
+      const card = document.querySelector(`.treatment[data-id="${id}"]`);
+      if (!card) {
+        return '';
+      }
+
+      const rotulo = card.querySelector('span');
+      return rotulo ? rotulo.textContent.trim().toLowerCase() : '';
+    }
+
+    function determinarServicoPrincipal(ids, duracaoSelecionada) {
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return '';
+      }
+
+      if (ids.length === 1) {
+        return ids[0];
+      }
+
+      const duracao = String(duracaoSelecionada || '').trim();
+      const duracoesQuick = new Set(['15', '30']);
+      const duracoesNaoQuick = new Set(['50', '90', 'pacote5', 'pacote10']);
+
+      const quickId = ids.find(id => obterNomeServicoPorId(id) === 'quick massage');
+      const naoQuickId = ids.find(id => obterNomeServicoPorId(id) !== 'quick massage');
+
+      if (duracoesQuick.has(duracao) && quickId) {
+        return quickId;
+      }
+
+      if (duracoesNaoQuick.has(duracao) && naoQuickId) {
+        return naoQuickId;
+      }
+
+      if (!duracao && naoQuickId) {
+        return naoQuickId;
+      }
+
+      return quickId || naoQuickId || ids[0];
+    }
     const avisoTratamentoToast = (() => {
       let toast = document.getElementById('aviso-tratamento-toast');
       if (!toast) {
@@ -1136,7 +1181,7 @@ if ($res instanceof mysqli_result) {
         hora: horaSelecionada
       };
 
-      const servicoPrincipal = servicosSelecionados[0];
+      const servicoPrincipal = determinarServicoPrincipal(servicosSelecionados, duracaoSelecionada.value);
       dados.servico_id = String(servicoPrincipal);
       dados.duracao = duracaoSelecionada.value;
 
