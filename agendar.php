@@ -301,15 +301,38 @@ if (!$user_id) {
             die('NASCIMENTO_OBRIGATORIO');
         }
 
-        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+        $stmt = null;
+        try {
+            $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
-        $stmt = $conn->prepare(
-            "INSERT INTO usuarios (nome, email, telefone, nascimento, sexo, senha_hash, criado_em) VALUES (?, ?, ?, ?, ?, ?, NOW())"
-        );
-        $stmt->bind_param('ssssss', $nome, $email, $telefone, $nascimento, $sexo, $senha_hash);
-        $stmt->execute();
-        $user_id = $stmt->insert_id;
-        $stmt->close();
+            $stmt = $conn->prepare(
+                "INSERT INTO usuarios (nome, email, telefone, nascimento, sexo, senha_hash, criado_em) VALUES (?, ?, ?, ?, ?, ?, NOW())"
+            );
+            $stmt->bind_param('ssssss', $nome, $email, $telefone, $nascimento, $sexo, $senha_hash);
+            $stmt->execute();
+            $user_id = $stmt->insert_id;
+            $stmt->close();
+        } catch (mysqli_sql_exception $e) {
+            if ($stmt instanceof mysqli_stmt) {
+                $stmt->close();
+            }
+
+            if ((int) $e->getCode() === 1062) {
+                $stmtBusca = $conn->prepare("SELECT id FROM usuarios WHERE email = ? LIMIT 1");
+                $stmtBusca->bind_param('s', $email);
+                $stmtBusca->execute();
+                $stmtBusca->bind_result($usuarioExistente);
+                if ($stmtBusca->fetch()) {
+                    $user_id = (int) $usuarioExistente;
+                    $stmtBusca->close();
+                } else {
+                    $stmtBusca->close();
+                    throw $e;
+                }
+            } else {
+                throw $e;
+            }
+        }
     }
 }
 
