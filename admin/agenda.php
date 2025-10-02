@@ -24,42 +24,161 @@ function getStatusLabel($status)
       return ucfirst($status);
   }
 }
-// ----------- AÇÕES DE STATUS ----------- 
-if (isset($_GET['confirmar'])) {
-  $id = (int) $_GET['confirmar'];
-  $stmt = $conn->prepare("UPDATE agendamentos SET status = 'Confirmado' WHERE id = ?");
+
+function atualizarStatusAgendamento(mysqli $conn, int $id, string $novoStatus): bool
+{
+  $stmt = $conn->prepare('UPDATE agendamentos SET status = ? WHERE id = ?');
+  if (!$stmt) {
+    return false;
+  }
+  $stmt->bind_param('si', $novoStatus, $id);
+  $stmt->execute();
+  $erro = $stmt->error;
+  $stmt->close();
+
+  return $erro === '';
+}
+
+function buscarAgendamento(mysqli $conn, int $id): ?array
+{
+  $sql = "SELECT a.*, u.nome as usuario_nome, e.nome as servico_nome
+FROM agendamentos a
+LEFT JOIN usuarios u ON a.usuario_id = u.id
+LEFT JOIN especialidades e ON a.especialidade_id = e.id
+WHERE a.id = ?";
+  $stmt = $conn->prepare($sql);
+  if (!$stmt) {
+    return null;
+  }
   $stmt->bind_param('i', $id);
   $stmt->execute();
+  $resultado = $stmt->get_result();
+  $agendamento = $resultado ? $resultado->fetch_assoc() : null;
   $stmt->close();
-  header('Location: agenda.php');
+
+  return $agendamento ?: null;
+}
+
+function renderStatusActionButton(int $id, string $acao, string $label, string $fallbackHref): string
+{
+  $acaoEsc = htmlspecialchars($acao, ENT_QUOTES, 'UTF-8');
+  $labelEsc = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
+  $fallbackEsc = htmlspecialchars($fallbackHref, ENT_QUOTES, 'UTF-8');
+
+  return sprintf(
+    '<button type="button" class="ag-card-action-btn" data-id="%d" data-acao="%s" data-fallback-href="%s" data-loading-text="Processando..." onclick="event.preventDefault();">%s</button><noscript><a class="ag-card-action-fallback" href="%s">%s</a></noscript>',
+    $id,
+    $acaoEsc,
+    $fallbackEsc,
+    $labelEsc,
+    $fallbackEsc,
+    $labelEsc
+  );
+}
+
+function renderActionButtons(array $agendamento): string
+{
+  $status = strtolower($agendamento['status'] ?? '');
+  $id = (int) ($agendamento['id'] ?? 0);
+  $usuarioId = isset($agendamento['usuario_id']) ? (int) $agendamento['usuario_id'] : 0;
+  $parts = [];
+
+  if ($status === 'pendente') {
+    $parts[] = renderStatusActionButton($id, 'confirmar', 'Confirmar', "?confirmar=$id");
+    $parts[] = renderStatusActionButton($id, 'recusar', 'Recusar', "?recusar=$id");
+  } elseif ($status === 'confirmado') {
+    $parts[] = renderStatusActionButton($id, 'cancelar', 'Cancelar', "?cancelar=$id");
+    if ($usuarioId) {
+      $parts[] = '<a class="ag-card-secondary-link" href="paciente.php?id=' . $usuarioId . '">Acessar Usuário</a>';
+    }
+  } elseif ($status === 'concluido') {
+    $parts[] = '<span style="color:#30795b">Concluído</span>';
+  } elseif ($status === 'cancelado') {
+    $parts[] = '<span style="color:#e25b5b">Cancelado</span>';
+  } elseif ($status === 'indisponivel') {
+    $parts[] = '<span class="bloqueado">Indisponível</span>';
+  } elseif ($status === 'recusado') {
+    $parts[] = '<span style="color:#aaa;">Recusado</span>';
+  }
+
+  return implode("\n", $parts);
+}
+
+// ----------- AÇÕES DE STATUS -----------
+$acoesStatus = [
+  'confirmar' => 'Confirmado',
+  'recusar' => 'Recusado',
+  'cancelar' => 'Cancelado',
+  'concluir' => 'Concluido',
+];
+
+if (isset($_POST['acao_status'])) {
+  header('Content-Type: application/json');
+
+  $acao = strtolower(trim((string) $_POST['acao_status']));
+  $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+
+  if (!$id || !isset($acoesStatus[$acao])) {
+    http_response_code(400);
+    echo json_encode([
+      'success' => false,
+      'message' => 'Ação inválida.',
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+  }
+
+  $novoStatus = $acoesStatus[$acao];
+  $atualizado = atualizarStatusAgendamento($conn, $id, $novoStatus);
+
+  if (!$atualizado) {
+    http_response_code(500);
+    echo json_encode([
+      'success' => false,
+      'message' => 'Não foi possível atualizar o status.',
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+  }
+
+  $agendamento = buscarAgendamento($conn, $id);
+
+  if (!$agendamento) {
+    echo json_encode([
+      'success' => true,
+      'message' => 'Status atualizado.',
+      'new_status' => strtolower($novoStatus),
+      'new_status_label' => getStatusLabel($novoStatus),
+      'actions_html' => '',
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+  }
+
+  // Atualizar descrições de serviços para manter consistência com a listagem.
+  [$tituloServicos, $listaServicos] = descreverServicos(
+    $conn,
+    isset($agendamento['especialidade_id']) ? (int) $agendamento['especialidade_id'] : 0,
+    $agendamento['servicos_csv'] ?? null,
+    $agendamento['servico_nome'] ?? ''
+  );
+  $agendamento['servico_exibicao'] = $tituloServicos;
+  $agendamento['servicos_lista'] = $listaServicos;
+
+  echo json_encode([
+    'success' => true,
+    'message' => 'Status atualizado.',
+    'new_status' => strtolower($agendamento['status']),
+    'new_status_label' => getStatusLabel($agendamento['status']),
+    'actions_html' => renderActionButtons($agendamento),
+  ], JSON_UNESCAPED_UNICODE);
   exit;
 }
-if (isset($_GET['recusar'])) {
-  $id = (int) $_GET['recusar'];
-  $stmt = $conn->prepare("UPDATE agendamentos SET status = 'Recusado' WHERE id = ?");
-  $stmt->bind_param('i', $id);
-  $stmt->execute();
-  $stmt->close();
-  header('Location: agenda.php');
-  exit;
-}
-if (isset($_GET['cancelar'])) {
-  $id = (int) $_GET['cancelar'];
-  $stmt = $conn->prepare("UPDATE agendamentos SET status = 'Cancelado' WHERE id = ?");
-  $stmt->bind_param('i', $id);
-  $stmt->execute();
-  $stmt->close();
-  header('Location: agenda.php');
-  exit;
-}
-if (isset($_GET['concluir'])) {
-  $id = (int) $_GET['concluir'];
-  $stmt = $conn->prepare("UPDATE agendamentos SET status = 'Concluido' WHERE id = ?");
-  $stmt->bind_param('i', $id);
-  $stmt->execute();
-  $stmt->close();
-  header('Location: agenda.php');
-  exit;
+
+foreach ($acoesStatus as $param => $statusAlvo) {
+  if (isset($_GET[$param])) {
+    $id = (int) $_GET[$param];
+    if ($id) {
+      atualizarStatusAgendamento($conn, $id, $statusAlvo);
+    }
+  }
 }
 // ----------- AUTOCOMPLETE AJAX ----------- 
 if (isset($_GET['autocomplete_usuario'])) {
@@ -548,6 +667,16 @@ foreach ($agendamentos as $a) {
       box-shadow: none;
       transition: background .13s, color .14s;
       outline: none;
+    }
+
+    .ag-card-action-btn.is-loading,
+    .ag-card-action-btn[disabled] {
+      opacity: 0.6;
+      cursor: progress;
+    }
+
+    .agenda-card.is-updating {
+      opacity: 0.85;
     }
 
     @media (max-width: 600px) {
@@ -1246,36 +1375,148 @@ foreach ($agendamentos as $a) {
           </div>
         </div>
         <div class="ag-card-actions">
-          <?php if (strtolower($a['status']) == 'pendente'): ?>
-            <a href="?confirmar=<?= $a['id'] ?>">Confirmar</a>
-            <a href="?recusar=<?= $a['id'] ?>">Recusar</a>
-          <?php elseif (strtolower($a['status']) == 'confirmado'): ?>
-            <a href="?cancelar=<?= $a['id'] ?>">Cancelar</a>
-            <a href="paciente.php?id=<?= $a['usuario_id'] ?>">Acessar Usuário</a>
-          <?php elseif (strtolower($a['status']) == 'concluido'): ?>
-            <span style="color:#30795b">Concluído</span>
-          <?php elseif (strtolower($a['status']) == 'cancelado'): ?>
-            <span style="color:#e25b5b">Cancelado</span>
-          <?php elseif (strtolower($a['status']) == 'indisponivel'): ?>
-            <span class="bloqueado">Indisponível</span>
-          <?php elseif (strtolower($a['status']) == 'recusado'): ?>
-            <span style="color:#aaa;">Recusado</span>
-          <?php endif; ?>
+          <?= renderActionButtons($a); ?>
         </div>
       </div>
     <?php endforeach; ?>
   </div>
 
   <script>
-      
-      function closeModal()
-      {
-          
-          document.getElementById("options-modal").style.display = 'none';
-          
+
+    function closeModal()
+    {
+
+        document.getElementById("options-modal").style.display = 'none';
+
+    }
+
+
+    function setupStatusActionHandlers() {
+      const agendasList = document.querySelector('.agendas-list');
+      if (!agendasList || agendasList.dataset.statusListeners === 'true') {
+        return;
       }
-      
-      
+
+      agendasList.dataset.statusListeners = 'true';
+
+      agendasList.addEventListener('click', function (event) {
+        const button = event.target.closest('.ag-card-action-btn');
+        if (!button) {
+          return;
+        }
+        event.preventDefault();
+        if (button.disabled) {
+          return;
+        }
+        processStatusAction(button);
+      });
+
+      agendasList.addEventListener('keydown', function (event) {
+        const button = event.target.closest('.ag-card-action-btn');
+        if (!button) {
+          return;
+        }
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          if (!button.disabled) {
+            processStatusAction(button);
+          }
+        }
+      });
+    }
+
+    function processStatusAction(button) {
+      const acao = button.dataset.acao;
+      const id = button.dataset.id;
+      if (!acao || !id) {
+        return;
+      }
+
+      const card = button.closest('.agenda-card');
+      const fallbackHref = button.dataset.fallbackHref || '';
+      const originalHtml = button.innerHTML;
+      const loadingText = button.dataset.loadingText || 'Processando...';
+
+      button.disabled = true;
+      button.classList.add('is-loading');
+      if (button.innerHTML.trim() !== loadingText) {
+        button.innerHTML = loadingText;
+      }
+
+      if (card) {
+        card.classList.add('is-updating');
+        card.setAttribute('aria-busy', 'true');
+      }
+
+      fetch('agenda.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({
+          acao_status: acao,
+          id: id
+        })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Falha na comunicação com o servidor.');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (!data.success) {
+            throw new Error(data.message || 'Não foi possível atualizar o status.');
+          }
+
+          if (card) {
+            if (data.new_status) {
+              card.dataset.status = data.new_status;
+            }
+
+            const statusBadge = card.querySelector('.ag-card-status');
+            if (statusBadge && data.new_status_label) {
+              statusBadge.textContent = data.new_status_label;
+              statusBadge.setAttribute('data-status', data.new_status);
+            }
+
+            if (typeof data.actions_html === 'string') {
+              const actionsContainer = card.querySelector('.ag-card-actions');
+              if (actionsContainer) {
+                actionsContainer.innerHTML = data.actions_html;
+              }
+            }
+
+            if (data.remove_card) {
+              card.classList.add('is-removing');
+              setTimeout(() => card.remove(), 200);
+            }
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          const message = error && error.message ? error.message : 'Ocorreu um erro ao atualizar o status.';
+          alert(message + (fallbackHref ? '\nVocê pode tentar novamente pelo link tradicional.' : ''));
+          if (fallbackHref) {
+            window.location.href = fallbackHref;
+          }
+        })
+        .finally(() => {
+          if (button.isConnected) {
+            button.classList.remove('is-loading');
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+          }
+
+          if (card && card.isConnected) {
+            card.classList.remove('is-updating');
+            card.removeAttribute('aria-busy');
+          }
+        });
+    }
+
+
     function setupAutocomplete(inputId, hiddenId, listId) {
       const input = document.getElementById(inputId);
       const hidden = document.getElementById(hiddenId);
@@ -1313,6 +1554,7 @@ foreach ($agendamentos as $a) {
 
       const cal = document.getElementById('calendar-admin');
 
+      setupStatusActionHandlers();
       renderCalendarAdmin(now.getFullYear(), now.getMonth(), datasBloqueadas);
     });
 
