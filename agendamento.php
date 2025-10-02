@@ -1077,6 +1077,66 @@ if ($stmt === false) {
         .filter(Boolean)
         .slice(0, 2);
     }
+    const avisoTratamentoToast = (() => {
+      let toast = document.getElementById('aviso-tratamento-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'aviso-tratamento-toast';
+        document.body.appendChild(toast);
+      }
+      return toast;
+    })();
+    let avisoTratamentoToastTimeout;
+
+    function mostrarAvisoLimiteTratamentos() {
+      if (!avisoTratamentoToast) {
+        alert('Você pode selecionar no máximo dois tratamentos.');
+        return;
+      }
+
+      avisoTratamentoToast.textContent = 'Você pode selecionar no máximo dois tratamentos.';
+      avisoTratamentoToast.style.top = '24px';
+      avisoTratamentoToast.style.transform = 'translateX(-50%)';
+      avisoTratamentoToast.classList.add('show');
+
+      clearTimeout(avisoTratamentoToastTimeout);
+      avisoTratamentoToastTimeout = setTimeout(() => {
+        avisoTratamentoToast.classList.remove('show');
+      }, 2500);
+    }
+
+    function atualizarEstadoBlockHover() {
+      const totalSelecionados = getServicosSelecionados().length;
+      document.querySelectorAll('.treatment').forEach(card => {
+        if (totalSelecionados >= 2 && !card.classList.contains('selected')) {
+          card.classList.add('block-hover');
+        } else {
+          card.classList.remove('block-hover');
+        }
+      });
+    }
+
+    document.querySelectorAll('.treatment').forEach(card => {
+      card.addEventListener('click', () => {
+        const jaSelecionado = card.classList.contains('selected');
+
+        if (jaSelecionado) {
+          card.classList.remove('selected');
+        } else {
+          const selecionados = getServicosSelecionados();
+          if (selecionados.length >= 2) {
+            mostrarAvisoLimiteTratamentos();
+            return;
+          }
+          card.classList.add('selected');
+        }
+
+        atualizarEstadoBlockHover();
+        atualizarDuracoes();
+      });
+    });
+
+    atualizarEstadoBlockHover();
 
     // Função para pegar a data escolhida no calendário
     function obterDataSelecionada() {
