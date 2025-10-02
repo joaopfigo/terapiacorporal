@@ -1021,6 +1021,15 @@ if (isCombo) {
   dados.servico_id = servicoEscolhido;
   dados.duracao = duracaoSelecionada.value;
   dados.servicos = servicoEscolhido;
+
+  if (duracaoSelecionada && (duracaoSelecionada.value === 'pacote5' || duracaoSelecionada.value === 'pacote10')) {
+    if (!pacoteId) {
+      alert('Não foi possível identificar um pacote ativo para este agendamento.');
+      return;
+    }
+    dados.usou_pacote = 1;
+    dados.pacote_id = String(pacoteId);
+  }
 }
 
 // Extra opcional: Escalda Pés  (mantemos a chave add_reflexo para não quebrar o PHP)
@@ -1046,187 +1055,7 @@ if (termoEl && termoEl.checked) {
     dados.criar_conta = document.getElementById('criar-conta').checked ? 1 : 0;
     if (dados.criar_conta) {
       dados.guest_senha = document.getElementById('guest-senha').value;
-      dados.guest_senha2 = document.getElementById('guest-senha2').value;
-    }
-  }
-
-  // Envia ao PHP (AJAX)
-  fetch('agendar.php', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-    body: new URLSearchParams(dados),
-    credentials: 'include'
-  })
-  .then(res => res.text())
-  .then(res => {
-  if (res.startsWith("ERRO_AGENDAR")) { alert(res); return; }
-  if (res.startsWith("SUCESSO|")) {
-    const partes = res.split('|');
-    const agendamentoId = partes[1] || null;
-
-    // Se o formulário de queixa foi preenchido, envie agora
-    if (formularioEnviado && agendamentoId) {
-      const formData = new FormData(document.getElementById('form-reclamacoes'));
-      formData.append('agendamento_id', agendamentoId);
-      fetch('salvarQueixa.php', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
-      });
-    }
-
-    // Redireciona para a página de sessão marcada
-    window.location.href = 'sessaoMarcada.html';
-} else if (res.includes("DADOS_INCOMPLETOS")) {
-  alert("Preencha todos os dados obrigatórios.");
-} else if (res.includes("SERVICO_SEM_PRECO")) {
-  alert("Serviço sem preço definido. Entre em contato.");
-} else if (res.includes("PRECO_INVALIDO")) {
-  alert("Preço inválido para a duração selecionada.");
-} else if (res.includes("PACOTE_INVALIDO")) {
-  alert("Pacote inválido para este usuário ou indisponível.");
-} else {
-  alert("Erro ao agendar. Tente novamente");
-}
-})
-      .catch(erro => {
-        alert('Erro ao conectar ao servidor. Tente novamente mais tarde.');
-        console.error(erro);
-      });
-    };
-    
-  function mostrarAvisoTratamento(msg) {
-    let aviso = document.getElementById('aviso-tratamento-toast');
-    if (!aviso) {
-      aviso = document.createElement('div');
-      aviso.id = 'aviso-tratamento-toast';
-      aviso.className = 'aviso-tratamento-toast';
-      document.body.appendChild(aviso);
-    }
-    aviso.innerHTML = msg;
-    aviso.classList.add('show');
-    aviso.style.display = "block";
-    // Mobile: gruda no topo, Desktop: mantém no centro inferior
-    if (window.innerWidth < 700) {
-      aviso.style.top = '10px';
-      aviso.style.bottom = '';
-      aviso.style.left = '50%';
-      aviso.style.transform = 'translateX(-50%)';
-    } else {
-      aviso.style.top = '';
-      aviso.style.bottom = '8vh';
-      aviso.style.left = '50%';
-      aviso.style.transform = 'translateX(-50%)';
-    }
-    // Fade-out automático:
-    setTimeout(() => {
-      aviso.classList.remove('show');
-      setTimeout(() => { aviso.style.display = "none"; }, 450);
-    }, 2500);
-  }
-
-    // Lógica robusta para seleção de até dois tratamentos
-    function atualizarHoverBloqueado() {
-      const selected = document.querySelectorAll('.treatment.selected');
-      const treatments = document.querySelectorAll('.treatment');
-      if (selected.length >= 2) {
-        treatments.forEach(card => {
-          if (!card.classList.contains('selected')) {
-            card.classList.add('block-hover');
-          }
-        });
-      } else {
-        treatments.forEach(card => {
-          card.classList.remove('block-hover');
-        });
-      }
-    }
-
-    // E, após cada clique, sempre rode:
-    document.querySelectorAll('.treatment').forEach(card => {
-  card.addEventListener('click', function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const selected = document.querySelectorAll('.treatment.selected');
-    if (this.classList.contains('selected')) {
-      this.classList.remove('selected');
-      atualizarHoverBloqueado();
-      atualizarDuracoes(); // <-- Aqui!
-      return;
-    }
-    if (selected.length >= 2) {
-      mostrarAvisoTratamento(
-        "Você só pode escolher até dois tratamentos.<br><span style='font-size:0.98em;font-weight:400;'>Para escolher outro, primeiro retire uma das opções já selecionadas.</span>"
-      );
-      atualizarHoverBloqueado();
-      return;
-    }
-    this.classList.add('selected');
-    atualizarHoverBloqueado();
-    atualizarDuracoes(); // <-- Aqui!
-  }, {passive: false});
-});
-
-
-    // Menu responsivo sanduíche
-    const navbarToggle = document.querySelector('.navbar-toggle');
-    const navbarMenu = document.querySelector('.navbar-menu');
-    navbarToggle.addEventListener('click', () => {
-      navbarMenu.classList.toggle('open');
-    });
-    // Fechar menu ao clicar em um item
-    document.querySelectorAll('.navbar-menu a').forEach(link => {
-      link.addEventListener('click', () => {
-        navbarMenu.classList.remove('open');
-      });
-    });
-
-    window.addEventListener('DOMContentLoaded', function() {
-      atualizarDuracoes();
-      const servicoEscolhido = localStorage.getItem('servicoSelecionado');
-      if (servicoEscolhido) {
-        // Considerando que cada tratamento tem um radio input ou card com texto igual ao nome do serviço
-        document.querySelectorAll('.treatment, .tratamento, .servico-opcao, label').forEach(el => {
-          if (
-            el.innerText &&
-            el.innerText.trim().toLowerCase() === servicoEscolhido.trim().toLowerCase()
-          ) {
-            // Caso seja radio:
-            if (el.querySelector('input[type="radio"]')) {
-              el.querySelector('input[type="radio"]').checked = true;
-            }
-            // Se for um card ou div que você usa para marcar visualmente:
-            el.classList.add('selected');
-            // Rola para o tratamento
-            el.scrollIntoView({behavior: 'smooth', block: 'center'});
-          }
-        });
-        // Limpa o LocalStorage para não afetar próximos acessos
-        localStorage.removeItem('servicoSelecionado');
-      }
-    });
-
-    function calcularValorFinal() {
-      let valor = 0;
-      const duracao = document.querySelector('input[name="duracao"]:checked');
-      const servicosSelecionados = getServicosSelecionados();
-      const isCombo = servicosSelecionados.length === 2;
-
-      const escaldaInput = document.getElementById('escalda-pes');
-      const escalda = escaldaInput && escaldaInput.checked ? parseFloat(escaldaInput.dataset.preco) : 0;
-
-      if (isCombo) {
-        valor = isNaN(DUO_PRECO) ? 0 : DUO_PRECO;
-      } else if (duracao && (duracao.value === 'pacote5' || duracao.value === 'pacote10')) {
-        valor = 0;
-      } else if (duracao) {
-        valor = parseFloat(duracao.dataset.preco);
-      }
-      valor += escalda;
-
-      // Atualiza o valor na tela
-      document.getElementById('valor-total').textContent = valor === 0 ? '0,00' : valor.toFixed(2).replace('.', ',');
+@@ -1230,68 +1239,75 @@ if (termoEl && termoEl.checked) {
 
       // Mensagem de pagamento
       if (valor === 0) {
@@ -1252,12 +1081,19 @@ if (termoEl && termoEl.checked) {
     
     // Ao carregar a página, verifica sessões restantes do usuário
     let sessoesDisponiveis = 0;
+    let pacoteId = null;
     // Função reutilizável
     function atualizarPacoteAgendamento() {
       fetch('getPacoteUsuario.php')
         .then(res => res.json())
         .then((data) => {
-          sessoesDisponiveis = data.sessoes_restantes || data.disponiveis || 0;
+          const sessoesRestantesBrutas =
+            typeof data.sessoes_restantes !== 'undefined'
+              ? Number(data.sessoes_restantes)
+              : Number(data.disponiveis ?? 0);
+          sessoesDisponiveis = Number.isFinite(sessoesRestantesBrutas) ? sessoesRestantesBrutas : 0;
+          const pacoteIdBruto = typeof data.pacote_id !== 'undefined' ? Number(data.pacote_id) : null;
+          pacoteId = Number.isFinite(pacoteIdBruto) && pacoteIdBruto > 0 ? pacoteIdBruto : null;
 
           const inputPacote = document.getElementById('duracao-pacote');
           if (!inputPacote) return; // Não existe opção de pacote, não faz nada
@@ -1269,7 +1105,7 @@ if (termoEl && termoEl.checked) {
           if (info) info.remove();
 
           // Exibe ou bloqueia
-          if (sessoesDisponiveis > 0) {
+          if (sessoesDisponiveis > 0 && pacoteId) {
             inputPacote.disabled = false;
             inputPacote.value = sessoesDisponiveis > 5 ? 'pacote10' : 'pacote5';
             labelPacote.innerHTML += ` <span id="pacote-info-agendamento" style="color:#30795b;">(${sessoesDisponiveis} sessões restantes)</span>`;
