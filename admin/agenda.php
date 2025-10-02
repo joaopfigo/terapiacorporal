@@ -616,8 +616,13 @@ foreach ($agendamentos as $a) {
       <div class="agenda-card" data-status="<?= strtolower($a['status']) ?>">
         <div class="ag-card-header">
           <div class="ag-card-title">
+            <?php $servicoTitulo = trim((string)($a['servico_exibicao'] ?? $a['servico_nome'] ?? '')); ?>
             <?= $a['usuario_nome'] ? htmlspecialchars($a['usuario_nome']) : '<span class="bloqueado">Indisponível</span>' ?>
-            style="font-weight:400;color:#b3a76c;font-size:.97rem;margin-left:9px;"><?= htmlspecialchars($a['servico_exibicao'] ?? $a['servico_nome'] ?? '-') ?></span>
+            <?php if ($servicoTitulo !== ''): ?>
+              <span style="font-weight:400;color:#b3a76c;font-size:.97rem;margin-left:9px;">
+                <?= htmlspecialchars($servicoTitulo) ?>
+              </span>
+            <?php endif; ?>
           </div>
           <div class="ag-card-status" data-status="<?= strtolower($a['status']) ?>">
             <?= getStatusLabel($a['status']) ?>
