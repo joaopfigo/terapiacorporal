@@ -38,7 +38,7 @@ if (!$idToken) {
     respondJson(false, 'Token de autenticação não informado.');
 }
 
-$apiKey = 'AIzaSyDEZV1A7BxIY1CXpiZAn3RteuY0pNC9gsY';
+$apiKey = 'AIzaSyBi3XjHtg2mCX595ldC0927U1GQp3nlCuA';
 $lookupUrl = 'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' . urlencode($apiKey);
 
 $requestBody = json_encode(['idToken' => $idToken]);
