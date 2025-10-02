@@ -231,11 +231,40 @@ foreach ($agendamentos as $a) {
       box-shadow: var(--header-shadow);
       z-index: 999;
       padding: 0 4vw;
+      gap: 16px;
+    }
+
+    .header-admin .header-brand {
+      font-weight: 700;
+      letter-spacing: .4px;
+    }
+
+    .header-admin .menu-container {
+      display: flex;
+      align-items: center;
     }
 
     .header-admin .menu-horizontal {
       display: flex;
       gap: 14px;
+    }
+
+    .header-admin .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.7rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 6px 10px;
+      border-radius: 10px;
+      transition: background .17s;
+    }
+
+    .header-admin .menu-toggle:hover,
+    .header-admin.is-open .menu-toggle {
+      background: rgba(255, 255, 255, 0.12);
     }
 
     .header-admin .menu-btn {
@@ -279,6 +308,44 @@ foreach ($agendamentos as $a) {
         height: 49px;
         border-radius: 0 0 16px 16px;
         padding: 0 2vw;
+        gap: 10px;
+      }
+
+      .header-admin .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .header-admin .menu-container {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        padding: 12px 2vw 16px 2vw;
+        background: var(--header-bg);
+        box-shadow: var(--header-shadow);
+        border-radius: 0 0 16px 16px;
+      }
+
+      .header-admin .menu-horizontal {
+        display: none;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .header-admin .menu-btn {
+        text-align: left;
+        padding: 10px 12px;
+      }
+
+      .header-admin.is-open .menu-container {
+        display: block;
+      }
+
+      .header-admin.is-open .menu-horizontal {
+        display: flex;
       }
     }
 
@@ -1033,13 +1100,16 @@ foreach ($agendamentos as $a) {
 
 <body>
   <div class="header-admin">
-    <div>Painel da Terapeuta</div>
-    <div class="menu-horizontal">
-      <a class="menu-btn active" href="agenda.php">Agenda</a>
-      <a class="menu-btn" href="pacientes.php">Pacientes</a>
-      <a class="menu-btn" href="precos.php">Preços</a>
-      <a class="menu-btn" href="blog.php">Blog</a>
-      <a class="menu-btn" href="index.php">Home</a>
+    <div class="header-brand">Painel da Terapeuta</div>
+    <button class="menu-toggle" aria-expanded="false" aria-controls="admin-menu">☰</button>
+    <div class="menu-container">
+      <div class="menu-horizontal" id="admin-menu">
+        <a class="menu-btn active" href="agenda.php">Agenda</a>
+        <a class="menu-btn" href="pacientes.php">Pacientes</a>
+        <a class="menu-btn" href="precos.php">Preços</a>
+        <a class="menu-btn" href="blog.php">Blog</a>
+        <a class="menu-btn" href="index.php">Home</a>
+      </div>
     </div>
   </div>
   <!-- Calendário -->
@@ -1539,6 +1609,36 @@ function abrirAgendamentoFixo(data, hora) {
               
               `;
 }
+</script>
+
+
+  <script>
+    (function () {
+      const header = document.querySelector('.header-admin');
+      if (!header) return;
+
+      const toggle = header.querySelector('.menu-toggle');
+      const menuLinks = header.querySelectorAll('.menu-horizontal a');
+      if (!toggle) return;
+
+      const closeMenu = () => {
+        header.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+
+      toggle.addEventListener('click', () => {
+        const isOpen = header.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+
+      menuLinks.forEach((link) => {
+        link.addEventListener('click', () => {
+          if (header.classList.contains('is-open')) {
+            closeMenu();
+          }
+        });
+      });
+    })();
   </script>
 
 
