@@ -115,6 +115,28 @@ if ($isCombo) {
     $usou_pacote = 0;
     $pacote_id   = null;
 }
+$duracaoPermitePacote = in_array($duracao, ['pacote5', 'pacote10'], true);
+if ($usou_pacote) {
+    if (!$user_id || !$pacote_id || !$duracaoPermitePacote) {
+        die('PACOTE_INVALIDO');
+    }
+
+    $stmt = $conn->prepare("SELECT total_sessoes, sessoes_usadas FROM pacotes WHERE id = ? AND usuario_id = ? LIMIT 1");
+    $stmt->bind_param('ii', $pacote_id, $user_id);
+    $stmt->execute();
+    $stmt->bind_result($totalSessoes, $sessoesUsadas);
+    if (!$stmt->fetch()) {
+        $stmt->close();
+        die('PACOTE_INVALIDO');
+    }
+    $stmt->close();
+
+    if ($sessoesUsadas >= $totalSessoes) {
+        die('PACOTE_INVALIDO');
+    }
+} else {
+    $pacote_id = null;
+}
 
 $required = ['data' => $data, 'hora' => $hora];
 if (!$isCombo) {
