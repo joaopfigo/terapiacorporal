@@ -821,7 +821,16 @@ if ($res instanceof mysqli_result) {
       if (!bruto) {
         return 0;
       }
-      const normalizado = String(bruto).replace(/\./g, '').replace(',', '.');
+
+      const texto = String(bruto).trim();
+      if (!texto) {
+        return 0;
+      }
+
+      const normalizado = texto.includes(',')
+        ? texto.replace(/\./g, '').replace(',', '.')
+        : texto;
+
       const numero = Number(normalizado);
       return Number.isFinite(numero) ? numero : 0;
     }
