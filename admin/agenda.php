@@ -600,10 +600,67 @@ foreach ($agendamentos as $a) {
 
       .agenda-card {
         padding: 8vw 3vw 10vw 5vw;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
       }
 
       .section-title {
         font-size: 1.05rem;
+      }
+
+      .agendas-list {
+        margin-left: 1vw;
+        margin-right: 1vw;
+      }
+
+      .ag-card-header,
+      .ag-card-body,
+      .ag-card-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 16px;
+      }
+
+      .ag-card-title {
+        font-size: 1.2rem;
+        line-height: 1.4;
+        margin-bottom: 4px;
+      }
+
+      .ag-card-status {
+        font-size: 1.1rem;
+        line-height: 1.3;
+        margin-left: 0;
+      }
+
+      .ag-card-body {
+        gap: 16px;
+      }
+
+      .ag-card-label {
+        font-size: 1.1rem;
+        line-height: 1.4;
+        margin-bottom: 2px;
+      }
+
+      .ag-card-value {
+        font-size: 1.2rem;
+        line-height: 1.4;
+        margin-right: 0;
+        margin-bottom: 6px;
+      }
+
+      .ag-card-actions {
+        width: 100%;
+        gap: 12px;
+      }
+
+      .ag-card-actions a,
+      .ag-card-actions button {
+        width: 100%;
+        text-align: center;
       }
     }
 
