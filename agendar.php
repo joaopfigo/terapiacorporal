@@ -207,26 +207,60 @@ if ($usou_pacote) {
 // Normaliza duração para o banco (schema = INT)
 $duracao_db = is_numeric($duracao) ? (int)$duracao : 0; // 0 como sentinela caso venha rótulo
 
+$idade = null;
+
 // Se for visitante, validar dados e criar conta se necessário
 if (!$user_id) {
-        if (!$stmt) {
-            die("ERRO_CRIAR_USUARIO");
+    $guestRequired = [
+        'guest_name'  => trim($nome),
+        'guest_email' => trim($email),
+        'guest_phone' => trim($telefone),
+    ];
+
+    $missingGuest = [];
+    foreach ($guestRequired as $campo => $valor) {
+        if ($valor === '') {
+            $missingGuest[] = $campo;
         }
-        $stmt->bind_param("ssssss", $nome, $email, $telefone, $nascimento, $sexo, $senha_hash);
-        if ($stmt->execute()) {
-            $user_id = $stmt->insert_id;
-        } else {
-            die("ERRO_CRIAR_USUARIO");
-        }
-        $stmt->close();
     }
 
-    $idade = null;
-    if ($nascimento) {
-        $dt = DateTime::createFromFormat('Y-m-d', $nascimento);
-        if ($dt) {
-            $idade = $dt->diff(new DateTime('now'))->y;
+    if ($missingGuest) {
+        die('DADOS_INCOMPLETOS: ' . implode(',', $missingGuest));
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        die('EMAIL_INVALIDO');
+    }
+
+    $dtNascimento = null;
+    if ($nascimento !== '') {
+        $dtNascimento = DateTime::createFromFormat('Y-m-d', $nascimento);
+        if (!$dtNascimento || $dtNascimento->format('Y-m-d') !== $nascimento) {
+            die('NASCIMENTO_INVALIDO');
         }
+        $idade = $dtNascimento->diff(new DateTime('now'))->y;
+    }
+
+    if ($criarConta) {
+        if ($senha === '' || $senha2 === '') {
+            die('SENHA_OBRIGATORIA');
+        }
+        if ($senha !== $senha2) {
+            die('SENHAS_DIFERENTES');
+        }
+        if (!$dtNascimento) {
+            die('NASCIMENTO_OBRIGATORIO');
+        }
+
+        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+
+        $stmt = $conn->prepare(
+            "INSERT INTO usuarios (nome, email, telefone, nascimento, sexo, senha_hash, criado_em) VALUES (?, ?, ?, ?, ?, ?, NOW())"
+        );
+        $stmt->bind_param('ssssss', $nome, $email, $telefone, $nascimento, $sexo, $senha_hash);
+        $stmt->execute();
+        $user_id = $stmt->insert_id;
+        $stmt->close();
     }
 }
 
