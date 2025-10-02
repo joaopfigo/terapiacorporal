@@ -144,14 +144,39 @@ if (isset($_POST['bloquear_dia_inteiro'])) {
   exit;
 }
 
-// ----------- LISTAGEM GERAL ----------- 
-$query = "SELECT a.*, u.nome as usuario_nome, e.nome as servico_nome 
-FROM agendamentos a 
-LEFT JOIN usuarios u ON a.usuario_id = u.id 
-LEFT JOIN especialidades e ON a.especialidade_id = e.id 
-ORDER BY a.data_horario DESC";
-$result = $conn->query($query);
+// ----------- LISTAGEM GERAL -----------
+$dataFiltro = $_GET['data'] ?? '';
+$dataFiltroValido = false;
+if ($dataFiltro !== '') {
+  $dataObj = DateTime::createFromFormat('Y-m-d', $dataFiltro);
+  if ($dataObj && $dataObj->format('Y-m-d') === $dataFiltro) {
+    $dataFiltroValido = true;
+  } else {
+    $dataFiltro = '';
+  }
+}
+
+$sql = "SELECT a.*, u.nome as usuario_nome, e.nome as servico_nome
+FROM agendamentos a
+LEFT JOIN usuarios u ON a.usuario_id = u.id
+LEFT JOIN especialidades e ON a.especialidade_id = e.id";
+if ($dataFiltroValido) {
+  $sql .= "\nWHERE DATE(a.data_horario) = ?";
+}
+$sql .= "\nORDER BY a.data_horario DESC";
+
+$stmt = $conn->prepare($sql);
+if ($dataFiltroValido) {
+  $stmt->bind_param('s', $dataFiltro);
+}
+$stmt->execute();
+$result = $stmt->get_result();
 $agendamentos = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+$stmt->close();
+$mensagemAgendamentos = '';
+if ($dataFiltroValido && empty($agendamentos)) {
+  $mensagemAgendamentos = 'Nenhum agendamento encontrado para a data selecionada.';
+}
 foreach ($agendamentos as &$ag) {
   [$tituloServicos, $listaServicos] = descreverServicos(
     $conn,
@@ -618,6 +643,62 @@ foreach ($agendamentos as $a) {
       font-weight: 700;
       letter-spacing: .2px;
       text-shadow: 0 1px 0 #f6f8f8;
+    }
+
+    .agenda-filter-form {
+      margin: 18px 24px 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .agenda-filter-form label {
+      font-weight: 600;
+      color: #256d54;
+    }
+
+    .agenda-filter-form input[type="date"] {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid #c9dfd6;
+      background: #ffffff;
+      color: #256d54;
+      font-size: 0.95rem;
+    }
+
+    .agenda-filter-form button {
+      background: var(--header-bg);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 22px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    .agenda-filter-form button:hover {
+      background: var(--accent);
+      color: #1d5f45;
+      transform: translateY(-1px);
+    }
+
+    .agenda-filter-form .filter-reset {
+      color: #256d54;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+
+    .no-results-alert {
+      margin: 0 24px 12px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      background: #ffeebe;
+      color: #8a6d3b;
+      font-weight: 600;
+      font-family: 'Roboto', sans-serif;
     }
 
     /* Tira borda feia de calendário FullCalendar */
@@ -1127,6 +1208,17 @@ foreach ($agendamentos as $a) {
 
   <!-- LISTA DE AGENDAMENTOS -->
   <h2 class="section-title-agenda">Todos os Agendamentos</h2>
+
+  <form class="agenda-filter-form" method="get" action="agenda.php">
+    <label for="filtro-data">Filtrar por data:</label>
+    <input type="date" id="filtro-data" name="data" value="<?= htmlspecialchars($dataFiltro) ?>">
+    <button type="submit">Buscar</button>
+    <a class="filter-reset" href="agenda.php">Limpar filtro</a>
+  </form>
+
+  <?php if ($mensagemAgendamentos !== ''): ?>
+    <div class="no-results-alert"><?= htmlspecialchars($mensagemAgendamentos) ?></div>
+  <?php endif; ?>
 
   <div class="agendas-list">
     <?php foreach ($agendamentos as $a): ?>
