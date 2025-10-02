@@ -563,13 +563,156 @@ foreach ($agendamentos as $a) {
     }
 
     #calendar-admin {
+      background: #fff;
       border-radius: 22px;
       box-shadow: 0 7px 30px #1d9a7740;
-      background: #fff9f4;
-      padding: 15px 22px 18px 22px;
-      /* padding lateral maior */
+      padding: 20px 24px 24px 24px;
       margin: 0 24px 26px 24px;
-      /* margem lateral externa */
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .calendar-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .calendar-nav button {
+      background: var(--success);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 8px 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px #1d9a7722;
+      transition: background .2s, transform .2s, box-shadow .2s;
+    }
+
+    .calendar-nav button:hover,
+    .calendar-nav button:focus-visible {
+      background: var(--accent);
+      color: #256d54;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px #ffd97233;
+      outline: none;
+    }
+
+    .calendar-nav-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: #246045;
+      text-transform: capitalize;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .calendar-header {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      color: var(--text-light);
+    }
+
+    .calendar-header span {
+      text-align: center;
+      padding: 6px 0;
+    }
+
+    .calendar-placeholder {
+      min-height: 54px;
+    }
+
+    .cal-admin-day {
+      background: #fdfdfd;
+      border: 1px solid #dfe9e6;
+      border-radius: 14px;
+      color: var(--text-main);
+      cursor: pointer;
+      font-weight: 600;
+      min-height: 54px;
+      padding: 10px 0;
+      transition: background .2s, color .2s, box-shadow .2s, transform .2s, border-color .2s;
+    }
+
+    .cal-admin-day:hover,
+    .cal-admin-day:focus-visible {
+      background: var(--action-hover);
+      border-color: var(--success);
+      box-shadow: 0 6px 18px #1d9a7718;
+      color: #246045;
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .cal-admin-day.is-today {
+      border-color: var(--accent);
+      background: #fff7dc;
+      color: #6f5300;
+    }
+
+    .cal-admin-day.cal-disabled {
+      background: #f1f4f3;
+      border-color: #d8e3df;
+      box-shadow: none;
+      color: #a1b2ab;
+      cursor: not-allowed;
+    }
+
+    .cal-admin-day.cal-disabled:hover,
+    .cal-admin-day.cal-disabled:focus-visible {
+      background: #f1f4f3;
+      color: #a1b2ab;
+      transform: none;
+      box-shadow: none;
+      border-color: #d8e3df;
+    }
+
+    .calendar-legend {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .calendar-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f7faf9;
+      border-radius: 999px;
+      padding: 6px 10px;
+    }
+
+    .calendar-legend .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .calendar-legend .legend-available {
+      background: var(--success);
+    }
+
+    .calendar-legend .legend-disabled {
+      background: #bccbc5;
+    }
+
+    .calendar-legend .legend-today {
+      background: var(--accent);
     }
 
     /* Calendar buttons melhorados */
@@ -600,6 +743,40 @@ foreach ($agendamentos as $a) {
     @media (max-width: 520px) {
       .container {
         padding: 0 2vw 26vw 2vw;
+      }
+
+      #calendar-admin {
+        padding: 18px;
+        margin: 0 12px 24px 12px;
+        gap: 12px;
+      }
+
+      .calendar-nav {
+        gap: 8px;
+      }
+
+      .calendar-nav button {
+        flex: 1 1 46px;
+      }
+
+      .calendar-nav-label {
+        flex: 1 1 100%;
+        text-align: center;
+        font-size: 1.1rem;
+      }
+
+      .calendar-grid {
+        gap: 6px;
+      }
+
+      .calendar-placeholder {
+        min-height: 46px;
+      }
+
+      .cal-admin-day {
+        min-height: 46px;
+        padding: 8px 0;
+        font-size: 0.95rem;
       }
 
       .agenda-card {
@@ -837,37 +1014,69 @@ foreach ($agendamentos as $a) {
     ?>;
 
     function renderCalendarAdmin(year, month, datasBloqueadas) {
-
-
       const cal = document.getElementById('calendar-admin');
-
-      cal.innerHTML = '';
+      const today = new Date();
+      const currentDateKey = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
       const dt = new Date(year, month, 1);
       const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-      let html = `<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;'>
-    <button id='prev-month'>&lt;</button>
-    <span style='font-weight:700;'>${dt.toLocaleString('pt-BR', { month: 'long' })} ${year}</span>
-    <button id='next-month'>&gt;</button>
-  </div>`;
-      html += `<div style='display:grid;grid-template-columns:repeat(7,1fr);font-weight:bold;'>${days.map(d => `<span>${d}</span>`).join('')}</div>`;
-      let firstDay = dt.getDay();
-      let totalDays = new Date(year, month + 1, 0).getDate();
-      html += `<div style='display:grid;grid-template-columns:repeat(7,1fr);'>`;
-      for (let i = 0; i < firstDay; i++) html += "<span></span>";
-      for (let d = 1; d <= totalDays; d++) {
-        let data = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
-        let isSunday = new Date(year, month, d).getDay() === 0;
-        let bloqueado = datasBloqueadas.includes(data) || isSunday;
-        html += `<button class="cal-admin-day${bloqueado ? ' cal-disabled' : ''}" data-date="${data}" ${bloqueado ? 'disabled' : ''}>${d}</button>`;
+      const monthLabel = dt.toLocaleString('pt-BR', { month: 'long' });
+      const monthDisplay = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
+      const firstDay = dt.getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+
+      let html = `
+        <div class="calendar-nav">
+          <button type="button" id="prev-month" aria-label="Mês anterior">&lt;</button>
+          <span class="calendar-nav-label" data-month="${month}" data-year="${year}">${monthDisplay} ${year}</span>
+          <button type="button" id="next-month" aria-label="Próximo mês">&gt;</button>
+        </div>
+        <div class="calendar-grid calendar-header">
+          ${days.map((d, index) => `<span data-weekday="${index}">${d}</span>`).join('')}
+        </div>
+        <div class="calendar-grid calendar-days">
+      `;
+
+      for (let i = 0; i < firstDay; i++) {
+        html += '<span class="calendar-placeholder" aria-hidden="true"></span>';
       }
-      html += `</div>`;
+
+      for (let d = 1; d <= totalDays; d++) {
+        const dateObj = new Date(year, month, d);
+        const data = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+        const weekday = dateObj.getDay();
+        const isSunday = weekday === 0;
+        const bloqueado = datasBloqueadas.includes(data) || isSunday;
+        const isToday = data === currentDateKey;
+        const classes = ['cal-admin-day'];
+
+        if (bloqueado) {
+          classes.push('cal-disabled');
+        }
+        if (isToday) {
+          classes.push('is-today');
+        }
+
+        html += `<button type="button" class="${classes.join(' ')}" data-date="${data}" data-weekday="${weekday}" ${bloqueado ? 'disabled' : ''} aria-label="${d} de ${monthDisplay} de ${year}">${d}</button>`;
+      }
+
+      html += `
+        </div>
+        <div class="calendar-legend">
+          <span><span class="legend-dot legend-available"></span>Disponível</span>
+          <span><span class="legend-dot legend-disabled"></span>Indisponível</span>
+          <span><span class="legend-dot legend-today"></span>Hoje</span>
+        </div>
+      `;
+
       cal.innerHTML = html;
+
       document.getElementById('prev-month').onclick = () => renderCalendarAdmin(month === 0 ? year - 1 : year, month === 0 ? 11 : month - 1, datasBloqueadas);
       document.getElementById('next-month').onclick = () => renderCalendarAdmin(month === 11 ? year + 1 : year, month === 11 ? 0 : month + 1, datasBloqueadas);
 
       document.querySelectorAll('.cal-admin-day').forEach(btn => {
+        if (btn.disabled) return;
         btn.onclick = function () {
-          let dataEscolhida = this.getAttribute('data-date');
+          const dataEscolhida = this.getAttribute('data-date');
           mostrarModalOpcoes(dataEscolhida);
         };
       });
