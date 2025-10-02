@@ -1227,6 +1227,98 @@ if ($stmt === false) {
       }
 
       // Neste ponto os dados estão montados e prontos para envio ao servidor.
+              const btnAgendar = document.getElementById('btn-agendar');
+      const textoOriginalBotao = btnAgendar ? btnAgendar.textContent : '';
+      if (btnAgendar) {
+        btnAgendar.disabled = true;
+        btnAgendar.textContent = 'Agendando...';
+      }
+
+      const interpretarResposta = (payload) => {
+        if (typeof payload === 'string') {
+          const mensagem = payload.trim();
+          const sucesso = mensagem.startsWith('SUCESSO');
+          const partes = mensagem.split('|');
+          return {
+            mensagem,
+            sucesso,
+            id: partes.length > 1 ? partes[1] : null
+          };
+        }
+
+        if (payload && typeof payload === 'object') {
+          const status = payload.status || payload.result || payload.sucesso || '';
+          const rawMensagem = payload.message || payload.mensagem || payload.error || '';
+          const idResposta = payload.id_agendamento ?? payload.id ?? payload.agendamento_id ?? null;
+          const sucesso = typeof status === 'string' && status.toUpperCase().startsWith('SUCESSO');
+          let mensagem = '';
+
+          if (typeof status === 'string' && status.length) {
+            mensagem = status;
+          }
+
+          if (rawMensagem) {
+            mensagem = mensagem ? `${mensagem}|${rawMensagem}` : rawMensagem;
+          }
+
+          if (!mensagem) {
+            mensagem = sucesso ? 'SUCESSO' : 'ERRO_AGENDAR: resposta inesperada do servidor.';
+          }
+
+          if (sucesso && idResposta && !mensagem.includes('|')) {
+            mensagem = `${mensagem}|${idResposta}`;
+          }
+
+          return {
+            mensagem,
+            sucesso,
+            id: idResposta
+          };
+        }
+
+        return {
+          mensagem: 'ERRO_AGENDAR: resposta inesperada do servidor.',
+          sucesso: false,
+          id: null
+        };
+      };
+
+      fetch('agendar.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(dados),
+        credentials: 'include'
+      })
+        .then(response => {
+          const contentType = response.headers.get('Content-Type') || '';
+          const parsePromise = contentType.includes('application/json') ? response.json() : response.text();
+          return parsePromise.then(payload => ({ payload, response }));
+        })
+        .then(({ payload }) => {
+          const { mensagem, sucesso, id } = interpretarResposta(payload);
+
+          if (mensagem) {
+            alert(mensagem);
+          }
+
+          if (sucesso) {
+            if (id) {
+              window.location.href = `sessaoMarcada.html?id=${encodeURIComponent(id)}`;
+            } else {
+              window.location.reload();
+            }
+          }
+        })
+        .catch((erro) => {
+          console.error('Erro ao agendar sessão:', erro);
+          alert('ERRO_AGENDAR: Ocorreu um problema ao finalizar seu agendamento. Tente novamente em instantes.');
+        })
+        .finally(() => {
+          if (btnAgendar) {
+            btnAgendar.disabled = false;
+            btnAgendar.textContent = textoOriginalBotao;
+          }
+        });
     };
 
     // Atualiza sempre que mudar as opções
