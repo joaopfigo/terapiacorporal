@@ -18,8 +18,13 @@ session_start();
 
 require_once 'conexao.php';
 
-function respondJson($success, $message = null) {
+function respondJson($success, $message = null, array $extra = []) {
     $payload = ['success' => $success];
+
+    if (!empty($extra)) {
+        $payload = array_merge($payload, $extra);
+    }
+
     if ($message !== null) {
         $payload['message'] = $message;
     }
@@ -144,5 +149,28 @@ $_SESSION['usuario_id'] = $userId;
 $_SESSION['tipo'] = 'usuario';
 $_SESSION['usuario_nome'] = $userName;
 $_SESSION['firebase_local_id'] = $localId;
+
+$profileStmt = $conn->prepare('SELECT telefone, nascimento, sexo FROM usuarios WHERE id = ?');
+if ($profileStmt) {
+    $profileStmt->bind_param('i', $userId);
+    if ($profileStmt->execute()) {
+        $profileResult = $profileStmt->get_result();
+        $profileData = $profileResult ? $profileResult->fetch_assoc() : null;
+        $profileStmt->close();
+
+        $telefone = isset($profileData['telefone']) ? trim((string) $profileData['telefone']) : '';
+        $nascimento = isset($profileData['nascimento']) ? trim((string) $profileData['nascimento']) : '';
+        if ($nascimento === '0000-00-00') {
+            $nascimento = '';
+        }
+        $sexo = isset($profileData['sexo']) ? trim((string) $profileData['sexo']) : '';
+
+        if ($telefone === '' || $nascimento === '' || $sexo === '') {
+            respondJson(true, null, ['redirect' => 'perfil.html?completar=1']);
+        }
+    } else {
+        $profileStmt->close();
+    }
+}
 
 respondJson(true);

@@ -382,7 +382,7 @@
         const data = await response.json();
 
         if (response.ok && data.success) {
-          window.location.href = 'perfil.html';
+          window.location.href = data.redirect || 'perfil.html';
           return;
         }
 
@@ -471,17 +471,16 @@
         body: `email=${encodeURIComponent(email)}&senha=${encodeURIComponent(senha)}`
       })
       .then(res => res.json())
-      .then(res => {
-        if (res.success) {
-          // NOVO: redirecionamento conforme o tipo de usuário
-          if (res.tipo === 'terapeuta') {
+      .then(data => {
+        if (data.success) {
+          if (data.tipo === 'terapeuta') {
             window.location.href = '/admin/index.php';
           } else {
-            window.location.href = '/perfil.html'; // ou index.html, como preferir para usuário normal
+            window.location.href = data.redirect || 'perfil.html';
           }
         } else {
           document.getElementById('loginError').style.display = 'block';
-          document.getElementById('loginError').innerText = res.message || 'Email ou senha inválidos.';
+          document.getElementById('loginError').innerText = data.message || 'Email ou senha inválidos.';
         }
       })
       .catch((err) => {

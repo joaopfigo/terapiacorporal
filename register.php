@@ -35,10 +35,10 @@ if ($stmt->num_rows > 0) {
 }
 $stmt->close();
 
-// Salva no banco (AGORA inclui o sexo)
+// Salva no banco com nascimento armazenado
 $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-$stmt = $conn->prepare("INSERT INTO usuarios (nome, email, telefone, idade, sexo, senha_hash) VALUES (?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("sssiss", $nome, $email, $telefone, $idade, $sexo, $senha_hash);
+$stmt = $conn->prepare("INSERT INTO usuarios (nome, email, telefone, nascimento, sexo, idade, senha_hash) VALUES (?, ?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("sssssis", $nome, $email, $telefone, $nascimento, $sexo, $idade, $senha_hash);
 
 if ($stmt->execute()) {
     echo json_encode(['success' => true]);

@@ -1418,6 +1418,16 @@ if ($res instanceof mysqli_result) {
       .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
           if (data.usuario && data.usuario.nome) {
+              const telefoneValido = data.usuario.telefone && String(data.usuario.telefone).trim() !== '';
+              const nascimentoValido = data.usuario.nascimento && data.usuario.nascimento !== '0000-00-00';
+              const sexoValido = data.usuario.sexo && String(data.usuario.sexo).trim() !== '';
+              const precisaCompletar = !telefoneValido || !nascimentoValido || !sexoValido;
+              if (precisaCompletar) {
+                  window.location.href = 'perfil.html?completar=1';
+                  return;
+              }
+          }
+          if (data.usuario && data.usuario.nome) {
               // Usuário logado: mostra bloco de usuário, esconde visitante
               document.getElementById('dados-usuario').style.display = 'block';
               document.getElementById('dados-guest').style.display = 'none';
