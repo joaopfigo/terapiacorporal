@@ -51,10 +51,39 @@ $_SESSION['usuario_id'] = $usuario['id'];
 $_SESSION['tipo'] = $usuario['is_admin'] ? 'terapeuta' : 'usuario';
 $_SESSION['usuario_nome'] = $usuario['nome'];
 
+$redirect = null;
+if (!$_SESSION['tipo'] || $_SESSION['tipo'] === 'usuario') {
+    $profileStmt = $conn->prepare('SELECT telefone, nascimento, sexo FROM usuarios WHERE id = ?');
+    if ($profileStmt) {
+        $profileStmt->bind_param('i', $usuario['id']);
+        if ($profileStmt->execute()) {
+            $profileResult = $profileStmt->get_result();
+            $profileData = $profileResult ? $profileResult->fetch_assoc() : null;
+            $telefone = isset($profileData['telefone']) ? trim((string) $profileData['telefone']) : '';
+            $nascimento = isset($profileData['nascimento']) ? trim((string) $profileData['nascimento']) : '';
+            if ($nascimento === '0000-00-00') {
+                $nascimento = '';
+            }
+            $sexo = isset($profileData['sexo']) ? trim((string) $profileData['sexo']) : '';
+
+            if ($telefone === '' || $nascimento === '' || $sexo === '') {
+                $redirect = 'perfil.html?completar=1';
+            }
+        }
+        $profileStmt->close();
+    }
+}
+
 header('Content-Type: application/json');
-echo json_encode([
+$payload = [
     'success' => true,
     'tipo'    => $_SESSION['tipo']
-]);
+];
+
+if ($redirect !== null) {
+    $payload['redirect'] = $redirect;
+}
+
+echo json_encode($payload);
 exit;
 ?>

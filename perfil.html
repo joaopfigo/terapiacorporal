@@ -158,6 +158,17 @@
       box-shadow: 0 4px 24px rgba(106,80,54,0.09);
       padding: 36px 3vw 32px 3vw;
     }
+    .alerta-completar {
+      max-width: 740px;
+      margin: 24px auto 0 auto;
+      background: #ffe3c4;
+      border: 1px solid #f0b26b;
+      border-radius: 12px;
+      padding: 18px 22px;
+      color: #6a3d1f;
+      font-size: 1.05rem;
+      box-shadow: 0 3px 16px rgba(106,80,54,0.08);
+    }
     .perfil-info {
       display: flex;
       gap: 28px;
@@ -449,6 +460,9 @@
   <div class="banner-terra">Meu Perfil</div>
 
   <div class="perfil-container" id="perfil-area">
+    <div id="alerta-completar" class="alerta-completar" style="display:none;">
+      Para continuar utilizando todos os serviços, informe seu telefone, data de nascimento e sexo.
+    </div>
     <div class="perfil-info">
       <div class="avatar-area">
         <img src="img/avatar-user.jpg" class="perfil-avatar" alt="Usuário">
@@ -513,7 +527,7 @@
         </select>
       </label><br>
       <button onclick="salvarEdicao()">Salvar</button>
-      <button onclick="fecharModal()">Cancelar</button>
+      <button id="btn-cancelar-editar" onclick="fecharModal()">Cancelar</button>
     </div>
   </div>
   <div id="feedback-msg" style="display:none;position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#88c275;padding:13px 29px;font-size:1.2rem;color:#fff;border-radius:9px;z-index:99999;box-shadow:0 2px 22px #2224;"></div>
@@ -537,11 +551,63 @@
       return sessao.tratamento;
     }
     let usuario = {};
+    let exigirDadosObrigatorios = false;
+
+    function abrirModalPerfil(obrigatorio = false) {
+      const modal = document.getElementById('modal-editar');
+      if (!modal) return;
+
+      document.getElementById('editar-nome').value = usuario.nome || "";
+      document.getElementById('editar-email').value = usuario.email || "";
+      document.getElementById('editar-nascimento').value = usuario.nascimento || "";
+      document.getElementById('editar-telefone').value = usuario.telefone || "";
+      document.getElementById('editar-sexo').value = usuario.sexo || "";
+
+      modal.style.display = 'flex';
+      modal.dataset.obrigatorio = obrigatorio ? '1' : '0';
+
+      const cancelarBtn = document.getElementById('btn-cancelar-editar');
+      if (cancelarBtn) {
+        cancelarBtn.style.display = obrigatorio ? 'none' : 'inline-block';
+      }
+
+      const tituloModal = modal.querySelector('h3');
+      if (tituloModal) {
+        tituloModal.textContent = obrigatorio ? 'Complete seu perfil' : 'Editar Perfil';
+      }
+    }
+
     // Preenche dados usuário
     fetch("getPerfil.php")
       .then(res => res.json())
       .then(data => {
-        usuario = data.usuario;
+        usuario = data.usuario || {};
+
+        const alertaCompletar = document.getElementById('alerta-completar');
+        const params = new URLSearchParams(window.location.search);
+        const telefoneValido = usuario.telefone && String(usuario.telefone).trim() !== '';
+        if (!telefoneValido) {
+          usuario.telefone = '';
+        }
+        const sexoValido = usuario.sexo && String(usuario.sexo).trim() !== '';
+        if (!sexoValido) {
+          usuario.sexo = '';
+        }
+        const nascimentoValido = usuario.nascimento && usuario.nascimento !== '0000-00-00';
+        if (!nascimentoValido) {
+          usuario.nascimento = '';
+        }
+        const camposObrigatoriosVazios = !telefoneValido || !nascimentoValido || !sexoValido;
+        exigirDadosObrigatorios = Boolean(usuario && (usuario.id || usuario.email)) && (camposObrigatoriosVazios || params.get('completar') === '1');
+
+        if (exigirDadosObrigatorios) {
+          if (alertaCompletar) {
+            alertaCompletar.style.display = 'block';
+          }
+          abrirModalPerfil(true);
+        } else if (alertaCompletar) {
+          alertaCompletar.style.display = 'none';
+        }
 
         document.querySelector("#perfil-nome").textContent = usuario.nome || "";
         document.querySelector("#perfil-email").textContent = usuario.email || "";
@@ -777,29 +843,50 @@
     document.getElementById('upload-foto-camera').addEventListener('change', function() { uploadFotoPerfil(this); });
 
 
-    document.querySelector('.perfil-editar').addEventListener('click', () => {
-      document.getElementById('modal-editar').style.display = 'flex';
-      document.getElementById('editar-nome').value = usuario.nome || "";
-      document.getElementById('editar-email').value = usuario.email || "";
-      document.getElementById('editar-nascimento').value = usuario.nascimento || "";
-      document.getElementById('editar-telefone').value = usuario.telefone || "";
-      document.getElementById('editar-sexo').value = usuario.sexo || "";
-    });
+    const botaoEditar = document.querySelector('.perfil-editar');
+    if (botaoEditar) {
+      botaoEditar.addEventListener('click', () => {
+        abrirModalPerfil(exigirDadosObrigatorios);
+      });
+    }
 
 
     // Para fechar o modal
-    function fecharModal() {
-      document.getElementById('modal-editar').style.display = 'none';
+    function fecharModal(force = false) {
+      const modal = document.getElementById('modal-editar');
+      if (!modal) return;
+
+      if (!force && modal.dataset.obrigatorio === '1') {
+        showFeedback('Complete seu perfil para continuar.', true);
+        return;
+      }
+
+      modal.style.display = 'none';
+      modal.dataset.obrigatorio = '0';
     }
 
 
     function salvarEdicao() {
+      const nome = document.getElementById('editar-nome').value;
+      const email = document.getElementById('editar-email').value;
+      const telefone = document.getElementById('editar-telefone').value.trim();
+      const nascimento = document.getElementById('editar-nascimento').value;
+      const sexo = document.getElementById('editar-sexo').value;
+
+      const modal = document.getElementById('modal-editar');
+      const obrigatorio = modal && modal.dataset.obrigatorio === '1';
+
+      if ((obrigatorio || exigirDadosObrigatorios) && (!telefone || !nascimento || !sexo)) {
+        showFeedback('Informe telefone, data de nascimento e sexo para continuar.', true);
+        return;
+      }
+
       const formData = new FormData();
-      formData.append('nome', document.getElementById('editar-nome').value);
-      formData.append('email', document.getElementById('editar-email').value);
-      formData.append('telefone', document.getElementById('editar-telefone').value);
-      formData.append('nascimento', document.getElementById('editar-nascimento').value); // Certo: nascimento
-      formData.append('sexo', document.getElementById('editar-sexo').value);
+      formData.append('nome', nome);
+      formData.append('email', email);
+      formData.append('telefone', telefone);
+      formData.append('nascimento', nascimento);
+      formData.append('sexo', sexo);
 
       fetch('atualizarPerfil.php', {
         method: 'POST',
@@ -808,20 +895,27 @@
       .then(res => res.json())
       .then(data => {
         if (data.sucesso) {
-          fecharModal();
+          exigirDadosObrigatorios = false;
+          if (modal) {
+            modal.dataset.obrigatorio = '0';
+          }
+          const alertaCompletar = document.getElementById('alerta-completar');
+          if (alertaCompletar) {
+            alertaCompletar.style.display = 'none';
+          }
+          fecharModal(true);
           // Atualiza imediatamente os campos visuais
-          document.getElementById("perfil-nome").textContent = document.getElementById('editar-nome').value;
-          document.getElementById("perfil-email").textContent = document.getElementById('editar-email').value;
+          document.getElementById("perfil-nome").textContent = nome;
+          document.getElementById("perfil-email").textContent = email;
 
           // Atualiza idade
-          const nasc = document.getElementById('editar-nascimento').value;
-          if (nasc) {
-            const nascimento = new Date(nasc);
+          if (nascimento) {
+            const nascimentoDate = new Date(nascimento);
             const hoje = new Date();
-            let idade = hoje.getFullYear() - nascimento.getFullYear();
+            let idade = hoje.getFullYear() - nascimentoDate.getFullYear();
             if (
-              hoje.getMonth() < nascimento.getMonth() ||
-              (hoje.getMonth() === nascimento.getMonth() && hoje.getDate() < nascimento.getDate())
+              hoje.getMonth() < nascimentoDate.getMonth() ||
+              (hoje.getMonth() === nascimentoDate.getMonth() && hoje.getDate() < nascimentoDate.getDate())
             ) {
               idade--;
             }
@@ -831,11 +925,16 @@
           }
 
           // Atualiza o objeto usuario (sincroniza sexo etc.)
-          usuario.nome = document.getElementById('editar-nome').value;
-          usuario.email = document.getElementById('editar-email').value;
-          usuario.telefone = document.getElementById('editar-telefone').value;
-          usuario.nascimento = nasc;
-          usuario.sexo = document.getElementById('editar-sexo').value;
+          usuario.nome = nome;
+          usuario.email = email;
+          usuario.telefone = telefone;
+          usuario.nascimento = nascimento;
+          usuario.sexo = sexo;
+
+          if (window.history.replaceState) {
+            const novaUrl = window.location.pathname;
+            window.history.replaceState(null, '', novaUrl);
+          }
 
           showFeedback("Dados salvos com sucesso!");
         } else {

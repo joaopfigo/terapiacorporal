@@ -13,10 +13,10 @@ if (!isset($_SESSION['usuario_id'])) {
 $user_id = $_SESSION['usuario_id'];
 
 // 2. Busca dados do usuário
-$stmt = $conn->prepare("SELECT nome, email, telefone, idade, sexo, foto_perfil, is_admin FROM usuarios WHERE id = ?");
+$stmt = $conn->prepare("SELECT nome, email, telefone, idade, sexo, foto_perfil, nascimento, is_admin FROM usuarios WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$stmt->bind_result($nome, $email, $telefone, $idade, $sexo, $foto, $is_admin);
+$stmt->bind_result($nome, $email, $telefone, $idade, $sexo, $foto, $nascimento, $is_admin);
 $stmt->fetch();
 $stmt->close();
 
@@ -28,6 +28,7 @@ $usuario = [
     "idade" => $idade,
     "sexo" => $sexo,
     "foto" => $foto ?: "img/avatar-user.jpg",
+    "nascimento" => $nascimento,
     "is_admin" => (int)$is_admin
 ];
 
