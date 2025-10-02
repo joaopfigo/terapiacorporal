@@ -17,6 +17,7 @@ ini_set('session.gc_maxlifetime', $lifetime);
 session_start();
 
 require_once 'conexao.php';
+require_once __DIR__ . '/lib/firebase_config.php';
 
 function respondJson($success, $message = null, array $extra = []) {
     $payload = ['success' => $success];
@@ -38,8 +39,7 @@ if (!$idToken) {
     respondJson(false, 'Token de autenticação não informado.');
 }
 
-$apiKey = 'AIzaSyBi3XjHtg2mCX595ldC0927U1GQp3nlCuA';
-$lookupUrl = 'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' . urlencode($apiKey);
+$lookupUrl = 'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' . urlencode(FIREBASE_API_KEY);
 
 $requestBody = json_encode(['idToken' => $idToken]);
 
