@@ -573,6 +573,93 @@ foreach ($agendamentos as $a) {
       gap: 16px;
     }
 
+    .calendar-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: 12px;
+      padding: 0.55rem 1.2rem;
+      border: 1px solid transparent;
+      background: var(--header-bg);
+      color: #fff;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .calendar-btn:hover,
+    .calendar-btn:focus-visible {
+      background: var(--accent);
+      color: #1d5f45;
+      outline: none;
+      box-shadow: 0 6px 18px #ffd97233;
+    }
+
+    .calendar-btn--primary {
+      background: var(--success);
+      box-shadow: 0 4px 16px #1d9a7722;
+    }
+
+    .calendar-btn--primary:hover,
+    .calendar-btn--primary:focus-visible {
+      background: #32a169;
+      color: #fff;
+      box-shadow: 0 6px 22px #1d9a7733;
+    }
+
+    .calendar-btn--secondary {
+      background: #fff;
+      color: var(--header-bg);
+      border-color: #c8dbd4;
+      box-shadow: 0 3px 12px #1d9a7714;
+    }
+
+    .calendar-btn--secondary:hover,
+    .calendar-btn--secondary:focus-visible {
+      background: var(--action-hover);
+      color: #1d5f45;
+      border-color: #9ecab8;
+    }
+
+    .calendar-btn--ghost {
+      background: transparent;
+      color: var(--text-light);
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    .calendar-btn--ghost:hover,
+    .calendar-btn--ghost:focus-visible {
+      background: #f1f5f4;
+      color: var(--header-bg);
+    }
+
+    .calendar-btn--icon {
+      padding: 0.35rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      line-height: 1;
+      min-width: 34px;
+      min-height: 34px;
+    }
+
+    .calendar-btn--small {
+      padding: 0.45rem 0.85rem;
+      font-size: 0.85rem;
+      border-radius: 10px;
+    }
+
+    .calendar-btn + .calendar-btn {
+      margin-left: 0.75rem;
+    }
+
+    .calendar-modal-actions .calendar-btn + .calendar-btn {
+      margin-left: 0;
+    }
+
     .calendar-nav {
       display: flex;
       align-items: center;
@@ -581,26 +668,15 @@ foreach ($agendamentos as $a) {
       gap: 12px;
     }
 
-    .calendar-nav button {
-      background: var(--success);
-      border: none;
-      border-radius: 12px;
-      color: #fff;
-      font-weight: 600;
+    .calendar-nav .calendar-btn {
       font-size: 1rem;
       padding: 8px 14px;
-      cursor: pointer;
       box-shadow: 0 4px 14px #1d9a7722;
-      transition: background .2s, transform .2s, box-shadow .2s;
     }
 
-    .calendar-nav button:hover,
-    .calendar-nav button:focus-visible {
-      background: var(--accent);
-      color: #256d54;
+    .calendar-nav .calendar-btn:hover,
+    .calendar-nav .calendar-btn:focus-visible {
       transform: translateY(-1px);
-      box-shadow: 0 6px 18px #ffd97233;
-      outline: none;
     }
 
     .calendar-nav-label {
@@ -850,9 +926,83 @@ foreach ($agendamentos as $a) {
       }
     }
 
-    /* Corrige sobreposição de modal se usar */
     #options-modal {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 32px 24px;
       z-index: 10010 !important;
+      border-radius: 16px;
+      box-shadow: 0 8px 40px #0001;
+      width: min(92vw, 520px);
+    }
+
+    #options-modal .modal-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #modal-title {
+      font-family: 'Playfair Display', serif;
+      color: #256d54;
+      margin: 0;
+      font-size: 1.3rem;
+    }
+
+    #modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .modal-subtitle {
+      margin: 0;
+      font-size: 1.05rem;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .modal-text {
+      margin: 0;
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+
+    .calendar-modal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 7px 8px;
+    }
+
+    .calendar-modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .calendar-modal-actions .calendar-btn {
+      flex: 1 1 160px;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+    }
+
+    @media (max-width: 520px) {
+      #options-modal {
+        padding: 24px 16px;
+      }
+
+      .calendar-modal-actions .calendar-btn {
+        flex: 1 1 100%;
+      }
     }
 
     /* Links desabilitados ou "Indisponível" */
@@ -891,10 +1041,9 @@ foreach ($agendamentos as $a) {
   <div class="container">
     <h1>Agenda da Massoterapeuta</h1>
     <div id="calendar-admin"></div>
-    <div id="options-modal"
-      style="display:none;position:fixed;top:10%;left:50%;transform:translateX(-50%);background:#fff;padding:32px 24px;z-index:9999;border-radius:16px;box-shadow:0 8px 40px #0001;">
+    <div id="options-modal">
       <div class="modal-content">
-        <button class="close-modal" onclick="closeModal()" style="float:right;">X</button>
+        <button type="button" class="calendar-btn calendar-btn--ghost calendar-btn--icon close-modal" onclick="closeModal()" aria-label="Fechar modal">&times;</button>
         <h2 id="modal-title"></h2>
         <div id="modal-body"></div>
       </div>
@@ -1026,9 +1175,9 @@ foreach ($agendamentos as $a) {
 
       let html = `
         <div class="calendar-nav">
-          <button type="button" id="prev-month" aria-label="Mês anterior">&lt;</button>
+          <button type="button" id="prev-month" class="calendar-btn calendar-btn--secondary calendar-btn--icon" aria-label="Mês anterior">&lt;</button>
           <span class="calendar-nav-label" data-month="${month}" data-year="${year}">${monthDisplay} ${year}</span>
-          <button type="button" id="next-month" aria-label="Próximo mês">&gt;</button>
+          <button type="button" id="next-month" class="calendar-btn calendar-btn--secondary calendar-btn--icon" aria-label="Próximo mês">&gt;</button>
         </div>
         <div class="calendar-grid calendar-header">
           ${days.map((d, index) => `<span data-weekday="${index}">${d}</span>`).join('')}
@@ -1047,7 +1196,7 @@ foreach ($agendamentos as $a) {
         const isSunday = weekday === 0;
         const bloqueado = datasBloqueadas.includes(data) || isSunday;
         const isToday = data === currentDateKey;
-        const classes = ['cal-admin-day'];
+        const classes = ['calendar-btn', 'calendar-btn--secondary', 'cal-admin-day'];
 
         if (bloqueado) {
           classes.push('cal-disabled');
@@ -1094,19 +1243,25 @@ foreach ($agendamentos as $a) {
       let horariosOcupados = []; // Ex: ['09:00', '14:00']
       let horariosBloqueados = []; // Ex: ['10:00']
 
-      let html = `<h3 style="margin-bottom:10px;">Horários do dia ${data.split('-').reverse().join('/')}</h3>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px 5px;margin-bottom:18px;">`;
+      let html = `<h3 class="modal-subtitle">Horários do dia ${data.split('-').reverse().join('/')}</h3>
+    <div class="calendar-modal-grid">`;
 
       horarios.forEach(h => {
         let ocupado = horariosOcupados.includes(h);
         let bloqueado = horariosBloqueados.includes(h);
         let btnClass = ocupado ? 'cal-disabled' : bloqueado ? 'cal-disabled' : '';
         let label = ocupado ? 'Ocupado' : bloqueado ? 'Bloqueado' : h;
-        html += `<button class="cal-admin-day ${btnClass}" style="padding:7px 0;" data-date="${data}" data-hora="${h}" ${ocupado || bloqueado ? 'disabled' : ''} onclick="abrirOpcoesHorario('${data}','${h}')">${label}</button>`;
+        const buttonClasses = ['calendar-btn', 'calendar-btn--secondary', 'cal-admin-day'];
+        if (btnClass) {
+          buttonClasses.push(btnClass);
+        }
+        html += `<button type="button" class="${buttonClasses.join(' ')}" data-date="${data}" data-hora="${h}" ${ocupado || bloqueado ? 'disabled' : ''} onclick="abrirOpcoesHorario('${data}','${h}')">${label}</button>`;
       });
       html += `</div>
-    <button onclick="abrirBloquearDia('${data}')" style="margin-top:10px;">Bloquear Dia Inteiro</button>
-    <button onclick="closeModal();" style="margin-left:10px;">Fechar</button>
+    <div class="calendar-modal-actions">
+      <button type="button" class="calendar-btn calendar-btn--primary" onclick="abrirBloquearDia('${data}')">Bloquear Dia Inteiro</button>
+      <button type="button" class="calendar-btn calendar-btn--secondary" onclick="closeModal()">Fechar</button>
+    </div>
   `;
 
       document.getElementById('options-modal').style.display = 'block';
@@ -1120,10 +1275,14 @@ foreach ($agendamentos as $a) {
     function abrirOpcoesHorario(data, hora) {
       document.getElementById('modal-title').innerText = `Opções para ${data.split('-').reverse().join('/')} ${hora}`;
       document.getElementById('modal-body').innerHTML = `
-    <button onclick="abrirNovoAgendamento('${data}','${hora}')">Marcar Novo Agendamento</button>
-    <button onclick="abrirBloquearHorario('${data}','${hora}')">Bloquear Horário</button>
-    <button onclick="abrirAgendamentoFixo('${data}','${hora}')">Agendamento Fixo</button>
-    <button onclick="mostrarModalOpcoes('${data}')" style="margin-top:10px;">Voltar</button>
+    <div class="calendar-modal-actions">
+      <button type="button" class="calendar-btn calendar-btn--primary" onclick="abrirNovoAgendamento('${data}','${hora}')">Marcar Novo Agendamento</button>
+      <button type="button" class="calendar-btn calendar-btn--secondary" onclick="abrirBloquearHorario('${data}','${hora}')">Bloquear Horário</button>
+      <button type="button" class="calendar-btn calendar-btn--secondary" onclick="abrirAgendamentoFixo('${data}','${hora}')">Agendamento Fixo</button>
+    </div>
+    <div class="calendar-modal-actions">
+      <button type="button" class="calendar-btn calendar-btn--ghost" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
+    </div>
   `;
     }
 
@@ -1131,8 +1290,11 @@ foreach ($agendamentos as $a) {
     function abrirBloquearDia(data) {
       document.getElementById('modal-title').innerText = 'Bloquear Dia Inteiro ' + data.split('-').reverse().join('/');
       document.getElementById('modal-body').innerHTML = `
-    <button id="btn-bloquear-dia" class="btn-form">Bloquear Dia Inteiro</button>
-    <button type="button" onclick="mostrarModalOpcoes('${data}')" style="margin-left:10px;">Voltar</button>
+    <p class="modal-text">Esta ação criará bloqueios para todos os horários disponíveis deste dia.</p>
+    <div class="calendar-modal-actions">
+      <button type="button" id="btn-bloquear-dia" class="calendar-btn calendar-btn--primary">Bloquear Dia Inteiro</button>
+      <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
+    </div>
   `;
       document.getElementById('btn-bloquear-dia').onclick = function () {
         let promises = [];
@@ -1158,20 +1320,23 @@ foreach ($agendamentos as $a) {
 function abrirBloquearHorario(data, hora) {
   document.getElementById('modal-title').innerText = 'Bloquear Horário em ' + data.split('-').reverse().join('/') + ' ' + hora;
   document.getElementById('modal-body').innerHTML = `
-        < button id = "btn-bloquear-horario" class="btn-form" > Bloquear</button >
-          <button type="button" onclick="mostrarModalOpcoes('${data}')" style="margin-left:10px;">Voltar</button>`;
-  document.getElementById('btn-bloquear-horario').onclick = function() {
+    <p class="modal-text">Confirme para impedir novos agendamentos neste horário específico.</p>
+    <div class="calendar-modal-actions">
+      <button type="button" id="btn-bloquear-horario" class="calendar-btn calendar-btn--primary">Bloquear</button>
+      <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
+    </div>`;
+  document.getElementById('btn-bloquear-horario').onclick = function () {
     fetch('bloquearHorario.php', {
       method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'data_horario=' + encodeURIComponent(data + ' ' + hora)
     })
-    .then(r => r.text())
-    .then(res => {
-      alert('Horário bloqueado!');
-      document.getElementById('options-modal').style.display = 'none';
-      location.reload();
-    });
+      .then(r => r.text())
+      .then(res => {
+        alert('Horário bloqueado!');
+        document.getElementById('options-modal').style.display = 'none';
+        location.reload();
+      });
   };
 }
 
@@ -1208,7 +1373,7 @@ function abrirBloquearHorario(data, hora) {
         <select id="select-usuario">
           <option value="">Selecione...</option>
         </select>
-        <button id="btn-para-visitante" type="button" class="btn-form">Agendar para visitante</button>
+        <button id="btn-para-visitante" type="button" class="calendar-btn calendar-btn--secondary">Agendar para visitante</button>
       </div>
       <div id="form-visitante-area" style="display:none;">
         <div class="guest-form">
@@ -1229,7 +1394,7 @@ function abrirBloquearHorario(data, hora) {
             <option value="prefiro_nao_dizer">Prefiro não dizer</option>
           </select>
         </div>
-        <button id="btn-voltar-escolha" type="button" class="btn-form">Voltar</button>
+        <button id="btn-voltar-escolha" type="button" class="calendar-btn calendar-btn--ghost">Voltar</button>
       </div>
       <label>Especialidade:</label>
       <select id="especialidade_id">
@@ -1245,8 +1410,10 @@ function abrirBloquearHorario(data, hora) {
       <label>Duração (min):</label>
       <input type="number" id="duracao" required>
       <label><input type="checkbox" id="adicional_reflexo" value="1"> Adicional Reflexo</label>
-      <br>
-      <button id="btn-agendar-massa" type="button" class="btn-form">Agendar</button>
+      <div class="calendar-modal-actions">
+        <button id="btn-agendar-massa" type="button" class="calendar-btn calendar-btn--primary">Agendar</button>
+        <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
+      </div>
     </div>
 `;
 }
@@ -1357,8 +1524,10 @@ function abrirAgendamentoFixo(data, hora) {
               <label>Data de fim:
                 <input type="date" name="data_fim" value="${data}" required>
               </label>
-              <button type="submit" class="btn-form">Agendar Fixo</button>
-              <button type="button" onclick="mostrarModalOpcoes('${data}')" style="margin-left:10px;">Voltar</button>
+              <div class="calendar-modal-actions">
+                <button type="submit" class="calendar-btn calendar-btn--primary">Agendar Fixo</button>
+                <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
+              </div>
         </form>
             <script>
               setupAutocomplete('usuario_nome_fixo', 'usuario_id_fixo', 'autocomplete-list-fixo');
