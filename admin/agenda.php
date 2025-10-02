@@ -603,10 +603,11 @@ foreach ($agendamentos as $a) {
       }
 
       .agenda-card {
-        padding: 8vw 3vw 10vw 5vw;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
+        padding: 16px 3vw;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 16px;
       }
 
       .section-title {
@@ -619,45 +620,49 @@ foreach ($agendamentos as $a) {
       }
 
       .ag-card-header,
-      .ag-card-body,
-      .ag-card-actions {
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
-        gap: 16px;
+      .ag-card-body {
+        flex: 1 1 50%;
+        min-width: 220px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
       }
 
       .ag-card-title {
-        font-size: 1.2rem;
-        line-height: 1.4;
-        margin-bottom: 4px;
+        font-size: 1.05rem;
+        line-height: 1.35;
+        margin-bottom: 2px;
       }
 
       .ag-card-status {
-        font-size: 1.1rem;
+        font-size: 1rem;
         line-height: 1.3;
         margin-left: 0;
       }
 
       .ag-card-body {
-        gap: 16px;
+        gap: 14px;
       }
 
       .ag-card-label {
-        font-size: 1.1rem;
-        line-height: 1.4;
+        font-size: 0.98rem;
+        line-height: 1.3;
         margin-bottom: 2px;
       }
 
       .ag-card-value {
-        font-size: 1.2rem;
-        line-height: 1.4;
+        font-size: 1.05rem;
+        line-height: 1.35;
         margin-right: 0;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
       }
 
       .ag-card-actions {
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
         gap: 12px;
       }
 
