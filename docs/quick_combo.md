@@ -35,3 +35,4 @@ Este roteiro garante que o cálculo de preço usa o serviço principal escolhido
 - O preço nunca é somado entre os serviços; o cálculo sempre segue a duração e a tabela do serviço principal.
 - Quick Massage pode ser adicionada como segundo serviço sem alterar o preço final, ficando registrada apenas para histórico em `servicos_csv`.
 - Agendamentos com um único serviço continuam funcionando como antes (sem `servicos_csv`).
+- - A base de serviços não precisa (nem deve) conter linhas artificiais de "combo"; basta registrar os dois IDs reais em `servicos_csv` quando houver atendimento duplo.
