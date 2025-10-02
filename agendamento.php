@@ -4,17 +4,6 @@
 
 session_start();
 require_once 'conexao.php'; // ajuste o caminho se necessário
-$bookingConstantsPath = __DIR__ . '/lib/booking_constants.php';
-if (file_exists($bookingConstantsPath)) {
-    require_once $bookingConstantsPath;
-} else {
-    if (!defined('DUO_SERVICE_ID')) {
-        define('DUO_SERVICE_ID', 10);
-    }
-    if (!defined('DUO_PRECO')) {
-        define('DUO_PRECO', 260.00);
-    }
-}
 
 
 // Buscar valores atuais
@@ -66,24 +55,6 @@ if ($res instanceof mysqli_result) {
     error_log(mysqli_error($conn));
 }
 
-$duoPreco = DUO_PRECO;
-$duoId = DUO_SERVICE_ID;
-$stmt = $conn->prepare('SELECT preco_30 FROM especialidades WHERE id = ? LIMIT 1');
-if ($stmt === false) {
-    error_log(mysqli_error($conn));
-} else {
-    if (!$stmt->bind_param('i', $duoId)) {
-        error_log($stmt->error);
-    } elseif (!$stmt->execute()) {
-        error_log($stmt->error);
-    } else {
-        $stmt->bind_result($precoComboDb);
-        if ($stmt->fetch() && $precoComboDb !== null) {
-            $duoPreco = (float) $precoComboDb;
-        }
-    }
-    $stmt->close();
-}
 ?>
 
 <!DOCTYPE html>
@@ -821,8 +792,6 @@ if ($stmt === false) {
   </div>
 
   <script>
-    const DUO_SERVICE_ID = <?= (int) DUO_SERVICE_ID ?>;
-    const DUO_PRECO = Number(<?= json_encode($duoPreco) ?>);
     let formularioEnviado = false;
     let sessoesDisponiveis = 0;
     let pacoteId = null;
@@ -864,23 +833,18 @@ if ($stmt === false) {
     function calcularValorFinal() {
       const servicosSelecionados = getServicosSelecionados();
       const duracaoSelecionada = document.querySelector('input[name="duracao"]:checked');
-            const escaldaCheckbox = document.getElementById('escalda-pes');
+      const escaldaCheckbox = document.getElementById('escalda-pes');
       const totalSpan = document.getElementById('valor-total');
       const mensagemPagamento = document.querySelector('.total-container small');
       const avisoTratamento = document.getElementById('aviso-tratamento');
       const infoPacote = document.getElementById('info-pacote');
 
-      const isCombo = servicosSelecionados.length === 2;
       let valor = 0;
       let usaPacote = false;
       let mensagemAviso = '';
       let mensagemPacote = '';
-      
 
-      if (isCombo) {
-        valor = Number.isFinite(DUO_PRECO) ? DUO_PRECO : Number(DUO_PRECO) || 0;
-        mensagemAviso = `Combo DUO selecionado: valor promocional de R$ ${formatarValorMonetario(valor)}.`;
-      } else if (duracaoSelecionada) {
+      if (duracaoSelecionada) {
         usaPacote = duracaoSelecionada.value === 'pacote5' || duracaoSelecionada.value === 'pacote10';
         if (usaPacote) {
           if (pacoteId) {
@@ -956,17 +920,8 @@ if ($stmt === false) {
         durationsDiv.innerHTML = htmlDuracoesPadrao;
       }
       // Recoloca os eventos nos radios (importante para funcionar o valor total!)
-      const isCombo = cards.length === 2;
       document.querySelectorAll('input[name="duracao"]').forEach(function(radio) {
         radio.addEventListener('change', calcularValorFinal);
-        radio.disabled = isCombo;
-        const label = radio.closest('label');
-        if (label) {
-          label.classList.toggle('duracao-disabled', isCombo);
-        }
-        if (isCombo && radio.checked) {
-          radio.checked = false;
-        }
       });
       calcularValorFinal();
       atualizarPacoteAgendamento();
@@ -1156,7 +1111,6 @@ if ($stmt === false) {
       const horaSelecionada = obterHoraSelecionada();
       const dataSelecionada = obterDataSelecionada();
       const servicosSelecionados = getServicosSelecionados();
-      const isCombo = servicosSelecionados.length === 2;
       let guestValid = true;
 
       // Checa se bloco de guest está visível
@@ -1167,7 +1121,7 @@ if ($stmt === false) {
 
       if (
         !servicosSelecionados.length ||
-        (!isCombo && !duracaoSelecionada) ||
+        !duracaoSelecionada ||
         !horaSelecionada ||
         !dataSelecionada ||
         (guestVisible && !guestValid)
@@ -1182,24 +1136,21 @@ if ($stmt === false) {
         hora: horaSelecionada
       };
 
-      if (isCombo) {
-        dados.servico_id = String(DUO_SERVICE_ID);
-        dados.duracao = '30';
-        dados.servicos = servicosSelecionados.join(',');
-      } else {
-        const servicoEscolhido = servicosSelecionados[0];
-        dados.servico_id = servicoEscolhido;
-        dados.duracao = duracaoSelecionada.value;
-        dados.servicos = servicoEscolhido;
+      const servicoPrincipal = servicosSelecionados[0];
+      dados.servico_id = String(servicoPrincipal);
+      dados.duracao = duracaoSelecionada.value;
 
-        if (duracaoSelecionada && (duracaoSelecionada.value === 'pacote5' || duracaoSelecionada.value === 'pacote10')) {
-          if (!pacoteId) {
-            alert('Não foi possível identificar um pacote ativo para este agendamento.');
-            return;
-          }
-          dados.usou_pacote = 1;
-          dados.pacote_id = String(pacoteId);
+      if (servicosSelecionados.length === 2) {
+        dados.servicos = servicosSelecionados.join(',');
+      }
+
+      if (duracaoSelecionada.value === 'pacote5' || duracaoSelecionada.value === 'pacote10') {
+        if (!pacoteId) {
+          alert('Não foi possível identificar um pacote ativo para este agendamento.');
+          return;
         }
+        dados.usou_pacote = 1;
+        dados.pacote_id = String(pacoteId);
       }
       // Extra opcional: Escalda Pés  (mantemos a chave add_reflexo para não quebrar o PHP)
       const escaldaEl = document.getElementById('escalda-pes');
@@ -1349,8 +1300,6 @@ if ($stmt === false) {
           const inputPacote = document.getElementById('duracao-pacote');
           if (!inputPacote) return; // Não existe opção de pacote, não faz nada
           const labelPacote = inputPacote.parentElement;
-          const comboAtivo = getServicosSelecionados().length === 2;
-
           // Remove info duplicada se recarregar
           const info = document.getElementById('pacote-info-agendamento');
           if (info) info.remove();
@@ -1374,12 +1323,6 @@ if ($stmt === false) {
             }
           }
 
-          if (comboAtivo) {
-            inputPacote.disabled = true;
-            if (labelPacote) {
-              labelPacote.classList.add('duracao-disabled');
-            }
-          }
         });
     }
     // Chama ao carregar a página:

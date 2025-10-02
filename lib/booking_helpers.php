@@ -1,16 +1,4 @@
 <?php
-$bookingConstantsPath = __DIR__ . '/booking_constants.php';
-if (file_exists($bookingConstantsPath)) {
-    require_once $bookingConstantsPath;
-} else {
-    if (!defined('DUO_SERVICE_ID')) {
-        define('DUO_SERVICE_ID', 10);
-    }
-    if (!defined('DUO_PRECO')) {
-        define('DUO_PRECO', 260.00);
-    }
-}
-
 /**
  * Retorna um mapa id => nome das especialidades, com cache simples para a requisição.
  */
@@ -32,26 +20,23 @@ function obterMapaEspecialidades(mysqli $conn): array {
 }
 
 /**
- * Monta o nome exibido para serviços selecionados, tratando o combo de dois tratamentos.
+ * Monta o nome exibido para serviços selecionados, priorizando os IDs presentes em servicos_csv
+ * quando houver. Caso contrário, utiliza o nome informado como fallback.
  *
  * @return array{0:string,1:array<int,string>} [titulo, lista de nomes]
  */
 function descreverServicos(mysqli $conn, int $especialidadeId, ?string $servicosCsv, string $fallbackNome): array {
     $nomes = [];
 
-    if ($especialidadeId === DUO_SERVICE_ID && $servicosCsv) {
-        $ids = array_values(array_filter(array_map('intval', explode(',', $servicosCsv))));
+    if ($servicosCsv) {
+        $ids = array_values(array_unique(array_filter(array_map('intval', explode(',', $servicosCsv)))));
         if ($ids) {
             $mapa = obterMapaEspecialidades($conn);
             foreach ($ids as $id) {
-                if ($id === DUO_SERVICE_ID) {
-                    continue;
-                }
                 if (isset($mapa[$id])) {
                     $nomes[] = $mapa[$id];
                 }
             }
-            $nomes = array_values(array_unique($nomes));
         }
     }
 
