@@ -824,6 +824,8 @@ if ($stmt === false) {
     const DUO_SERVICE_ID = <?= (int) DUO_SERVICE_ID ?>;
     const DUO_PRECO = Number(<?= json_encode($duoPreco) ?>);
     let formularioEnviado = false;
+    let sessoesDisponiveis = 0;
+    let pacoteId = null;
     // HTML padrão (todas as opções exceto quick massage sozinho)
     const htmlDuracoesPadrao = `
       <label><input type="radio" name="duracao" value="50" data-preco="<?= htmlspecialchars($precos['padrao_50']) ?>"> 50 min — R$ <?= htmlspecialchars($precos['padrao_50']) ?></label>
@@ -837,6 +839,62 @@ if ($stmt === false) {
   <label><input type="radio" name="duracao" value="30" data-preco="<?= htmlspecialchars($precos['quick_30']) ?>"> 30 min — R$ <?= htmlspecialchars($precos['quick_30']) ?></label>
   <label><input type="radio" name="duracao" id="duracao-pacote" value="pacote5" data-preco="0"> Utilizar pacote de sessões</label>
     `;
+    
+    function obterPrecoNumerico(elemento) {
+      if (!elemento) {
+        return 0;
+      }
+      const bruto = elemento.getAttribute('data-preco');
+      if (!bruto) {
+        return 0;
+      }
+      const normalizado = String(bruto).replace(/\./g, '').replace(',', '.');
+      const numero = Number(normalizado);
+      return Number.isFinite(numero) ? numero : 0;
+    }
+
+    function formatarValorMonetario(valor) {
+      return Number(valor).toFixed(2).replace('.', ',');
+    }
+
+    function calcularValorFinal() {
+      const servicosSelecionados = getServicosSelecionados();
+      const isCombo = servicosSelecionados.length === 2;
+      const duracaoSelecionada = document.querySelector('input[name="duracao"]:checked');
+      let valor = 0;
+
+      if (isCombo) {
+        valor = Number.isFinite(Number(DUO_PRECO)) ? Number(DUO_PRECO) : 0;
+      } else if (duracaoSelecionada) {
+        const usaPacote = duracaoSelecionada.value === 'pacote5' || duracaoSelecionada.value === 'pacote10';
+        if (!usaPacote) {
+          valor += obterPrecoNumerico(duracaoSelecionada);
+        }
+      }
+
+      const escaldaCheckbox = document.getElementById('escalda-pes');
+      if (escaldaCheckbox && escaldaCheckbox.checked) {
+        valor += obterPrecoNumerico(escaldaCheckbox);
+      }
+
+      const totalSpan = document.getElementById('valor-total');
+      if (totalSpan) {
+        totalSpan.textContent = formatarValorMonetario(valor);
+      }
+
+      const mensagemPagamento = document.querySelector('.total-container small');
+      if (mensagemPagamento) {
+        if (valor === 0) {
+          mensagemPagamento.textContent =
+            "O valor desta consulta será debitado do seu pacote. Nenhum pagamento é necessário.";
+        } else {
+          mensagemPagamento.textContent =
+            "O pagamento deve ser feito no dia da consulta através de Pix, dinheiro, cartão de crédito ou débito.";
+        }
+      }
+
+      return valor;
+    }
     function atualizarDuracoes() {
       const cards = document.querySelectorAll('.treatment.selected');
       const durationsDiv = document.querySelector('.durations');
@@ -965,107 +1023,104 @@ if ($stmt === false) {
   let usuarioLogado = false;
   // O código correto para exibir os blocos será executado após a resposta do fetch('getPerfil.php')
       
-// Função para obter até dois serviços selecionados
-function getServicosSelecionados() {
-  return Array.from(document.querySelectorAll('.treatment.selected'))
-    .map(card => card.dataset.id)
-    .filter(Boolean)
-    .slice(0, 2);
-}
-
-// Função para pegar a data escolhida no calendário
-function obterDataSelecionada() {
-  // Pega o botão de slot selecionado e lê o atributo data-date do calendário
-  const btn = document.querySelector('.cal-day[style*="box-shadow"]');
-  return btn ? btn.getAttribute('data-date') : null;
-}
-
-// Função para pegar o horário selecionado
-function obterHoraSelecionada() {
-  const slot = document.querySelector('.slot.selected');
-  return slot ? slot.textContent.trim() : null;
-}
-document.getElementById('btn-agendar').onclick = function(e) {
-  e.preventDefault();
-
-  const duracaoSelecionada = document.querySelector('input[name="duracao"]:checked');
-  const horaSelecionada = obterHoraSelecionada();
-  const dataSelecionada = obterDataSelecionada();
-  const servicosSelecionados = getServicosSelecionados();
-  const isCombo = servicosSelecionados.length === 2;
-  let guestValid = true;
-
-  // Checa se bloco de guest está visível
-  const guestVisible = document.getElementById('dados-guest').style.display !== 'none';
-  if (guestVisible) {
-    guestValid = [...document.querySelectorAll('#dados-guest input[required]')].every(f => f.value.trim() !== "");
-  }
-
-  if (!servicosSelecionados.length || (!isCombo && !duracaoSelecionada) || !horaSelecionada || !dataSelecionada || (guestVisible && !guestValid)) {
-    alert('Por favor, selecione serviço, data, horário e duração, preenchendo todos os campos obrigatórios.');
-    return;
-  }
-
-// Prepara os dados para envio
-const dados = {
-  data: dataSelecionada,
-  hora: horaSelecionada
-};
-
-if (isCombo) {
-  dados.servico_id = String(DUO_SERVICE_ID);
-  dados.duracao = '30';
-  dados.servicos = servicosSelecionados.join(',');
-} else {
-  const servicoEscolhido = servicosSelecionados[0];
-  dados.servico_id = servicoEscolhido;
-  dados.duracao = duracaoSelecionada.value;
-  dados.servicos = servicoEscolhido;
-
-  if (duracaoSelecionada && (duracaoSelecionada.value === 'pacote5' || duracaoSelecionada.value === 'pacote10')) {
-    if (!pacoteId) {
-      alert('Não foi possível identificar um pacote ativo para este agendamento.');
-      return;
+    // Função para obter até dois serviços selecionados
+    function getServicosSelecionados() {
+      return Array.from(document.querySelectorAll('.treatment.selected'))
+        .map(card => card.dataset.id)
+        .filter(Boolean)
+        .slice(0, 2);
     }
-    dados.usou_pacote = 1;
-    dados.pacote_id = String(pacoteId);
-  }
-}
 
-// Extra opcional: Escalda Pés  (mantemos a chave add_reflexo para não quebrar o PHP)
-const escaldaEl = document.getElementById('escalda-pes');
-if (escaldaEl && escaldaEl.checked) {
-  dados.add_reflexo = 1;
-}
+    // Função para pegar a data escolhida no calendário
+    function obterDataSelecionada() {
+      // Pega o botão de slot selecionado e lê o atributo data-date do calendário
+      const btn = document.querySelector('.cal-day[style*="box-shadow"]');
+      return btn ? btn.getAttribute('data-date') : null;
+    }
+      
+    // Função para pegar o horário selecionado
+    function obterHoraSelecionada() {
+      const slot = document.querySelector('.slot.selected');
+      return slot ? slot.textContent.trim() : null;
+    }
+    document.getElementById('btn-agendar').onclick = function(e) {
+      e.preventDefault();
+              const duracaoSelecionada = document.querySelector('input[name="duracao"]:checked');
+      const horaSelecionada = obterHoraSelecionada();
+      const dataSelecionada = obterDataSelecionada();
+      const servicosSelecionados = getServicosSelecionados();
+      const isCombo = servicosSelecionados.length === 2;
+      let guestValid = true;
 
-// Termo (se existir no formulário)
-const termoEl = document.getElementById('termo');
-if (termoEl && termoEl.checked) {
-  dados.termo = 1;
-}
-
-
-  // Se o bloco de guest estiver visível (usuário não logado), pega os campos obrigatórios de visitante
-  if (guestVisible) {
-    dados.guest_name = document.getElementById('guest-name').value;
-    dados.guest_email = document.getElementById('guest-email').value;
-    dados.guest_phone = document.getElementById('guest-phone').value;
-    dados.guest_nascimento = document.getElementById('guest-nascimento').value;
-    dados.guest_sexo = document.getElementById('guest-sexo').value;
-    dados.criar_conta = document.getElementById('criar-conta').checked ? 1 : 0;
-    if (dados.criar_conta) {
-      dados.guest_senha = document.getElementById('guest-senha').value;
-@@ -1230,68 +1239,75 @@ if (termoEl && termoEl.checked) {
-
-      // Mensagem de pagamento
-      if (valor === 0) {
-        document.querySelector('.total-container small').textContent = 
-          "O valor desta consulta será debitado do seu pacote. Nenhum pagamento é necessário.";
-      } else {
-        document.querySelector('.total-container small').textContent =
-          "O pagamento deve ser feito no dia da consulta através de Pix, dinheiro, cartão de crédito ou débito.";
+      // Checa se bloco de guest está visível
+      const guestVisible = document.getElementById('dados-guest').style.display !== 'none';
+      if (guestVisible) {
+        guestValid = [...document.querySelectorAll('#dados-guest input[required]')].every(f => f.value.trim() !== "");
       }
-    }
+
+      if (
+        !servicosSelecionados.length ||
+        (!isCombo && !duracaoSelecionada) ||
+        !horaSelecionada ||
+        !dataSelecionada ||
+        (guestVisible && !guestValid)
+      ) {
+        alert('Por favor, selecione serviço, data, horário e duração, preenchendo todos os campos obrigatórios.');
+        return;
+      }
+
+      // Prepara os dados para envio
+      const dados = {
+        data: dataSelecionada,
+        hora: horaSelecionada
+      };
+
+      if (isCombo) {
+        dados.servico_id = String(DUO_SERVICE_ID);
+        dados.duracao = '30';
+        dados.servicos = servicosSelecionados.join(',');
+      } else {
+        const servicoEscolhido = servicosSelecionados[0];
+        dados.servico_id = servicoEscolhido;
+        dados.duracao = duracaoSelecionada.value;
+        dados.servicos = servicoEscolhido;
+
+        if (duracaoSelecionada && (duracaoSelecionada.value === 'pacote5' || duracaoSelecionada.value === 'pacote10')) {
+          if (!pacoteId) {
+            alert('Não foi possível identificar um pacote ativo para este agendamento.');
+            return;
+          }
+          dados.usou_pacote = 1;
+          dados.pacote_id = String(pacoteId);
+        }
+      }
+      // Extra opcional: Escalda Pés  (mantemos a chave add_reflexo para não quebrar o PHP)
+      const escaldaEl = document.getElementById('escalda-pes');
+      if (escaldaEl && escaldaEl.checked) {
+        dados.add_reflexo = 1;
+      }
+
+      // Termo (se existir no formulário)
+      const termoEl = document.getElementById('termo');
+      if (termoEl && termoEl.checked) {
+        dados.termo = 1;
+      }
+
+      // Se o bloco de guest estiver visível (usuário não logado), pega os campos obrigatórios de visitante
+      if (guestVisible) {
+        dados.guest_name = document.getElementById('guest-name').value;
+        dados.guest_email = document.getElementById('guest-email').value;
+        dados.guest_phone = document.getElementById('guest-phone').value;
+        dados.guest_nascimento = document.getElementById('guest-nascimento').value;
+        dados.guest_sexo = document.getElementById('guest-sexo').value;
+        dados.criar_conta = document.getElementById('criar-conta').checked ? 1 : 0;
+        if (dados.criar_conta) {
+          dados.guest_senha = document.getElementById('guest-senha').value;
+        }
+      }
+
+      // Neste ponto os dados estão montados e prontos para envio ao servidor.
+    };
 
     // Atualiza sempre que mudar as opções
     document.querySelectorAll('input[name="duracao"]').forEach(function(radio) {
@@ -1079,9 +1134,6 @@ if (termoEl && termoEl.checked) {
     // Chama na inicialização
     calcularValorFinal();
     
-    // Ao carregar a página, verifica sessões restantes do usuário
-    let sessoesDisponiveis = 0;
-    let pacoteId = null;
     // Função reutilizável
     function atualizarPacoteAgendamento() {
       fetch('getPacoteUsuario.php')
