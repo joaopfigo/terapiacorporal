@@ -293,8 +293,8 @@ try {
         $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, servicos_csv, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
         $stmt->bind_param("iisidiss", $user_id, $servico_id, $datetime, $duracao_db, $preco_final, $add_reflexo, $status, $servicosCsv);
     } else {
-        $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, nome_visitante, email_visitante, telefone_visitante, idade_visitante, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, servicos_csv, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->bind_param("isssiisidiss", $user_id, $nome, $email, $telefone, $idade, $servico_id, $datetime, $duracao_db, $preco_final, $add_reflexo, $status, $servicosCsv);
+        $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, nome_visitante, email_visitante, telefone_visitante, idade_visitante, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, servicos_csv, criado_em) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+        $stmt->bind_param("sssiisidiss", $nome, $email, $telefone, $idade, $servico_id, $datetime, $duracao_db, $preco_final, $add_reflexo, $status, $servicosCsv);
     }
 
     if (!$stmt->execute()) {
