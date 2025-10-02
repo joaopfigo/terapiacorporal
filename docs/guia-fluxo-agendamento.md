@@ -33,6 +33,7 @@
 ### Tabela `especialidades`
 
 * Precisa conter: `preco_15`, `preco_30`, `preco_50`, `preco_90`, `preco_escalda`, `pacote5`, `pacote10`, `quick`.
+* * **Não** criar registros artificiais de "combo". O suporte a dois tratamentos acontece registrando o par real em `servicos_csv`, mantendo `especialidades` restrita aos serviços efetivamente ofertados.
 
 ---
 
