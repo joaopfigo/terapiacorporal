@@ -1792,7 +1792,7 @@ function abrirBloquearHorario(data, hora) {
       </select>
       <label>Duração (min):</label>
       <input type="number" id="duracao" required>
-      <label><input type="checkbox" id="adicional_reflexo" value="1"> Adicional Reflexo</label>
+      <label><input type="checkbox" id="adicional_reflexo" value="1"> Adicional Escalda</label>
       <div class="calendar-modal-actions">
         <button id="btn-agendar-massa" type="button" class="calendar-btn calendar-btn--primary">Agendar</button>
         <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
