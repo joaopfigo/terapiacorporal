@@ -275,28 +275,45 @@ if ($dataFiltro !== '') {
   }
 }
 
-$sql = "SELECT a.*, u.nome as usuario_nome, e.nome as servico_nome
+$sqlBaseAgendamentos = "SELECT a.*, u.nome as usuario_nome, e.nome as servico_nome
 FROM agendamentos a
 LEFT JOIN usuarios u ON a.usuario_id = u.id
 LEFT JOIN especialidades e ON a.especialidade_id = e.id";
-if ($dataFiltroValido) {
-  $sql .= "\nWHERE DATE(a.data_horario) = ?";
-}
-$sql .= "\nORDER BY a.data_horario DESC";
+$orderByClause = "\nORDER BY a.data_horario DESC";
 
-$stmt = $conn->prepare($sql);
-if ($dataFiltroValido) {
-  $stmt->bind_param('s', $dataFiltro);
+// Consulta completa para o calendário e bloqueios
+$agendamentosCalendario = [];
+$stmtCalendario = $conn->prepare($sqlBaseAgendamentos . $orderByClause);
+if ($stmtCalendario) {
+  $stmtCalendario->execute();
+  $resultCalendario = $stmtCalendario->get_result();
+  $agendamentosCalendario = $resultCalendario ? $resultCalendario->fetch_all(MYSQLI_ASSOC) : [];
+  $stmtCalendario->close();
 }
-$stmt->execute();
-$result = $stmt->get_result();
-$agendamentos = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
-$stmt->close();
+
+// Consulta filtrada para a listagem
+$sqlLista = $sqlBaseAgendamentos;
+if ($dataFiltroValido) {
+  $sqlLista .= "\nWHERE DATE(a.data_horario) = ?";
+}
+$sqlLista .= $orderByClause;
+$agendamentosLista = [];
+$stmtLista = $conn->prepare($sqlLista);
+if ($stmtLista) {
+  if ($dataFiltroValido) {
+    $stmtLista->bind_param('s', $dataFiltro);
+  }
+  $stmtLista->execute();
+  $resultLista = $stmtLista->get_result();
+  $agendamentosLista = $resultLista ? $resultLista->fetch_all(MYSQLI_ASSOC) : [];
+  $stmtLista->close();
+}
+
 $mensagemAgendamentos = '';
-if ($dataFiltroValido && empty($agendamentos)) {
+if ($dataFiltroValido && empty($agendamentosLista)) {
   $mensagemAgendamentos = 'Nenhum agendamento encontrado para a data selecionada.';
 }
-foreach ($agendamentos as &$ag) {
+foreach ($agendamentosLista as &$ag) {
   [$tituloServicos, $listaServicos] = descreverServicos(
     $conn,
     isset($ag['especialidade_id']) ? (int)$ag['especialidade_id'] : 0,
@@ -307,9 +324,9 @@ foreach ($agendamentos as &$ag) {
   $ag['servicos_lista'] = $listaServicos;
 }
 unset($ag);
-// Separar eventos para o calendário 
+// Separar eventos para o calendário
 $eventos_calendario = [];
-foreach ($agendamentos as $a) {
+foreach ($agendamentosCalendario as $a) {
   if (in_array(strtolower($a['status']), ['confirmado', 'concluido'])) {
     $title = $a['usuario_nome'] ? $a['usuario_nome'] : 'Indisponível';
     $eventos_calendario[] = [
@@ -1350,7 +1367,7 @@ foreach ($agendamentos as $a) {
   <?php endif; ?>
 
   <div class="agendas-list">
-    <?php foreach ($agendamentos as $a): ?>
+    <?php foreach ($agendamentosLista as $a): ?>
       <div class="agenda-card" data-status="<?= strtolower($a['status']) ?>">
         <div class="ag-card-header">
           <div class="ag-card-title">
@@ -1561,9 +1578,9 @@ foreach ($agendamentos as $a) {
 
 
     let datasBloqueadas = <?php
-    // PHP para bloquear domingos e datas confirmadas
+    // PHP para bloquear domingos e datas confirmadas usando o conjunto completo
     $bloqueadas = [];
-    foreach ($agendamentos as $a) {
+    foreach ($agendamentosCalendario as $a) {
       if (strtolower($a['status']) == 'confirmado') {
         $bloqueadas[] = date('Y-m-d', strtotime($a['data_horario']));
       }
