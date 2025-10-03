@@ -1955,10 +1955,12 @@ function abrirAgendamentoFixo(data, hora) {
 }
 
 
-  <script>
-    (function () {
-      const header = document.querySelector('.header-admin');
-      if (!header) return;
+    </script>
+
+    <script>
+      (function () {
+        const header = document.querySelector('.header-admin');
+        if (!header) return;
 
       const toggle = header.querySelector('.menu-toggle');
       const menuLinks = header.querySelectorAll('.menu-horizontal a');
