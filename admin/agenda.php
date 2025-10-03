@@ -326,15 +326,42 @@ foreach ($agendamentosLista as &$ag) {
 unset($ag);
 // Separar eventos para o calendário
 $eventos_calendario = [];
+$eventos_bloqueados = [];
 foreach ($agendamentosCalendario as $a) {
-  if (in_array(strtolower($a['status']), ['confirmado', 'concluido'])) {
+  $status = strtolower($a['status'] ?? '');
+  $dataHorario = $a['data_horario'] ?? null;
+
+  if (!$dataHorario) {
+    continue;
+  }
+
+  if (in_array($status, ['confirmado', 'concluido'], true)) {
     $title = $a['usuario_nome'] ? $a['usuario_nome'] : 'Indisponível';
     $eventos_calendario[] = [
       'title' => $title,
-      'start' => $a['data_horario'],
+      'start' => $dataHorario,
       'url' => '#agendamento-' . $a['id'],
     ];
   }
+
+  if ($status === 'indisponivel') {
+    $dia = date('Y-m-d', strtotime($dataHorario));
+    if (!isset($eventos_bloqueados[$dia])) {
+      $eventos_bloqueados[$dia] = [
+        'title' => '🚫 Indisponível',
+        'start' => $dia,
+        'allDay' => true,
+        'display' => 'block',
+        'color' => '#f8d7da',
+        'textColor' => '#b04a4a',
+        'className' => ['evento-bloqueado'],
+      ];
+    }
+  }
+}
+
+if (!empty($eventos_bloqueados)) {
+  $eventos_calendario = array_merge($eventos_calendario, array_values($eventos_bloqueados));
 }
 ?>
 <!DOCTYPE html>
@@ -1294,6 +1321,48 @@ foreach ($agendamentosCalendario as $a) {
       right: 8px;
     }
 
+    .fc-daygrid-day.fc-day--domingo {
+      background-color: #fff7f0;
+    }
+
+    .fc-daygrid-day.fc-day--bloqueado {
+      background-image: linear-gradient(135deg, rgba(248, 215, 218, 0.45) 0%, rgba(248, 215, 218, 0.1) 100%);
+    }
+
+    .fc-daygrid-day.fc-day--bloqueado .fc-daygrid-day-number {
+      color: #b04a4a;
+    }
+
+    .fc-day-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #a94442;
+      background: rgba(248, 215, 218, 0.6);
+      border-radius: 999px;
+      padding: 2px 10px;
+      margin-bottom: 4px;
+    }
+
+    .fc-day-status::before {
+      margin-right: 4px;
+    }
+
+    .fc-day-status--domingo {
+      background: rgba(255, 231, 204, 0.7);
+      color: #c77f1a;
+    }
+
+    .fc-day-status--bloqueado::before {
+      content: '🚫';
+    }
+
+    .fc-day-status--domingo::before {
+      content: '☀️';
+    }
+
     @media (max-width: 520px) {
       #options-modal {
         padding: 24px 16px;
@@ -1570,12 +1639,31 @@ foreach ($agendamentosCalendario as $a) {
     // PHP para bloquear domingos e datas confirmadas usando o conjunto completo
     $bloqueadas = [];
     foreach ($agendamentosCalendario as $a) {
-      if (strtolower($a['status']) == 'confirmado') {
+      $status = strtolower($a['status'] ?? '');
+      if (in_array($status, ['confirmado', 'concluido', 'indisponivel'], true) && !empty($a['data_horario'])) {
         $bloqueadas[] = date('Y-m-d', strtotime($a['data_horario']));
       }
     }
+    $bloqueadas = array_values(array_unique($bloqueadas));
+    sort($bloqueadas);
     echo json_encode($bloqueadas);
     ?>;
+    const datasBloqueadasSet = new Set(datasBloqueadas);
+
+    function adicionarIndicadorDia(dayEl, texto, extraClass) {
+      const frame = dayEl.querySelector('.fc-daygrid-day-frame');
+      if (!frame) {
+        return;
+      }
+      const selector = '.fc-day-status' + (extraClass ? '.' + extraClass : '');
+      if (frame.querySelector(selector)) {
+        return;
+      }
+      const badge = document.createElement('span');
+      badge.className = 'fc-day-status' + (extraClass ? ' ' + extraClass : '');
+      badge.textContent = texto;
+      frame.prepend(badge);
+    }
 
     document.addEventListener('DOMContentLoaded', function () {
       const calendarEl = document.getElementById('calendar-admin');
@@ -1597,8 +1685,28 @@ foreach ($agendamentosCalendario as $a) {
         },
         footerToolbar: false,
         events: <?php echo json_encode($eventos_calendario); ?>,
+        dayCellClassNames: function (arg) {
+          const classes = [];
+          const dateStr = arg.date.toISOString().split('T')[0];
+          if (arg.date.getDay() === 0) {
+            classes.push('fc-day--domingo');
+          }
+          if (datasBloqueadasSet.has(dateStr)) {
+            classes.push('fc-day--bloqueado');
+          }
+          return classes;
+        },
+        dayCellDidMount: function (arg) {
+          const dateStr = arg.date.toISOString().split('T')[0];
+          if (arg.date.getDay() === 0) {
+            adicionarIndicadorDia(arg.el, 'Domingo', 'fc-day-status--domingo');
+          }
+          if (datasBloqueadasSet.has(dateStr)) {
+            adicionarIndicadorDia(arg.el, 'Indisponível', 'fc-day-status--bloqueado');
+          }
+        },
         dateClick: function (info) {
-          if (datasBloqueadas.includes(info.dateStr) || info.date.getDay() === 0) {
+          if (datasBloqueadasSet.has(info.dateStr) || info.date.getDay() === 0) {
             return;
           }
 

@@ -9,7 +9,7 @@ $eventos = [];
 $sql = "SELECT a.id, a.data_horario, a.status, a.usuario_id, u.nome as paciente
         FROM agendamentos a
         LEFT JOIN usuarios u ON a.usuario_id = u.id
-        WHERE a.status IN ('Confirmado','Concluido','Indisponível')";
+        WHERE a.status IN ('Confirmado','Concluido','Indisponivel')";
 $res = $conn->query($sql);
 
 while ($row = $res->fetch_assoc()) {
