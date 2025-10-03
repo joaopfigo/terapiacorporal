@@ -1586,7 +1586,7 @@ foreach ($agendamentosCalendario as $a) {
       setupStatusActionHandlers();
 
       const calendar = new FullCalendar.Calendar(calendarEl, {
-        plugins: [FullCalendar.dayGridPlugin, FullCalendar.interactionPlugin],
+        plugins: ['dayGrid', 'interaction'],
         initialView: 'dayGridMonth',
         locale: 'pt-br',
         height: 600,
