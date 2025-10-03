@@ -1908,59 +1908,57 @@ function abrirBloquearHorario(data, hora) {
 
 function abrirAgendamentoFixo(data, hora) {
   document.getElementById('modal-title').innerText = 'Agendamento Fixo';
-  document.getElementById('modal-body').innerHTML = `
-        < form method = "post" action = "agendarFixo.php" autocomplete = "off" >
+  const modalBody = document.getElementById('modal-body');
+  modalBody.innerHTML = `
+        <form method="post" action="agendarFixo.php" autocomplete="off">
           <label>Usuário:
             <input type="text" id="usuario_nome_fixo" placeholder="Digite o nome..." autocomplete="off" required>
-              <input type="hidden" name="usuario_id" id="usuario_id_fixo" required>
-                <div id="autocomplete-list-fixo" class="autocomplete-items"></div>
-              </label>
-              <label>Especialidade:
-                <select name="especialidade_id" required>
-                  <option value="1">Quick Massage</option>
-                  <option value="2">Massoterapia</option>
-                  <option value="3">Reflexologia Podal</option>
-                  <option value="4">Auriculoterapia</option>
-                  <option value="5">Ventosa</option>
-                  <option value="6">Acupuntura</option>
-                  <option value="7">Biomagnetismo</option>
-                  <option value="8">Reiki</option>
-                </select>
-              </label>
-              <label>Dia da semana:
-                <select name="dia_semana" required>
-                  <option value="1">Segunda-feira</option>
-                  <option value="2">Terça-feira</option>
-                  <option value="3">Quarta-feira</option>
-                  <option value="4">Quinta-feira</option>
-                  <option value="5">Sexta-feira</option>
-                  <option value="6">Sábado</option>
-                  <option value="7">Domingo</option>
-                </select>
-              </label>
-              <label>Horário:
-                <input type="time" name="horario" required>
-              </label>
-              <label>Duração (min):
-                <input type="number" name="duracao" value="60" required>
-              </label>
-              <label>Data de início:
-                <input type="date" name="data_inicio" value="${data}" required>
-              </label>
-              <label>Data de fim:
-                <input type="date" name="data_fim" value="${data}" required>
-              </label>
-              <div class="calendar-modal-actions">
-                <button type="submit" class="calendar-btn calendar-btn--primary">Agendar Fixo</button>
-                <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
-              </div>
+            <input type="hidden" name="usuario_id" id="usuario_id_fixo" required>
+            <div id="autocomplete-list-fixo" class="autocomplete-items"></div>
+          </label>
+          <label>Especialidade:
+            <select name="especialidade_id" required>
+              <option value="1">Quick Massage</option>
+              <option value="2">Massoterapia</option>
+              <option value="3">Reflexologia Podal</option>
+              <option value="4">Auriculoterapia</option>
+              <option value="5">Ventosa</option>
+              <option value="6">Acupuntura</option>
+              <option value="7">Biomagnetismo</option>
+              <option value="8">Reiki</option>
+            </select>
+          </label>
+          <label>Dia da semana:
+            <select name="dia_semana" required>
+              <option value="1">Segunda-feira</option>
+              <option value="2">Terça-feira</option>
+              <option value="3">Quarta-feira</option>
+              <option value="4">Quinta-feira</option>
+              <option value="5">Sexta-feira</option>
+              <option value="6">Sábado</option>
+              <option value="7">Domingo</option>
+            </select>
+          </label>
+          <label>Horário:
+            <input type="time" name="horario" required>
+          </label>
+          <label>Duração (min):
+            <input type="number" name="duracao" value="60" required>
+          </label>
+          <label>Data de início:
+            <input type="date" name="data_inicio" value="${data}" required>
+          </label>
+          <label>Data de fim:
+            <input type="date" name="data_fim" value="${data}" required>
+          </label>
+          <div class="calendar-modal-actions">
+            <button type="submit" class="calendar-btn calendar-btn--primary">Agendar Fixo</button>
+            <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
+          </div>
         </form>
-            <script>
-              setupAutocomplete('usuario_nome_fixo', 'usuario_id_fixo', 'autocomplete-list-fixo');
-              
-              `;
+      `;
+  setupAutocomplete('usuario_nome_fixo', 'usuario_id_fixo', 'autocomplete-list-fixo');
 }
-</script>
 
 
   <script>
