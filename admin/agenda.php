@@ -1321,7 +1321,7 @@ foreach ($agendamentosCalendario as $a) {
   <title>Agenda Unificada</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11e/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
 </head>
 
