@@ -1320,7 +1320,7 @@ foreach ($agendamentosCalendario as $a) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Agenda Unificada</title>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
 </head>
