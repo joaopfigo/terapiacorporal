@@ -1717,7 +1717,19 @@ function abrirBloquearHorario(data, hora) {
       });
   };
 }
-
+ document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar-admin');
+              var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+              locale: 'pt-br',
+              height: 600,
+              events: <?php echo json_encode($eventos_calendario); ?>,
+              dateClick: function(info) {
+                mostrarModalOpcoes(info.dateStr);
+    }
+  });
+              calendar.render();
+});
 
  </script>
  <script>
