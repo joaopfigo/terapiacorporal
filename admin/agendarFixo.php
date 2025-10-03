@@ -57,7 +57,7 @@ for ($i = 0; $i < $repeticoes; $i++) {
 $agendados = 0;
 foreach ($datasGeradas as $dataOcorrencia) {
     $data_horario = $dataOcorrencia->format('Y-m-d') . ' ' . $horaFormatada;
-    $stmt = $conn->prepare("SELECT COUNT(*) as qtd FROM agendamentos WHERE data_horario = ? AND status IN ('Confirmado','Indisponível')");
+    $stmt = $conn->prepare("SELECT COUNT(*) as qtd FROM agendamentos WHERE data_horario = ? AND status IN ('Confirmado','Indisponivel')");
     $stmt->bind_param('s', $data_horario);
     $stmt->execute();
     $r = $stmt->get_result()->fetch_assoc();
