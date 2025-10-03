@@ -1321,7 +1321,7 @@ foreach ($agendamentosCalendario as $a) {
   <title>Agenda Unificada</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
 </head>
 
@@ -1586,7 +1586,7 @@ foreach ($agendamentosCalendario as $a) {
       setupStatusActionHandlers();
 
       const calendar = new FullCalendar.Calendar(calendarEl, {
-        plugins: [FullCalendar.dayGridPlugin, FullCalendar.interactionPlugin],
+        plugins: [FullCalendarDayGrid, FullCalendarInteraction],
         initialView: 'dayGridMonth',
         locale: 'pt-br',
         height: 600,
