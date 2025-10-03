@@ -1790,9 +1790,16 @@ function abrirBloquearHorario(data, hora) {
 
 
     // Ajuste as funções abrirNovoAgendamento, abrirBloquearHorario, abrirAgendamentoFixo para receber data e hora:
-    function abrirNovoAgendamento(data) {
-      document.getElementById('modal-title').innerText = 'Novo Agendamento em ' + data;
-      document.getElementById('modal-body').innerHTML = `
+    function abrirNovoAgendamento(data, hora = '') {
+      const modalTitle = document.getElementById('modal-title');
+      const modalBody = document.getElementById('modal-body');
+
+      if (!modalTitle || !modalBody) {
+        return;
+      }
+
+      modalTitle.innerText = 'Novo Agendamento em ' + data;
+      modalBody.innerHTML = `
     <div id="novo-agendamento-massoterapeuta">
       <div id="escolher-usuario-area">
         <label>Escolha um usuário cadastrado:</label>
@@ -1842,68 +1849,104 @@ function abrirBloquearHorario(data, hora) {
       </div>
     </div>
 `;
-}
 
-  // 1. Carrega usuários no select
-  fetch('get_usuarios.php')
-    .then(r=>r.json())
-    .then(lista => {
-      let sel = document.getElementById('select-usuario');
-      lista.forEach(u=>{
-        let opt = document.createElement('option');
-        opt.value = u.id;
-        opt.innerText = u.nome + (u.email ? ' ('+u.email+')' : '');
-        sel.appendChild(opt);
-      });
-    });
+      const sel = modalBody.querySelector('#select-usuario');
+      const btnParaVisitante = modalBody.querySelector('#btn-para-visitante');
+      const btnVoltarEscolha = modalBody.querySelector('#btn-voltar-escolha');
+      const btnAgendar = modalBody.querySelector('#btn-agendar-massa');
+      const escolherUsuarioArea = modalBody.querySelector('#escolher-usuario-area');
+      const formVisitanteArea = modalBody.querySelector('#form-visitante-area');
 
-  // 2. Alterna visitante/usuário
-  document.getElementById('btn-para-visitante').onclick = function(){
-    document.getElementById('escolher-usuario-area').style.display = 'none';
-    document.getElementById('form-visitante-area').style.display = '';
-  };
-  document.getElementById('btn-voltar-escolha').onclick = function(){
-    document.getElementById('form-visitante-area').style.display = 'none';
-    document.getElementById('escolher-usuario-area').style.display = '';
-  };
-
-  // 3. Agendamento
-  document.getElementById('btn-agendar-massa').onclick = function(){
-    let especialidade_id = document.getElementById('especialidade_id').value;
-    let duracao = document.getElementById('duracao').value;
-    let adicional_reflexo = document.getElementById('adicional_reflexo').checked ? 1 : 0;
-    let usuario_id = document.getElementById('select-usuario').value;
-    let hora = ''; // Se não for usar hora separada, deixe vazio ou adicione um campo de horário no modal
-
-    let dados = {
-      data, hora, especialidade_id, duracao, adicional_reflexo
-    };
-
-    if(usuario_id){
-      dados.usuario_id = usuario_id;
-    } else {
-      dados.guest_name = document.getElementById('guest-name').value;
-      dados.guest_email = document.getElementById('guest-email').value;
-      dados.guest_phone = document.getElementById('guest-phone').value;
-      dados.guest_nascimento = document.getElementById('guest-nascimento').value;
-      dados.guest_sexo = document.getElementById('guest-sexo').value;
-    }
-
-    fetch('novo_agendar_massat.php', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: new URLSearchParams(dados)
-    })
-    .then(r=>r.json())
-    .then(res=>{
-      if(res.ok){
-        alert('Agendado com sucesso!');
-        document.getElementById('options-modal').style.display = 'none';
-      } else {
-        alert(res.msg);
+      if (!sel || !btnParaVisitante || !btnVoltarEscolha || !btnAgendar) {
+        return;
       }
-    });
-  };
+
+      fetch('get_usuarios.php')
+        .then(r => r.json())
+        .then(lista => {
+          if (!sel.isConnected || !Array.isArray(lista)) {
+            return;
+          }
+
+          lista.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            opt.innerText = u.nome + (u.email ? ' (' + u.email + ')' : '');
+            sel.appendChild(opt);
+          });
+        })
+        .catch(() => {
+          /* Evita quebra silenciosa caso o fetch falhe. */
+        });
+
+      btnParaVisitante.onclick = function () {
+        if (escolherUsuarioArea) {
+          escolherUsuarioArea.style.display = 'none';
+        }
+        if (formVisitanteArea) {
+          formVisitanteArea.style.display = '';
+        }
+      };
+
+      btnVoltarEscolha.onclick = function () {
+        if (formVisitanteArea) {
+          formVisitanteArea.style.display = 'none';
+        }
+        if (escolherUsuarioArea) {
+          escolherUsuarioArea.style.display = '';
+        }
+      };
+
+      btnAgendar.onclick = function () {
+        const especialidadeSelect = modalBody.querySelector('#especialidade_id');
+        const duracaoInput = modalBody.querySelector('#duracao');
+        const adicionalReflexoCheckbox = modalBody.querySelector('#adicional_reflexo');
+        const horaSelecionada = hora || '';
+
+        const dados = {
+          data,
+          hora: horaSelecionada,
+          especialidade_id: especialidadeSelect ? especialidadeSelect.value : '',
+          duracao: duracaoInput ? duracaoInput.value : '',
+          adicional_reflexo: adicionalReflexoCheckbox && adicionalReflexoCheckbox.checked ? 1 : 0
+        };
+
+        const usuarioId = sel.value;
+        if (usuarioId) {
+          dados.usuario_id = usuarioId;
+        } else {
+          const guestName = modalBody.querySelector('#guest-name');
+          const guestEmail = modalBody.querySelector('#guest-email');
+          const guestPhone = modalBody.querySelector('#guest-phone');
+          const guestNascimento = modalBody.querySelector('#guest-nascimento');
+          const guestSexo = modalBody.querySelector('#guest-sexo');
+
+          dados.guest_name = guestName ? guestName.value : '';
+          dados.guest_email = guestEmail ? guestEmail.value : '';
+          dados.guest_phone = guestPhone ? guestPhone.value : '';
+          dados.guest_nascimento = guestNascimento ? guestNascimento.value : '';
+          dados.guest_sexo = guestSexo ? guestSexo.value : '';
+        }
+
+        fetch('novo_agendar_massat.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(dados)
+        })
+          .then(r => r.json())
+          .then(res => {
+            if (res.ok) {
+              alert('Agendado com sucesso!');
+              const modal = document.getElementById('options-modal');
+              if (modal) {
+                modal.style.display = 'none';
+              }
+            } else {
+              alert(res.msg);
+            }
+          });
+      };
+    }
 
 
 function abrirAgendamentoFixo(data, hora) {
