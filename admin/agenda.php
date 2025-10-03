@@ -1948,8 +1948,8 @@ function abrirAgendamentoFixo(data, hora) {
           <label>Data de início:
             <input type="date" name="data_inicio" value="${data}" required>
           </label>
-          <label>Data de fim:
-            <input type="date" name="data_fim" value="${data}" required>
+          <label>Repetições:
+            <input type="number" name="repeticoes" value="1" min="1" required>
           </label>
           <div class="calendar-modal-actions">
             <button type="submit" class="calendar-btn calendar-btn--primary">Agendar Fixo</button>
@@ -1958,6 +1958,19 @@ function abrirAgendamentoFixo(data, hora) {
         </form>
       `;
   setupAutocomplete('usuario_nome_fixo', 'usuario_id_fixo', 'autocomplete-list-fixo');
+  const diaSemanaSelect = modalBody.querySelector('select[name="dia_semana"]');
+  if (diaSemanaSelect) {
+    const baseDate = new Date(`${data}T00:00:00`);
+    if (!Number.isNaN(baseDate.getTime())) {
+      const diaSemanaJs = baseDate.getDay(); // 0 (domingo) - 6 (sábado)
+      const diaSemana = ((diaSemanaJs + 6) % 7) + 1; // converte para 1=segunda ... 7=domingo
+      diaSemanaSelect.value = String(diaSemana);
+    }
+  }
+  const horarioInput = modalBody.querySelector('input[name="horario"]');
+  if (horarioInput && hora) {
+    horarioInput.value = hora.substring(0, 5);
+  }
 }
 
 
