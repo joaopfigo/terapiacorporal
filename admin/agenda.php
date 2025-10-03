@@ -1566,17 +1566,6 @@ foreach ($agendamentosCalendario as $a) {
         }
       });
     }
-    document.addEventListener('DOMContentLoaded', function () {
-      let now = new Date();
-
-      const cal = document.getElementById('calendar-admin');
-
-      setupStatusActionHandlers();
-      renderCalendarAdmin(now.getFullYear(), now.getMonth(), datasBloqueadas);
-    });
-
-
-
     let datasBloqueadas = <?php
     // PHP para bloquear domingos e datas confirmadas usando o conjunto completo
     $bloqueadas = [];
@@ -1588,74 +1577,36 @@ foreach ($agendamentosCalendario as $a) {
     echo json_encode($bloqueadas);
     ?>;
 
-    function renderCalendarAdmin(year, month, datasBloqueadas) {
-      const cal = document.getElementById('calendar-admin');
-      const today = new Date();
-      const currentDateKey = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
-      const dt = new Date(year, month, 1);
-      const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-      const monthLabel = dt.toLocaleString('pt-BR', { month: 'long' });
-      const monthDisplay = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
-      const firstDay = dt.getDay();
-      const totalDays = new Date(year, month + 1, 0).getDate();
-
-      let html = `
-        <div class="calendar-nav">
-          <button type="button" id="prev-month" class="calendar-btn calendar-btn--secondary calendar-btn--icon" aria-label="Mês anterior">&lt;</button>
-          <span class="calendar-nav-label" data-month="${month}" data-year="${year}">${monthDisplay} ${year}</span>
-          <button type="button" id="next-month" class="calendar-btn calendar-btn--secondary calendar-btn--icon" aria-label="Próximo mês">&gt;</button>
-        </div>
-        <div class="calendar-grid calendar-header">
-          ${days.map((d, index) => `<span data-weekday="${index}">${d}</span>`).join('')}
-        </div>
-        <div class="calendar-grid calendar-days">
-      `;
-
-      for (let i = 0; i < firstDay; i++) {
-        html += '<span class="calendar-placeholder" aria-hidden="true"></span>';
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('calendar-admin');
+      if (!calendarEl) {
+        return;
       }
 
-      for (let d = 1; d <= totalDays; d++) {
-        const dateObj = new Date(year, month, d);
-        const data = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
-        const weekday = dateObj.getDay();
-        const isSunday = weekday === 0;
-        const bloqueado = datasBloqueadas.includes(data) || isSunday;
-        const isToday = data === currentDateKey;
-        const classes = ['calendar-btn', 'calendar-btn--secondary', 'cal-admin-day'];
+      setupStatusActionHandlers();
 
-        if (bloqueado) {
-          classes.push('cal-disabled');
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        height: 600,
+        headerToolbar: {
+          start: 'prev,next today',
+          center: 'title',
+          end: ''
+        },
+        footerToolbar: false,
+        events: <?php echo json_encode($eventos_calendario); ?>,
+        dateClick: function (info) {
+          if (datasBloqueadas.includes(info.dateStr) || info.date.getDay() === 0) {
+            return;
+          }
+
+          mostrarModalOpcoes(info.dateStr);
         }
-        if (isToday) {
-          classes.push('is-today');
-        }
-
-        html += `<button type="button" class="${classes.join(' ')}" data-date="${data}" data-weekday="${weekday}" ${bloqueado ? 'disabled' : ''} aria-label="${d} de ${monthDisplay} de ${year}">${d}</button>`;
-      }
-
-      html += `
-        </div>
-        <div class="calendar-legend">
-          <span><span class="legend-dot legend-available"></span>Disponível</span>
-          <span><span class="legend-dot legend-disabled"></span>Indisponível</span>
-          <span><span class="legend-dot legend-today"></span>Hoje</span>
-        </div>
-      `;
-
-      cal.innerHTML = html;
-
-      document.getElementById('prev-month').onclick = () => renderCalendarAdmin(month === 0 ? year - 1 : year, month === 0 ? 11 : month - 1, datasBloqueadas);
-      document.getElementById('next-month').onclick = () => renderCalendarAdmin(month === 11 ? year + 1 : year, month === 11 ? 0 : month + 1, datasBloqueadas);
-
-      document.querySelectorAll('.cal-admin-day').forEach(btn => {
-        if (btn.disabled) return;
-        btn.onclick = function () {
-          const dataEscolhida = this.getAttribute('data-date');
-          mostrarModalOpcoes(dataEscolhida);
-        };
       });
-    }
+
+      calendar.render();
+    });
 
     function mostrarModalOpcoes(data) {
       // Gera horários do dia (exemplo: 08:00 às 20:00 de hora em hora)
