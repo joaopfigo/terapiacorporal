@@ -2131,12 +2131,37 @@ function abrirAgendamentoFixo(data, hora) {
   document.getElementById('modal-title').innerText = 'Agendamento Fixo';
   const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = `
-        <form method="post" action="agendarFixo.php" autocomplete="off">
-          <label>Usuário:
-            <input type="text" id="usuario_nome_fixo" placeholder="Digite o nome..." autocomplete="off" required>
-            <input type="hidden" name="usuario_id" id="usuario_id_fixo" required>
-            <div id="autocomplete-list-fixo" class="autocomplete-items"></div>
-          </label>
+        <form id="form-agendamento-fixo" method="post" action="agendarFixo.php" autocomplete="off">
+          <input type="hidden" name="visitante" id="agendamento-fixo-visitante-flag" value="0">
+          <div id="agendamento-fixo-usuario">
+            <label>Usuário:
+              <input type="text" id="usuario_nome_fixo" placeholder="Digite o nome..." autocomplete="off">
+              <input type="hidden" name="usuario_id" id="usuario_id_fixo">
+              <div id="autocomplete-list-fixo" class="autocomplete-items"></div>
+            </label>
+            <button type="button" id="btn-fixo-para-visitante" class="calendar-btn calendar-btn--secondary">Agendar para visitante</button>
+          </div>
+          <div id="agendamento-fixo-visitante" style="display:none;">
+            <div class="guest-form">
+              <label for="guest-name-fixo">Nome</label>
+              <input type="text" id="guest-name-fixo" name="guest_name">
+              <label for="guest-email-fixo">E-mail</label>
+              <input type="email" id="guest-email-fixo" name="guest_email">
+              <label for="guest-phone-fixo">Número de telefone</label>
+              <input type="tel" id="guest-phone-fixo" name="guest_phone" placeholder="+55" pattern="\\+?\\d{2,15}">
+              <label for="guest-nascimento-fixo">Data de nascimento</label>
+              <input type="date" id="guest-nascimento-fixo" name="guest_nascimento">
+              <label for="guest-sexo-fixo">Sexo</label>
+              <select id="guest-sexo-fixo" name="guest_sexo">
+                <option value="">Selecione...</option>
+                <option value="feminino">Feminino</option>
+                <option value="masculino">Masculino</option>
+                <option value="outro">Outro</option>
+                <option value="prefiro_nao_dizer">Prefiro não dizer</option>
+              </select>
+            </div>
+            <button type="button" id="btn-fixo-voltar-usuario" class="calendar-btn calendar-btn--ghost">Selecionar usuário cadastrado</button>
+          </div>
           <label>Especialidade:
             <select name="especialidade_id" required>
               <option value="1">Quick Massage</option>
@@ -2172,6 +2197,9 @@ function abrirAgendamentoFixo(data, hora) {
           <label>Repetições:
             <input type="number" name="repeticoes" value="1" min="1" required>
           </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" name="adicional_reflexo_fixo" value="1"> Adicional Escalda
+          </label>
           <div class="calendar-modal-actions">
             <button type="submit" class="calendar-btn calendar-btn--primary">Agendar Fixo</button>
             <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
@@ -2179,6 +2207,7 @@ function abrirAgendamentoFixo(data, hora) {
         </form>
       `;
   setupAutocomplete('usuario_nome_fixo', 'usuario_id_fixo', 'autocomplete-list-fixo');
+
   const diaSemanaSelect = modalBody.querySelector('select[name="dia_semana"]');
   if (diaSemanaSelect) {
     const baseDate = new Date(`${data}T00:00:00`);
@@ -2188,10 +2217,74 @@ function abrirAgendamentoFixo(data, hora) {
       diaSemanaSelect.value = String(diaSemana);
     }
   }
+
   const horarioInput = modalBody.querySelector('input[name="horario"]');
   if (horarioInput && hora) {
     horarioInput.value = hora.substring(0, 5);
   }
+
+  const usuarioNomeInput = modalBody.querySelector('#usuario_nome_fixo');
+  const usuarioIdInput = modalBody.querySelector('#usuario_id_fixo');
+  const visitanteFlag = modalBody.querySelector('#agendamento-fixo-visitante-flag');
+  const usuarioSection = modalBody.querySelector('#agendamento-fixo-usuario');
+  const visitanteSection = modalBody.querySelector('#agendamento-fixo-visitante');
+  const btnParaVisitante = modalBody.querySelector('#btn-fixo-para-visitante');
+  const btnVoltarUsuario = modalBody.querySelector('#btn-fixo-voltar-usuario');
+  const visitanteCampos = visitanteSection ? visitanteSection.querySelectorAll('input, select') : [];
+
+  function atualizarModoVisitante(ativar) {
+    if (!usuarioSection || !visitanteSection || !visitanteFlag) {
+      return;
+    }
+
+    visitanteFlag.value = ativar ? '1' : '0';
+    usuarioSection.style.display = ativar ? 'none' : '';
+    visitanteSection.style.display = ativar ? '' : 'none';
+
+    if (usuarioNomeInput) {
+      usuarioNomeInput.required = !ativar;
+      if (ativar) {
+        usuarioNomeInput.value = '';
+      }
+    }
+
+    if (usuarioIdInput) {
+      usuarioIdInput.required = !ativar;
+      if (ativar) {
+        usuarioIdInput.value = '';
+      }
+    }
+
+    const camposObrigatorios = ['guest_name', 'guest_email', 'guest_phone'];
+    visitanteCampos.forEach((campo) => {
+      if (!(campo instanceof HTMLElement)) {
+        return;
+      }
+
+      if (ativar) {
+        campo.required = camposObrigatorios.includes(campo.name);
+      } else {
+        campo.required = false;
+        if ('value' in campo) {
+          campo.value = '';
+        }
+      }
+    });
+  }
+
+  if (btnParaVisitante) {
+    btnParaVisitante.addEventListener('click', function () {
+      atualizarModoVisitante(true);
+    });
+  }
+
+  if (btnVoltarUsuario) {
+    btnVoltarUsuario.addEventListener('click', function () {
+      atualizarModoVisitante(false);
+    });
+  }
+
+  atualizarModoVisitante(false);
 }
 
 
