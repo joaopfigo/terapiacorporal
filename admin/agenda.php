@@ -2021,11 +2021,12 @@ if (!empty($eventos_bloqueados)) {
       setupStatusActionHandlers();
 
       if (!window.FullCalendar || !FullCalendar.Calendar) {
+        console.warn('FullCalendar não está disponível. Verifique se os assets foram carregados corretamente.');
+
         const aviso = document.createElement('div');
-        aviso.className = 'alert alert-warning mt-3';
+        aviso.className = 'calendar-error alert alert-warning mt-3';
         aviso.textContent = 'Não foi possível carregar o calendário no momento. Por favor, verifique sua conexão e tente novamente mais tarde.';
-        calendarEl.innerHTML = '';
-        calendarEl.appendChild(aviso);
+        calendarEl.insertAdjacentElement('afterend', aviso);
         return;
       }
 
