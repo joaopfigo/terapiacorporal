@@ -1044,6 +1044,35 @@ if (!empty($eventos_bloqueados)) {
       min-height: 34px;
     }
 
+    .calendar-btn--outline {
+      background: #fff;
+      color: var(--header-bg);
+      border-color: #bcd9cd;
+      box-shadow: inset 0 0 0 1px rgba(37, 109, 84, 0.1);
+    }
+
+    .calendar-btn--outline:hover,
+    .calendar-btn--outline:focus-visible {
+      background: var(--action-hover);
+      border-color: #8fbfa9;
+      color: #1d5f45;
+      box-shadow: 0 5px 16px #1d9a7722;
+    }
+
+    .calendar-btn.is-active,
+    .calendar-btn--outline.is-active {
+      background: var(--success);
+      color: #fff;
+      border-color: #2a8a60;
+      box-shadow: 0 6px 20px #1d9a7726;
+    }
+
+    .calendar-btn[disabled] {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
     .calendar-btn--small {
       padding: 0.45rem 0.85rem;
       font-size: 0.85rem;
@@ -1484,6 +1513,209 @@ if (!empty($eventos_bloqueados)) {
       }
     }
 
+    .agendamento-novo-layout {
+      display: grid;
+      gap: 18px;
+    }
+
+    @media (min-width: 640px) {
+      .agendamento-novo-layout {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .agendamento-novo-card {
+      background: #f7fbfa;
+      border-radius: 20px;
+      border: 1px solid #d7ebe3;
+      padding: 18px 20px 22px;
+      box-shadow: 0 8px 28px rgba(29, 154, 119, 0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .agendamento-novo-card--wide {
+      grid-column: 1 / -1;
+    }
+
+    .agendamento-novo-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: #1f5e45;
+      margin: 0;
+    }
+
+    .agendamento-novo-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .agendamento-novo-section label,
+    .agendamento-novo-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-weight: 600;
+      color: #305e4f;
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .agendamento-novo-section--visitante {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px dashed #cbdad4;
+      padding: 14px 16px;
+    }
+
+    #form-agendamento-fixo input[type="time"],
+    #form-agendamento-fixo input[type="date"],
+    #form-agendamento-fixo input[type="number"],
+    #form-agendamento-fixo input[type="text"],
+    #form-agendamento-fixo input[type="email"],
+    #form-agendamento-fixo input[type="tel"],
+    #form-agendamento-fixo select {
+      border: 1px solid #cfe3db;
+      border-radius: 11px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #1f3d35;
+      background: #fff;
+      box-shadow: inset 0 1px 2px rgba(8, 42, 26, 0.06);
+    }
+
+    #form-agendamento-fixo input:focus,
+    #form-agendamento-fixo select:focus {
+      outline: none;
+      border-color: #7fbca3;
+      box-shadow: 0 0 0 3px rgba(47, 143, 110, 0.18);
+    }
+
+    .agendamento-novo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px 16px;
+    }
+
+    .agendamento-novo-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .agendamento-novo-helper {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6f877d;
+    }
+
+    .agendamento-novo-extras {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .agendamento-novo-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .checkbox-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #305e4f;
+    }
+
+    .checkbox-inline input[type="checkbox"] {
+      width: auto;
+      height: auto;
+      margin: 0;
+    }
+
+    .pacote-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #fff9ed;
+      border-radius: 16px;
+      border: 1px dashed #e5c690;
+      padding: 14px 16px;
+      transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .pacote-info[data-state="idle"] {
+      background: #fdfcf8;
+      border-color: #d9e7e1;
+    }
+
+    .pacote-info[data-state="available"] {
+      background: #f2fbf7;
+      border-color: #9ecab8;
+    }
+
+    .pacote-info[data-state="active"] {
+      background: #e6f6ef;
+      border-color: #4fa57c;
+      box-shadow: 0 6px 22px rgba(31, 111, 83, 0.18);
+    }
+
+    .pacote-info__status {
+      margin: 0;
+      font-weight: 700;
+      color: #2f5447;
+    }
+
+    .pacote-info__helper {
+      margin: 0;
+      font-size: 0.88rem;
+      color: #6c8379;
+    }
+
+    .pacote-info__texts {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .pacote-info__helper strong {
+      color: #214d3b;
+    }
+
+    .autocomplete-wrapper {
+      position: relative;
+    }
+
+    .autocomplete-items {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 10100;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #cfe3db;
+      box-shadow: 0 12px 26px rgba(18, 65, 47, 0.15);
+      overflow: hidden;
+    }
+
+    .autocomplete-items div {
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: #274b3e;
+    }
+
+    .autocomplete-items div:hover {
+      background: #edf7f3;
+    }
+
     /* Links desabilitados ou "Indisponível" */
     .bloqueado,
     .ag-card-actions .indisponivel {
@@ -1714,16 +1946,26 @@ if (!empty($eventos_bloqueados)) {
     }
 
 
-    function setupAutocomplete(inputId, hiddenId, listId) {
+    function setupAutocomplete(inputId, hiddenId, listId, onSelect) {
       const input = document.getElementById(inputId);
       const hidden = document.getElementById(hiddenId);
       const list = document.getElementById(listId);
+      const callback = typeof onSelect === 'function' ? onSelect : null;
 
-      input.addEventListener("input", function () {
+      if (!input || !hidden || !list) {
+        return;
+      }
+
+      input.addEventListener('input', function () {
         const val = this.value;
         hidden.value = '';
         list.innerHTML = '';
-        if (!val) return;
+        if (callback) {
+          callback(null);
+        }
+        if (!val) {
+          return;
+        }
         fetch('?autocomplete_usuario=' + encodeURIComponent(val))
           .then(r => r.json())
           .then(data => {
@@ -1735,11 +1977,15 @@ if (!empty($eventos_bloqueados)) {
                 input.value = u.nome;
                 hidden.value = u.id;
                 list.innerHTML = '';
+                if (callback) {
+                  callback(u);
+                }
               };
               list.appendChild(div);
             });
           });
       });
+
       document.addEventListener('click', function (e) {
         if (!input.contains(e.target) && !list.contains(e.target)) {
           list.innerHTML = '';
@@ -1882,9 +2128,8 @@ if (!empty($eventos_bloqueados)) {
       document.getElementById('modal-title').innerText = `Opções para ${data.split('-').reverse().join('/')} ${hora}`;
       document.getElementById('modal-body').innerHTML = `
     <div class="calendar-modal-actions">
-      <button type="button" class="calendar-btn calendar-btn--primary" onclick="abrirNovoAgendamento('${data}','${hora}')">Marcar Novo Agendamento</button>
+      <button type="button" class="calendar-btn calendar-btn--primary" onclick="abrirAgendamentoNovo('${data}','${hora}')">Agendamento Novo</button>
       <button type="button" class="calendar-btn calendar-btn--secondary" onclick="abrirBloquearHorario('${data}','${hora}')">Bloquear Horário</button>
-      <button type="button" class="calendar-btn calendar-btn--secondary" onclick="abrirAgendamentoFixo('${data}','${hora}')">Agendamento Fixo</button>
     </div>
     <div class="calendar-modal-actions">
       <button type="button" class="calendar-btn calendar-btn--ghost" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
@@ -1967,227 +2212,385 @@ function abrirBloquearHorario(data, hora) {
 
 
 
-    // Ajuste as funções abrirNovoAgendamento, abrirBloquearHorario, abrirAgendamentoFixo para receber data e hora:
-    function abrirNovoAgendamento(data, hora = '') {
-      const modalTitle = document.getElementById('modal-title');
-      const modalBody = document.getElementById('modal-body');
-
-      if (!modalTitle || !modalBody) {
-        return;
-      }
-
-      modalTitle.innerText = 'Novo Agendamento em ' + data;
-      modalBody.innerHTML = `
-    <div id="novo-agendamento-massoterapeuta">
-      <div id="escolher-usuario-area">
-        <label>Escolha um usuário cadastrado:</label>
-        <select id="select-usuario">
-          <option value="">Selecione...</option>
-        </select>
-        <button id="btn-para-visitante" type="button" class="calendar-btn calendar-btn--secondary">Agendar para visitante</button>
-      </div>
-      <div id="form-visitante-area" style="display:none;">
-        <div class="guest-form">
-          <label for="guest-name">Nome</label>
-          <input type="text" id="guest-name" name="guest-name" placeholder="Digite seu nome" required>
-          <label for="guest-email">E-mail</label>
-          <input type="email" id="guest-email" name="guest-email" placeholder="Seu e-mail" required>
-          <label for="guest-phone">Número de telefone</label>
-          <input type="tel" id="guest-phone" name="guest-phone" placeholder="+55" pattern="\\+?\\d{2,15}" required>
-          <label for="guest-nascimento">Data de nascimento</label>
-          <input type="date" id="guest-nascimento" name="guest-nascimento" required>
-          <label for="guest-sexo">Sexo</label>
-          <select id="guest-sexo" name="guest-sexo" required>
-            <option value="">Selecione...</option>
-            <option value="feminino">Feminino</option>
-            <option value="masculino">Masculino</option>
-            <option value="outro">Outro</option>
-            <option value="prefiro_nao_dizer">Prefiro não dizer</option>
-          </select>
-        </div>
-        <button id="btn-voltar-escolha" type="button" class="calendar-btn calendar-btn--ghost">Voltar</button>
-      </div>
-      <label>Especialidade:</label>
-      <select id="especialidade_id">
-        <option value="1">Quick Massage</option>
-        <option value="2">Massoterapia</option>
-        <option value="3">Reflexologia Podal</option>
-        <option value="4">Auriculoterapia</option>
-        <option value="5">Ventosa</option>
-        <option value="6">Acupuntura</option>
-        <option value="7">Biomagnetismo</option>
-        <option value="8">Reiki</option>
-      </select>
-      <label>Duração (min):</label>
-      <input type="number" id="duracao" required>
-      <label><input type="checkbox" id="adicional_reflexo" value="1"> Adicional Escalda</label>
-      <div class="calendar-modal-actions">
-        <button id="btn-agendar-massa" type="button" class="calendar-btn calendar-btn--primary">Agendar</button>
-        <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
-      </div>
-    </div>
-`;
-
-      const sel = modalBody.querySelector('#select-usuario');
-      const btnParaVisitante = modalBody.querySelector('#btn-para-visitante');
-      const btnVoltarEscolha = modalBody.querySelector('#btn-voltar-escolha');
-      const btnAgendar = modalBody.querySelector('#btn-agendar-massa');
-      const escolherUsuarioArea = modalBody.querySelector('#escolher-usuario-area');
-      const formVisitanteArea = modalBody.querySelector('#form-visitante-area');
-
-      if (!sel || !btnParaVisitante || !btnVoltarEscolha || !btnAgendar) {
-        return;
-      }
-
-      fetch('get_usuarios.php')
-        .then(r => r.json())
-        .then(lista => {
-          if (!sel.isConnected || !Array.isArray(lista)) {
-            return;
-          }
-
-          lista.forEach(u => {
-            const opt = document.createElement('option');
-            opt.value = u.id;
-            opt.innerText = u.nome + (u.email ? ' (' + u.email + ')' : '');
-            sel.appendChild(opt);
-          });
-        })
-        .catch(() => {
-          /* Evita quebra silenciosa caso o fetch falhe. */
-        });
-
-      btnParaVisitante.onclick = function () {
-        if (escolherUsuarioArea) {
-          escolherUsuarioArea.style.display = 'none';
-        }
-        if (formVisitanteArea) {
-          formVisitanteArea.style.display = '';
-        }
-      };
-
-      btnVoltarEscolha.onclick = function () {
-        if (formVisitanteArea) {
-          formVisitanteArea.style.display = 'none';
-        }
-        if (escolherUsuarioArea) {
-          escolherUsuarioArea.style.display = '';
-        }
-      };
-
-      btnAgendar.onclick = function () {
-        const especialidadeSelect = modalBody.querySelector('#especialidade_id');
-        const duracaoInput = modalBody.querySelector('#duracao');
-        const adicionalReflexoCheckbox = modalBody.querySelector('#adicional_reflexo');
-        const horaSelecionada = hora || '';
-
-        const dados = {
-          data,
-          hora: horaSelecionada,
-          especialidade_id: especialidadeSelect ? especialidadeSelect.value : '',
-          duracao: duracaoInput ? duracaoInput.value : '',
-          adicional_reflexo: adicionalReflexoCheckbox && adicionalReflexoCheckbox.checked ? 1 : 0
-        };
-
-        const usuarioId = sel.value;
-        if (usuarioId) {
-          dados.usuario_id = usuarioId;
-        } else {
-          const guestName = modalBody.querySelector('#guest-name');
-          const guestEmail = modalBody.querySelector('#guest-email');
-          const guestPhone = modalBody.querySelector('#guest-phone');
-          const guestNascimento = modalBody.querySelector('#guest-nascimento');
-          const guestSexo = modalBody.querySelector('#guest-sexo');
-
-          dados.guest_name = guestName ? guestName.value : '';
-          dados.guest_email = guestEmail ? guestEmail.value : '';
-          dados.guest_phone = guestPhone ? guestPhone.value : '';
-          dados.guest_nascimento = guestNascimento ? guestNascimento.value : '';
-          dados.guest_sexo = guestSexo ? guestSexo.value : '';
-        }
-
-        fetch('novo_agendar_massat.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(dados)
-        })
-          .then(r => r.json())
-          .then(res => {
-            if (res.ok) {
-              alert('Agendado com sucesso!');
-              const modal = document.getElementById('options-modal');
-              if (modal) {
-                modal.style.display = 'none';
-              }
-            } else {
-              alert(res.msg);
-            }
-          });
-      };
-    }
+    // Ajuste as funções abrirBloquearHorario e abrirAgendamentoNovo para receber data e hora:
 
 
-function abrirAgendamentoFixo(data, hora) {
-  document.getElementById('modal-title').innerText = 'Agendamento Fixo';
+function abrirAgendamentoNovo(data, hora) {
+  const modalTitle = document.getElementById('modal-title');
   const modalBody = document.getElementById('modal-body');
+
+  if (!modalTitle || !modalBody) {
+    return;
+  }
+
+  modalTitle.innerText = 'Agendamento Novo';
   modalBody.innerHTML = `
-        <form method="post" action="agendarFixo.php" autocomplete="off">
-          <label>Usuário:
-            <input type="text" id="usuario_nome_fixo" placeholder="Digite o nome..." autocomplete="off" required>
-            <input type="hidden" name="usuario_id" id="usuario_id_fixo" required>
-            <div id="autocomplete-list-fixo" class="autocomplete-items"></div>
-          </label>
-          <label>Especialidade:
-            <select name="especialidade_id" required>
-              <option value="1">Quick Massage</option>
-              <option value="2">Massoterapia</option>
-              <option value="3">Reflexologia Podal</option>
-              <option value="4">Auriculoterapia</option>
-              <option value="5">Ventosa</option>
-              <option value="6">Acupuntura</option>
-              <option value="7">Biomagnetismo</option>
-              <option value="8">Reiki</option>
-            </select>
-          </label>
-          <label>Dia da semana:
-            <select name="dia_semana" required>
-              <option value="1">Segunda-feira</option>
-              <option value="2">Terça-feira</option>
-              <option value="3">Quarta-feira</option>
-              <option value="4">Quinta-feira</option>
-              <option value="5">Sexta-feira</option>
-              <option value="6">Sábado</option>
-              <option value="7">Domingo</option>
-            </select>
-          </label>
-          <label>Horário:
-            <input type="time" name="horario" required>
-          </label>
-          <label>Duração (min):
-            <input type="number" name="duracao" value="60" required>
-          </label>
-          <label>Data de início:
-            <input type="date" name="data_inicio" value="${data}" required>
-          </label>
-          <label>Repetições:
-            <input type="number" name="repeticoes" value="1" min="1" required>
-          </label>
-          <div class="calendar-modal-actions">
-            <button type="submit" class="calendar-btn calendar-btn--primary">Agendar Fixo</button>
+        <form id="form-agendamento-fixo" method="post" action="agendarFixo.php" autocomplete="off">
+          <input type="hidden" name="visitante" id="agendamento-fixo-visitante-flag" value="0">
+          <input type="hidden" name="usar_pacote" id="usar-pacote-flag" value="0">
+          <input type="hidden" name="pacote_id" id="pacote-id-fixo" value="">
+          <div class="agendamento-novo-layout">
+            <section class="agendamento-novo-card">
+              <h3 class="agendamento-novo-title">Paciente</h3>
+              <div class="agendamento-novo-section" id="agendamento-fixo-usuario">
+                <label class="agendamento-novo-field" for="usuario_nome_fixo">
+                  <span>Paciente cadastrado</span>
+                  <div class="autocomplete-wrapper">
+                    <input type="text" id="usuario_nome_fixo" placeholder="Digite o nome..." autocomplete="off">
+                    <div id="autocomplete-list-fixo" class="autocomplete-items"></div>
+                  </div>
+                </label>
+                <input type="hidden" name="usuario_id" id="usuario_id_fixo">
+                <p class="agendamento-novo-helper">Selecione um paciente para vincular este agendamento.</p>
+                <div class="agendamento-novo-actions">
+                  <button type="button" id="btn-fixo-para-visitante" class="calendar-btn calendar-btn--outline">Agendar para visitante</button>
+                </div>
+              </div>
+              <div id="agendamento-fixo-visitante" class="agendamento-novo-section agendamento-novo-section--visitante" style="display:none;">
+                <p class="agendamento-novo-helper"><strong>Visitante:</strong> preencha os dados para um paciente sem cadastro.</p>
+                <label class="agendamento-novo-field" for="guest-name-fixo"><span>Nome</span>
+                  <input type="text" id="guest-name-fixo" name="guest_name"></label>
+                <label class="agendamento-novo-field" for="guest-email-fixo"><span>E-mail</span>
+                  <input type="email" id="guest-email-fixo" name="guest_email"></label>
+                <label class="agendamento-novo-field" for="guest-phone-fixo"><span>Número de telefone</span>
+                  <input type="tel" id="guest-phone-fixo" name="guest_phone" placeholder="+55" pattern="\\+?\\d{2,15}"></label>
+                <label class="agendamento-novo-field" for="guest-nascimento-fixo"><span>Data de nascimento</span>
+                  <input type="date" id="guest-nascimento-fixo" name="guest_nascimento"></label>
+                <label class="agendamento-novo-field" for="guest-sexo-fixo"><span>Sexo</span>
+                  <select id="guest-sexo-fixo" name="guest_sexo">
+                    <option value="">Selecione...</option>
+                    <option value="feminino">Feminino</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="outro">Outro</option>
+                    <option value="prefiro_nao_dizer">Prefiro não dizer</option>
+                  </select>
+                </label>
+                <div class="agendamento-novo-actions">
+                  <button type="button" id="btn-fixo-voltar-usuario" class="calendar-btn calendar-btn--ghost">Selecionar usuário cadastrado</button>
+                </div>
+              </div>
+              <div class="pacote-info" id="pacote-info-fixo" data-state="idle">
+                <div class="pacote-info__texts">
+                  <p class="pacote-info__status" id="pacote-info-status">Selecione um paciente para verificar pacotes.</p>
+                  <p class="pacote-info__helper" id="pacote-info-helper">Os pacotes ativos aparecerão aqui.</p>
+                </div>
+                <div class="agendamento-novo-actions">
+                  <button type="button" class="calendar-btn calendar-btn--outline" id="btn-toggle-pacote" disabled>Usar pacote</button>
+                </div>
+              </div>
+            </section>
+            <section class="agendamento-novo-card">
+              <h3 class="agendamento-novo-title">Detalhes da sessão</h3>
+              <div class="agendamento-novo-grid">
+                <label class="agendamento-novo-field"><span>Especialidade</span>
+                  <select name="especialidade_id" required>
+                    <option value="1">Quick Massage</option>
+                    <option value="2">Massoterapia</option>
+                    <option value="3">Reflexologia Podal</option>
+                    <option value="4">Auriculoterapia</option>
+                    <option value="5">Ventosa</option>
+                    <option value="6">Acupuntura</option>
+                    <option value="7">Biomagnetismo</option>
+                    <option value="8">Reiki</option>
+                  </select>
+                </label>
+                <label class="agendamento-novo-field"><span>Dia da semana</span>
+                  <select name="dia_semana" required>
+                    <option value="1">Segunda-feira</option>
+                    <option value="2">Terça-feira</option>
+                    <option value="3">Quarta-feira</option>
+                    <option value="4">Quinta-feira</option>
+                    <option value="5">Sexta-feira</option>
+                    <option value="6">Sábado</option>
+                    <option value="7">Domingo</option>
+                  </select>
+                </label>
+                <label class="agendamento-novo-field"><span>Horário</span>
+                  <input type="time" name="horario" required></label>
+                <label class="agendamento-novo-field"><span>Duração (min)</span>
+                  <input type="number" name="duracao" value="60" min="1" required></label>
+                <label class="agendamento-novo-field"><span>Data de início</span>
+                  <input type="date" name="data_inicio" value="${data}" required></label>
+                <label class="agendamento-novo-field"><span>Repetições</span>
+                  <input type="number" name="repeticoes" value="1" min="1" required></label>
+              </div>
+              <div class="agendamento-novo-extras">
+                <label class="checkbox-inline">
+                  <input type="checkbox" name="adicional_reflexo_fixo" value="1"> Adicional Escalda
+                </label>
+              </div>
+            </section>
+          </div>
+          <div class="agendamento-novo-footer">
             <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
+            <button type="submit" class="calendar-btn calendar-btn--primary">Agendar</button>
           </div>
         </form>
       `;
-  setupAutocomplete('usuario_nome_fixo', 'usuario_id_fixo', 'autocomplete-list-fixo');
+
+  const usuarioNomeInput = modalBody.querySelector('#usuario_nome_fixo');
+  const usuarioIdInput = modalBody.querySelector('#usuario_id_fixo');
+  const visitanteFlag = modalBody.querySelector('#agendamento-fixo-visitante-flag');
+  const usuarioSection = modalBody.querySelector('#agendamento-fixo-usuario');
+  const visitanteSection = modalBody.querySelector('#agendamento-fixo-visitante');
+  const visitanteCampos = visitanteSection ? visitanteSection.querySelectorAll('input, select') : [];
+  const btnParaVisitante = modalBody.querySelector('#btn-fixo-para-visitante');
+  const btnVoltarUsuario = modalBody.querySelector('#btn-fixo-voltar-usuario');
+  const pacoteInfoBox = modalBody.querySelector('#pacote-info-fixo');
+  const pacoteStatusText = modalBody.querySelector('#pacote-info-status');
+  const pacoteHelperText = modalBody.querySelector('#pacote-info-helper');
+  const pacoteToggleBtn = modalBody.querySelector('#btn-toggle-pacote');
+  const usarPacoteInput = modalBody.querySelector('#usar-pacote-flag');
+  const pacoteIdInput = modalBody.querySelector('#pacote-id-fixo');
+  const repeticoesInput = modalBody.querySelector('input[name="repeticoes"]');
+
+  let pacoteAtual = null;
+
+  function atualizarPacoteBox(state, statusMsg, helperMsg) {
+    if (pacoteInfoBox) {
+      pacoteInfoBox.dataset.state = state;
+    }
+    if (pacoteStatusText && typeof statusMsg === 'string') {
+      pacoteStatusText.textContent = statusMsg;
+    }
+    if (pacoteHelperText) {
+      pacoteHelperText.textContent = helperMsg || '';
+    }
+  }
+
+  function definirUsoPacote(ativar) {
+    if (!usarPacoteInput || !pacoteToggleBtn) {
+      return;
+    }
+    usarPacoteInput.value = ativar ? '1' : '0';
+    pacoteToggleBtn.classList.toggle('is-active', ativar);
+    pacoteToggleBtn.textContent = ativar ? 'Não usar pacote' : 'Usar pacote';
+    if (pacoteInfoBox) {
+      pacoteInfoBox.dataset.state = ativar ? 'active' : (pacoteAtual ? 'available' : pacoteInfoBox.dataset.state);
+    }
+  }
+
+  function resetPacoteInfo(baseState) {
+    pacoteAtual = null;
+    if (pacoteIdInput) {
+      pacoteIdInput.value = '';
+    }
+    if (pacoteToggleBtn) {
+      pacoteToggleBtn.disabled = true;
+      pacoteToggleBtn.classList.remove('is-active');
+      pacoteToggleBtn.textContent = 'Usar pacote';
+    }
+    definirUsoPacote(false);
+    atualizarPacoteBox(baseState || 'idle',
+      baseState === 'visitor'
+        ? 'Pacotes disponíveis apenas para pacientes cadastrados.'
+        : 'Selecione um paciente para verificar pacotes.',
+      baseState === 'visitor' ? '' : 'Os pacotes ativos aparecerão aqui.');
+  }
+
+  function verificarRepeticoesPacote() {
+    if (!pacoteAtual || !repeticoesInput) {
+      return;
+    }
+    const repeticoes = parseInt(repeticoesInput.value, 10) || 0;
+    const excedeu = repeticoes > pacoteAtual.restantes;
+    if (excedeu) {
+      definirUsoPacote(false);
+      if (pacoteToggleBtn) {
+        pacoteToggleBtn.disabled = true;
+      }
+      atualizarPacoteBox('available',
+        `Pacote disponível: ${pacoteAtual.restantes} de ${pacoteAtual.total} sessões.`,
+        'Ajuste as repetições ou agende sem usar o pacote.');
+    } else {
+      if (pacoteToggleBtn) {
+        pacoteToggleBtn.disabled = false;
+      }
+      atualizarPacoteBox(usarPacoteInput && usarPacoteInput.value === '1' ? 'active' : 'available',
+        `Pacote disponível: ${pacoteAtual.restantes} de ${pacoteAtual.total} sessões.`,
+        'Ative para descontar uma sessão do pacote a cada encontro.');
+    }
+  }
+
+  function aplicarDadosPacote(info) {
+    pacoteAtual = info;
+    if (pacoteIdInput) {
+      pacoteIdInput.value = info && info.id ? String(info.id) : '';
+    }
+    definirUsoPacote(false);
+    if (pacoteToggleBtn) {
+      pacoteToggleBtn.disabled = !info;
+    }
+    if (info) {
+      atualizarPacoteBox('available',
+        `Pacote disponível: ${info.restantes} de ${info.total} sessões.`,
+        'Ative para descontar uma sessão do pacote a cada encontro.');
+      verificarRepeticoesPacote();
+    } else {
+      atualizarPacoteBox('empty', 'Este paciente não possui pacote ativo.', 'É possível agendar normalmente sem desconto de pacote.');
+    }
+  }
+
+  function carregarPacote(usuarioId) {
+    if (!pacoteInfoBox) {
+      return;
+    }
+    if (!usuarioId) {
+      resetPacoteInfo('idle');
+      return;
+    }
+    atualizarPacoteBox('idle', 'Verificando pacotes disponíveis...', '');
+    if (pacoteToggleBtn) {
+      pacoteToggleBtn.disabled = true;
+    }
+    fetch('getPacoteUsuario.php?usuario_id=' + encodeURIComponent(usuarioId))
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Erro ao buscar pacote.');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (!data || data.success === false) {
+          throw new Error(data && data.message ? data.message : 'Não foi possível carregar pacotes.');
+        }
+        const pacoteInfo = data.pacote && typeof data.pacote === 'object'
+          ? {
+            id: Number(data.pacote.id) || null,
+            total: Number(data.pacote.total) || 0,
+            usadas: Number(data.pacote.usadas) || 0,
+            restantes: Number(data.pacote.restantes) || 0,
+          }
+          : null;
+        if (pacoteInfo && (!pacoteInfo.id || pacoteInfo.restantes <= 0)) {
+          aplicarDadosPacote(null);
+        } else {
+          aplicarDadosPacote(pacoteInfo);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        aplicarDadosPacote(null);
+        atualizarPacoteBox('empty', 'Não foi possível carregar os dados de pacote.', 'Tente novamente ou prossiga sem utilizar pacote.');
+      });
+  }
+
+  function atualizarModoVisitante(ativar) {
+    if (!usuarioSection || !visitanteSection || !visitanteFlag) {
+      return;
+    }
+
+    visitanteFlag.value = ativar ? '1' : '0';
+    usuarioSection.style.display = ativar ? 'none' : '';
+    visitanteSection.style.display = ativar ? '' : 'none';
+
+    if (usuarioNomeInput) {
+      usuarioNomeInput.required = !ativar;
+      if (ativar) {
+        usuarioNomeInput.value = '';
+      }
+    }
+
+    if (usuarioIdInput) {
+      usuarioIdInput.required = !ativar;
+      if (ativar) {
+        usuarioIdInput.value = '';
+      }
+    }
+
+    const camposObrigatorios = ['guest_name', 'guest_email', 'guest_phone'];
+    visitanteCampos.forEach((campo) => {
+      if (!(campo instanceof HTMLElement)) {
+        return;
+      }
+
+      if (ativar) {
+        campo.required = camposObrigatorios.includes(campo.name);
+      } else {
+        campo.required = false;
+        if ('value' in campo) {
+          campo.value = '';
+        }
+      }
+    });
+
+    if (ativar) {
+      resetPacoteInfo('visitor');
+    } else if (usuarioIdInput && usuarioIdInput.value) {
+      carregarPacote(usuarioIdInput.value);
+    } else {
+      resetPacoteInfo('idle');
+    }
+  }
+
+  function handleSelecaoUsuario(usuarioSelecionado) {
+    if (!usuarioIdInput) {
+      return;
+    }
+    if (!usuarioSelecionado) {
+      usuarioIdInput.value = '';
+      if (!visitanteFlag || visitanteFlag.value !== '1') {
+        resetPacoteInfo('idle');
+      }
+      return;
+    }
+    usuarioIdInput.value = usuarioSelecionado.id;
+    if (!visitanteFlag || visitanteFlag.value !== '1') {
+      carregarPacote(usuarioSelecionado.id);
+    }
+  }
+
+  setupAutocomplete('usuario_nome_fixo', 'usuario_id_fixo', 'autocomplete-list-fixo', handleSelecaoUsuario);
+
+  if (btnParaVisitante) {
+    btnParaVisitante.addEventListener('click', function () {
+      atualizarModoVisitante(true);
+    });
+  }
+
+  if (btnVoltarUsuario) {
+    btnVoltarUsuario.addEventListener('click', function () {
+      atualizarModoVisitante(false);
+    });
+  }
+
+  if (pacoteToggleBtn) {
+    pacoteToggleBtn.addEventListener('click', function () {
+      if (!pacoteAtual || pacoteToggleBtn.disabled) {
+        return;
+      }
+      const ativar = usarPacoteInput && usarPacoteInput.value !== '1';
+      definirUsoPacote(ativar);
+      if (ativar) {
+        atualizarPacoteBox('active',
+          `Pacote disponível: ${pacoteAtual.restantes} de ${pacoteAtual.total} sessões.`,
+          'Este agendamento irá consumir sessões do pacote.');
+      } else {
+        atualizarPacoteBox('available',
+          `Pacote disponível: ${pacoteAtual.restantes} de ${pacoteAtual.total} sessões.`,
+          'Ative para descontar uma sessão do pacote a cada encontro.');
+      }
+    });
+  }
+
+  if (repeticoesInput) {
+    repeticoesInput.addEventListener('input', function () {
+      verificarRepeticoesPacote();
+    });
+  }
+
+  atualizarModoVisitante(false);
+
   const diaSemanaSelect = modalBody.querySelector('select[name="dia_semana"]');
   if (diaSemanaSelect) {
     const baseDate = new Date(`${data}T00:00:00`);
     if (!Number.isNaN(baseDate.getTime())) {
-      const diaSemanaJs = baseDate.getDay(); // 0 (domingo) - 6 (sábado)
-      const diaSemana = ((diaSemanaJs + 6) % 7) + 1; // converte para 1=segunda ... 7=domingo
+      const diaSemanaJs = baseDate.getDay();
+      const diaSemana = ((diaSemanaJs + 6) % 7) + 1;
       diaSemanaSelect.value = String(diaSemana);
     }
   }
+
   const horarioInput = modalBody.querySelector('input[name="horario"]');
   if (horarioInput && hora) {
     horarioInput.value = hora.substring(0, 5);
