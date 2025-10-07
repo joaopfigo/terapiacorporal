@@ -2020,8 +2020,11 @@ if (!empty($eventos_bloqueados)) {
 
       setupStatusActionHandlers();
 
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        plugins: [FullCalendarDayGrid, FullCalendarInteraction],
+      const calendarPlugins = window.FullCalendar
+        ? [FullCalendar.dayGridPlugin, FullCalendar.interactionPlugin].filter(Boolean)
+        : [];
+
+      const calendarConfig = {
         initialView: 'dayGridMonth',
         locale: 'pt-br',
         height: 600,
@@ -2073,7 +2076,13 @@ if (!empty($eventos_bloqueados)) {
 
           mostrarModalOpcoes(info.dateStr);
         }
-      });
+      };
+
+      if (calendarPlugins.length) {
+        calendarConfig.plugins = calendarPlugins;
+      }
+
+      const calendar = new FullCalendar.Calendar(calendarEl, calendarConfig);
 
       calendar.render();
     });
@@ -2190,20 +2199,6 @@ function abrirBloquearHorario(data, hora) {
       });
   };
 }
- document.addEventListener('DOMContentLoaded', function() {
-  var calendarEl = document.getElementById('calendar-admin');
-              var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-              locale: 'pt-br',
-              height: 600,
-              events: <?php echo json_encode($eventos_calendario); ?>,
-              dateClick: function(info) {
-                mostrarModalOpcoes(info.dateStr);
-    }
-  });
-              calendar.render();
-});
-
  </script>
  <script>
 
@@ -2580,87 +2575,6 @@ function abrirAgendamentoNovo(data, hora) {
   }
 
   atualizarModoVisitante(false);
-
-function abrirAgendamentoNovo(data, hora) {
-  document.getElementById('modal-title').innerText = 'Agendamento Novo';
-  const modalBody = document.getElementById('modal-body');
-  modalBody.innerHTML = `
-        <form id="form-agendamento-fixo" method="post" action="agendarFixo.php" autocomplete="off">
-          <input type="hidden" name="visitante" id="agendamento-fixo-visitante-flag" value="0">
-          <div id="agendamento-fixo-usuario">
-            <label>Usuário:
-              <input type="text" id="usuario_nome_fixo" placeholder="Digite o nome..." autocomplete="off">
-              <input type="hidden" name="usuario_id" id="usuario_id_fixo">
-              <div id="autocomplete-list-fixo" class="autocomplete-items"></div>
-            </label>
-            <button type="button" id="btn-fixo-para-visitante" class="calendar-btn calendar-btn--secondary">Agendar para visitante</button>
-          </div>
-          <div id="agendamento-fixo-visitante" style="display:none;">
-            <div class="guest-form">
-              <label for="guest-name-fixo">Nome</label>
-              <input type="text" id="guest-name-fixo" name="guest_name">
-              <label for="guest-email-fixo">E-mail</label>
-              <input type="email" id="guest-email-fixo" name="guest_email">
-              <label for="guest-phone-fixo">Número de telefone</label>
-              <input type="tel" id="guest-phone-fixo" name="guest_phone" placeholder="+55" pattern="\\+?\\d{2,15}">
-              <label for="guest-nascimento-fixo">Data de nascimento</label>
-              <input type="date" id="guest-nascimento-fixo" name="guest_nascimento">
-              <label for="guest-sexo-fixo">Sexo</label>
-              <select id="guest-sexo-fixo" name="guest_sexo">
-                <option value="">Selecione...</option>
-                <option value="feminino">Feminino</option>
-                <option value="masculino">Masculino</option>
-                <option value="outro">Outro</option>
-                <option value="prefiro_nao_dizer">Prefiro não dizer</option>
-              </select>
-            </div>
-            <button type="button" id="btn-fixo-voltar-usuario" class="calendar-btn calendar-btn--ghost">Selecionar usuário cadastrado</button>
-          </div>
-          <label>Especialidade:
-            <select name="especialidade_id" required>
-              <option value="1">Quick Massage</option>
-              <option value="2">Massoterapia</option>
-              <option value="3">Reflexologia Podal</option>
-              <option value="4">Auriculoterapia</option>
-              <option value="5">Ventosa</option>
-              <option value="6">Acupuntura</option>
-              <option value="7">Biomagnetismo</option>
-              <option value="8">Reiki</option>
-            </select>
-          </label>
-          <label>Dia da semana:
-            <select name="dia_semana" required>
-              <option value="1">Segunda-feira</option>
-              <option value="2">Terça-feira</option>
-              <option value="3">Quarta-feira</option>
-              <option value="4">Quinta-feira</option>
-              <option value="5">Sexta-feira</option>
-              <option value="6">Sábado</option>
-              <option value="7">Domingo</option>
-            </select>
-          </label>
-          <label>Horário:
-            <input type="time" name="horario" required>
-          </label>
-          <label>Duração (min):
-            <input type="number" name="duracao" value="60" required>
-          </label>
-          <label>Data de início:
-            <input type="date" name="data_inicio" value="${data}" required>
-          </label>
-          <label>Repetições:
-            <input type="number" name="repeticoes" value="1" min="1" required>
-          </label>
-          <label class="checkbox-inline">
-            <input type="checkbox" name="adicional_reflexo_fixo" value="1"> Adicional Escalda
-          </label>
-          <div class="calendar-modal-actions">
-            <button type="submit" class="calendar-btn calendar-btn--primary">Agendar</button>
-            <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
-          </div>
-        </form>
-      `;
-  setupAutocomplete('usuario_nome_fixo', 'usuario_id_fixo', 'autocomplete-list-fixo');
 
   const diaSemanaSelect = modalBody.querySelector('select[name="dia_semana"]');
   if (diaSemanaSelect) {
