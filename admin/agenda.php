@@ -2020,9 +2020,19 @@ if (!empty($eventos_bloqueados)) {
 
       setupStatusActionHandlers();
 
-      const calendarPlugins = window.FullCalendar
-        ? [FullCalendar.dayGridPlugin, FullCalendar.interactionPlugin].filter(Boolean)
-        : [];
+      if (!window.FullCalendar || !FullCalendar.Calendar) {
+        const aviso = document.createElement('div');
+        aviso.className = 'alert alert-warning mt-3';
+        aviso.textContent = 'Não foi possível carregar o calendário no momento. Por favor, verifique sua conexão e tente novamente mais tarde.';
+        calendarEl.innerHTML = '';
+        calendarEl.appendChild(aviso);
+        return;
+      }
+
+      const calendarPlugins = [
+        FullCalendar.dayGridPlugin,
+        FullCalendar.interactionPlugin
+      ].filter(Boolean);
 
       const calendarConfig = {
         initialView: 'dayGridMonth',
