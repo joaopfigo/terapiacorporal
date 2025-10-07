@@ -2156,6 +2156,8 @@ if (!empty($eventos_bloqueados)) {
   `;
     }
 
+    window.abrirOpcoesHorario = abrirOpcoesHorario;
+
     // Bloquear dia inteiro
     function abrirBloquearDia(data) {
       document.getElementById('modal-title').innerText = 'Bloquear Dia Inteiro ' + data.split('-').reverse().join('/');
@@ -2664,6 +2666,8 @@ function abrirAgendamentoNovo(data, hora) {
 
   atualizarModoVisitante(false);
 }
+
+window.abrirAgendamentoNovo = abrirAgendamentoNovo;
 
 
     </script>
