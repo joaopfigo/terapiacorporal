@@ -2590,6 +2590,69 @@ function abrirAgendamentoNovo(data, hora) {
   if (horarioInput && hora) {
     horarioInput.value = hora.substring(0, 5);
   }
+
+  const usuarioNomeInput = modalBody.querySelector('#usuario_nome_fixo');
+  const usuarioIdInput = modalBody.querySelector('#usuario_id_fixo');
+  const visitanteFlag = modalBody.querySelector('#agendamento-fixo-visitante-flag');
+  const usuarioSection = modalBody.querySelector('#agendamento-fixo-usuario');
+  const visitanteSection = modalBody.querySelector('#agendamento-fixo-visitante');
+  const btnParaVisitante = modalBody.querySelector('#btn-fixo-para-visitante');
+  const btnVoltarUsuario = modalBody.querySelector('#btn-fixo-voltar-usuario');
+  const visitanteCampos = visitanteSection ? visitanteSection.querySelectorAll('input, select') : [];
+
+  function atualizarModoVisitante(ativar) {
+    if (!usuarioSection || !visitanteSection || !visitanteFlag) {
+      return;
+    }
+
+    visitanteFlag.value = ativar ? '1' : '0';
+    usuarioSection.style.display = ativar ? 'none' : '';
+    visitanteSection.style.display = ativar ? '' : 'none';
+
+    if (usuarioNomeInput) {
+      usuarioNomeInput.required = !ativar;
+      if (ativar) {
+        usuarioNomeInput.value = '';
+      }
+    }
+
+    if (usuarioIdInput) {
+      usuarioIdInput.required = !ativar;
+      if (ativar) {
+        usuarioIdInput.value = '';
+      }
+    }
+
+    const camposObrigatorios = ['guest_name', 'guest_email', 'guest_phone'];
+    visitanteCampos.forEach((campo) => {
+      if (!(campo instanceof HTMLElement)) {
+        return;
+      }
+
+      if (ativar) {
+        campo.required = camposObrigatorios.includes(campo.name);
+      } else {
+        campo.required = false;
+        if ('value' in campo) {
+          campo.value = '';
+        }
+      }
+    });
+  }
+
+  if (btnParaVisitante) {
+    btnParaVisitante.addEventListener('click', function () {
+      atualizarModoVisitante(true);
+    });
+  }
+
+  if (btnVoltarUsuario) {
+    btnVoltarUsuario.addEventListener('click', function () {
+      atualizarModoVisitante(false);
+    });
+  }
+
+  atualizarModoVisitante(false);
 }
 
 
