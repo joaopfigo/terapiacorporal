@@ -291,6 +291,83 @@ if ($stmtCalendario) {
   $stmtCalendario->close();
 }
 
+$horariosPadrao = [];
+for ($h = 8; $h <= 20; $h++) {
+  $horariosPadrao[] = sprintf('%02d:00', $h);
+}
+
+$horariosPorData = [];
+foreach ($agendamentosCalendario as $a) {
+  $status = strtolower($a['status'] ?? '');
+  $dataHorario = $a['data_horario'] ?? null;
+
+  if (!$dataHorario) {
+    continue;
+  }
+
+  $timestamp = strtotime($dataHorario);
+  if ($timestamp === false) {
+    continue;
+  }
+
+  $data = date('Y-m-d', $timestamp);
+  $hora = date('H:i', $timestamp);
+
+  switch ($status) {
+    case 'confirmado':
+      $statusKey = 'confirmado';
+      break;
+    case 'concluido':
+    case 'concluído':
+      $statusKey = 'concluido';
+      break;
+    case 'indisponivel':
+    case 'indisponível':
+      $statusKey = 'indisponivel';
+      break;
+    default:
+      $statusKey = null;
+  }
+
+  if ($statusKey === null) {
+    continue;
+  }
+
+  if (!isset($horariosPorData[$data])) {
+    $horariosPorData[$data] = [
+      'confirmado' => [],
+      'concluido' => [],
+      'indisponivel' => [],
+    ];
+  }
+
+  $horariosPorData[$data][$statusKey][$hora] = true;
+}
+
+foreach ($horariosPorData as &$statusLista) {
+  foreach ($statusLista as $statusKey => &$horas) {
+    if (!is_array($horas)) {
+      $horas = [];
+      continue;
+    }
+
+    $horas = array_keys($horas);
+    sort($horas);
+  }
+  unset($horas);
+}
+unset($statusLista);
+
+$datasBloqueadas = [];
+foreach ($horariosPorData as $data => $statusLista) {
+  $horariosBloqueados = $statusLista['indisponivel'] ?? [];
+  if (!empty($horariosBloqueados) && count(array_intersect($horariosPadrao, $horariosBloqueados)) === count($horariosPadrao)) {
+    $datasBloqueadas[] = $data;
+  }
+}
+$datasBloqueadas = array_values(array_unique($datasBloqueadas));
+sort($datasBloqueadas);
+
 // Consulta filtrada para a listagem
 $sqlLista = $sqlBaseAgendamentos;
 if ($dataFiltroValido) {
@@ -1075,6 +1152,40 @@ if (!empty($eventos_bloqueados)) {
       border-color: #d8e3df;
     }
 
+    .cal-admin-day.is-blocked {
+      background: #fdecea;
+      border-color: #f5c2c7;
+      color: #b04a4a;
+    }
+
+    .cal-admin-day.is-occupied {
+      background: #e7f1ff;
+      border-color: #b6d4fe;
+      color: #3a6ea5;
+    }
+
+    .cal-admin-day.is-blocked:hover,
+    .cal-admin-day.is-blocked:focus-visible,
+    .cal-admin-day.is-occupied:hover,
+    .cal-admin-day.is-occupied:focus-visible {
+      background: inherit;
+      border-color: inherit;
+      box-shadow: none;
+      color: inherit;
+      transform: none;
+    }
+
+    .cal-admin-day .cal-status-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 6px;
+    }
+
+    .cal-admin-day .cal-status-text {
+      vertical-align: middle;
+    }
+
     .calendar-legend {
       display: flex;
       align-items: center;
@@ -1635,19 +1746,9 @@ if (!empty($eventos_bloqueados)) {
         }
       });
     }
-    let datasBloqueadas = <?php
-    // PHP para bloquear domingos e datas confirmadas usando o conjunto completo
-    $bloqueadas = [];
-    foreach ($agendamentosCalendario as $a) {
-      $status = strtolower($a['status'] ?? '');
-      if (in_array($status, ['confirmado', 'concluido', 'indisponivel'], true) && !empty($a['data_horario'])) {
-        $bloqueadas[] = date('Y-m-d', strtotime($a['data_horario']));
-      }
-    }
-    $bloqueadas = array_values(array_unique($bloqueadas));
-    sort($bloqueadas);
-    echo json_encode($bloqueadas);
-    ?>;
+    const datasBloqueadas = <?php echo json_encode($datasBloqueadas, JSON_UNESCAPED_UNICODE); ?>;
+    const horariosPorData = <?php echo json_encode($horariosPorData, JSON_UNESCAPED_UNICODE); ?>;
+    const horariosPadraoDia = <?php echo json_encode($horariosPadrao, JSON_UNESCAPED_UNICODE); ?>;
     const datasBloqueadasSet = new Set(datasBloqueadas);
 
     function adicionarIndicadorDia(dayEl, texto, extraClass) {
@@ -1706,8 +1807,22 @@ if (!empty($eventos_bloqueados)) {
           }
         },
         dateClick: function (info) {
-          if (datasBloqueadasSet.has(info.dateStr) || info.date.getDay() === 0) {
+          if (info.date.getDay() === 0) {
             return;
+          }
+
+          if (datasBloqueadasSet.has(info.dateStr)) {
+            return;
+          }
+
+          const dadosDia = horariosPorData[info.dateStr];
+          if (dadosDia) {
+            const bloqueiosDia = new Set(dadosDia.indisponivel || []);
+            const todosBloqueados = horariosPadraoDia.every(horario => bloqueiosDia.has(horario));
+            if (todosBloqueados) {
+              datasBloqueadasSet.add(info.dateStr);
+              return;
+            }
           }
 
           mostrarModalOpcoes(info.dateStr);
@@ -1724,24 +1839,29 @@ if (!empty($eventos_bloqueados)) {
         horarios.push((h < 10 ? '0' : '') + h + ':00');
       }
 
-      // Você pode buscar horários ocupados/bloqueados via PHP e passar para o JS se quiser
-      // Aqui exemplo estático:
-      let horariosOcupados = []; // Ex: ['09:00', '14:00']
-      let horariosBloqueados = []; // Ex: ['10:00']
+      const infoDia = horariosPorData[data] || {};
+      const horariosOcupados = new Set([...(infoDia.confirmado || []), ...(infoDia.concluido || [])]);
+      const horariosBloqueados = new Set(infoDia.indisponivel || []);
 
       let html = `<h3 class="modal-subtitle">Horários do dia ${data.split('-').reverse().join('/')}</h3>
     <div class="calendar-modal-grid">`;
 
       horarios.forEach(h => {
-        let ocupado = horariosOcupados.includes(h);
-        let bloqueado = horariosBloqueados.includes(h);
-        let btnClass = ocupado ? 'cal-disabled' : bloqueado ? 'cal-disabled' : '';
-        let label = ocupado ? 'Ocupado' : bloqueado ? 'Bloqueado' : h;
+        const ocupado = horariosOcupados.has(h);
+        const bloqueado = horariosBloqueados.has(h);
+        const isDisabled = ocupado || bloqueado;
         const buttonClasses = ['calendar-btn', 'calendar-btn--secondary', 'cal-admin-day'];
-        if (btnClass) {
-          buttonClasses.push(btnClass);
+        let label = h;
+
+        if (bloqueado) {
+          buttonClasses.push('cal-disabled', 'is-blocked');
+          label = '<span class="cal-status-icon" aria-hidden="true">🚫</span><span class="cal-status-text">Bloqueado</span>';
+        } else if (ocupado) {
+          buttonClasses.push('cal-disabled', 'is-occupied');
+          label = '<span class="cal-status-icon" aria-hidden="true">📌</span><span class="cal-status-text">Reservado</span>';
         }
-        html += `<button type="button" class="${buttonClasses.join(' ')}" data-date="${data}" data-hora="${h}" ${ocupado || bloqueado ? 'disabled' : ''} onclick="abrirOpcoesHorario('${data}','${h}')">${label}</button>`;
+
+        html += `<button type="button" class="${buttonClasses.join(' ')}" data-date="${data}" data-hora="${h}" ${isDisabled ? 'disabled' : ''} onclick="abrirOpcoesHorario('${data}','${h}')">${label}</button>`;
       });
       html += `</div>
     <div class="calendar-modal-actions">
