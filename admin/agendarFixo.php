@@ -194,6 +194,29 @@ try {
     }
     header('Location: agenda.php?msg=erro_agendamento');
     exit;
+foreach ($datasGeradas as $dataOcorrencia) {
+    $data_horario = $dataOcorrencia->format('Y-m-d') . ' ' . $horaFormatada;
+    $stmt = $conn->prepare("SELECT COUNT(*) as qtd FROM agendamentos WHERE data_horario = ? AND status IN ('Confirmado','Indisponivel','Indisponível')");
+    $stmt->bind_param('s', $data_horario);
+    $stmt->execute();
+    $r = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!isset($r['qtd']) || $r['qtd'] != 0) {
+        continue;
+    }
+
+    if ($visitante) {
+        $stmt2 = $conn->prepare("INSERT INTO agendamentos (usuario_id, nome_visitante, email_visitante, telefone_visitante, idade_visitante, especialidade_id, data_horario, duracao, adicional_reflexo, status, criado_em) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, 'Confirmado', NOW())");
+        $stmt2->bind_param('sssiisii', $guest_name, $guest_email, $guest_phone, $idade_visitante, $especialidade_id, $data_horario, $duracao, $adicional_reflexo);
+    } else {
+        $stmt2 = $conn->prepare("INSERT INTO agendamentos (usuario_id, especialidade_id, data_horario, duracao, adicional_reflexo, status, criado_em) VALUES (?, ?, ?, ?, ?, 'Confirmado', NOW())");
+        $stmt2->bind_param('iisii', $usuario_id, $especialidade_id, $data_horario, $duracao, $adicional_reflexo);
+    }
+
+    $stmt2->execute();
+    $stmt2->close();
+    $agendados++;
 }
 
 header('Location: agenda.php?msg=fixos&total=' . $totalGerado . '&criados=' . $agendados);
