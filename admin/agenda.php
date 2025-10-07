@@ -2144,16 +2144,28 @@ if (!empty($eventos_bloqueados)) {
 
     // Opções para um horário específico
     function abrirOpcoesHorario(data, hora) {
-      document.getElementById('modal-title').innerText = `Opções para ${data.split('-').reverse().join('/')} ${hora}`;
-      document.getElementById('modal-body').innerHTML = `
+      const modalTitle = document.getElementById('modal-title');
+      const modalBody = document.getElementById('modal-body');
+
+      if (!modalTitle || !modalBody) {
+        return;
+      }
+
+      modalTitle.innerText = `Opções para ${data.split('-').reverse().join('/')} ${hora}`;
+      modalBody.innerHTML = `
     <div class="calendar-modal-actions">
-      <button type="button" class="calendar-btn calendar-btn--primary" onclick="abrirAgendamentoNovo('${data}','${hora}')">Agendamento Novo</button>
+      <button type="button" class="calendar-btn calendar-btn--primary" data-action="agendamento-novo">Agendamento Novo</button>
       <button type="button" class="calendar-btn calendar-btn--secondary" onclick="abrirBloquearHorario('${data}','${hora}')">Bloquear Horário</button>
     </div>
     <div class="calendar-modal-actions">
       <button type="button" class="calendar-btn calendar-btn--ghost" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
     </div>
   `;
+
+      const novoAgendamentoBtn = modalBody.querySelector('[data-action="agendamento-novo"]');
+      if (novoAgendamentoBtn) {
+        novoAgendamentoBtn.addEventListener('click', () => abrirAgendamentoNovo(data, hora));
+      }
     }
 
     window.abrirOpcoesHorario = abrirOpcoesHorario;
