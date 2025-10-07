@@ -1882,9 +1882,8 @@ if (!empty($eventos_bloqueados)) {
       document.getElementById('modal-title').innerText = `Opções para ${data.split('-').reverse().join('/')} ${hora}`;
       document.getElementById('modal-body').innerHTML = `
     <div class="calendar-modal-actions">
-      <button type="button" class="calendar-btn calendar-btn--primary" onclick="abrirNovoAgendamento('${data}','${hora}')">Marcar Novo Agendamento</button>
+      <button type="button" class="calendar-btn calendar-btn--primary" onclick="abrirAgendamentoNovo('${data}','${hora}')">Agendamento Novo</button>
       <button type="button" class="calendar-btn calendar-btn--secondary" onclick="abrirBloquearHorario('${data}','${hora}')">Bloquear Horário</button>
-      <button type="button" class="calendar-btn calendar-btn--secondary" onclick="abrirAgendamentoFixo('${data}','${hora}')">Agendamento Fixo</button>
     </div>
     <div class="calendar-modal-actions">
       <button type="button" class="calendar-btn calendar-btn--ghost" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
@@ -1967,176 +1966,44 @@ function abrirBloquearHorario(data, hora) {
 
 
 
-    // Ajuste as funções abrirNovoAgendamento, abrirBloquearHorario, abrirAgendamentoFixo para receber data e hora:
-    function abrirNovoAgendamento(data, hora = '') {
-      const modalTitle = document.getElementById('modal-title');
-      const modalBody = document.getElementById('modal-body');
-
-      if (!modalTitle || !modalBody) {
-        return;
-      }
-
-      modalTitle.innerText = 'Novo Agendamento em ' + data;
-      modalBody.innerHTML = `
-    <div id="novo-agendamento-massoterapeuta">
-      <div id="escolher-usuario-area">
-        <label>Escolha um usuário cadastrado:</label>
-        <select id="select-usuario">
-          <option value="">Selecione...</option>
-        </select>
-        <button id="btn-para-visitante" type="button" class="calendar-btn calendar-btn--secondary">Agendar para visitante</button>
-      </div>
-      <div id="form-visitante-area" style="display:none;">
-        <div class="guest-form">
-          <label for="guest-name">Nome</label>
-          <input type="text" id="guest-name" name="guest-name" placeholder="Digite seu nome" required>
-          <label for="guest-email">E-mail</label>
-          <input type="email" id="guest-email" name="guest-email" placeholder="Seu e-mail" required>
-          <label for="guest-phone">Número de telefone</label>
-          <input type="tel" id="guest-phone" name="guest-phone" placeholder="+55" pattern="\\+?\\d{2,15}" required>
-          <label for="guest-nascimento">Data de nascimento</label>
-          <input type="date" id="guest-nascimento" name="guest-nascimento" required>
-          <label for="guest-sexo">Sexo</label>
-          <select id="guest-sexo" name="guest-sexo" required>
-            <option value="">Selecione...</option>
-            <option value="feminino">Feminino</option>
-            <option value="masculino">Masculino</option>
-            <option value="outro">Outro</option>
-            <option value="prefiro_nao_dizer">Prefiro não dizer</option>
-          </select>
-        </div>
-        <button id="btn-voltar-escolha" type="button" class="calendar-btn calendar-btn--ghost">Voltar</button>
-      </div>
-      <label>Especialidade:</label>
-      <select id="especialidade_id">
-        <option value="1">Quick Massage</option>
-        <option value="2">Massoterapia</option>
-        <option value="3">Reflexologia Podal</option>
-        <option value="4">Auriculoterapia</option>
-        <option value="5">Ventosa</option>
-        <option value="6">Acupuntura</option>
-        <option value="7">Biomagnetismo</option>
-        <option value="8">Reiki</option>
-      </select>
-      <label>Duração (min):</label>
-      <input type="number" id="duracao" required>
-      <label><input type="checkbox" id="adicional_reflexo" value="1"> Adicional Escalda</label>
-      <div class="calendar-modal-actions">
-        <button id="btn-agendar-massa" type="button" class="calendar-btn calendar-btn--primary">Agendar</button>
-        <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
-      </div>
-    </div>
-`;
-
-      const sel = modalBody.querySelector('#select-usuario');
-      const btnParaVisitante = modalBody.querySelector('#btn-para-visitante');
-      const btnVoltarEscolha = modalBody.querySelector('#btn-voltar-escolha');
-      const btnAgendar = modalBody.querySelector('#btn-agendar-massa');
-      const escolherUsuarioArea = modalBody.querySelector('#escolher-usuario-area');
-      const formVisitanteArea = modalBody.querySelector('#form-visitante-area');
-
-      if (!sel || !btnParaVisitante || !btnVoltarEscolha || !btnAgendar) {
-        return;
-      }
-
-      fetch('get_usuarios.php')
-        .then(r => r.json())
-        .then(lista => {
-          if (!sel.isConnected || !Array.isArray(lista)) {
-            return;
-          }
-
-          lista.forEach(u => {
-            const opt = document.createElement('option');
-            opt.value = u.id;
-            opt.innerText = u.nome + (u.email ? ' (' + u.email + ')' : '');
-            sel.appendChild(opt);
-          });
-        })
-        .catch(() => {
-          /* Evita quebra silenciosa caso o fetch falhe. */
-        });
-
-      btnParaVisitante.onclick = function () {
-        if (escolherUsuarioArea) {
-          escolherUsuarioArea.style.display = 'none';
-        }
-        if (formVisitanteArea) {
-          formVisitanteArea.style.display = '';
-        }
-      };
-
-      btnVoltarEscolha.onclick = function () {
-        if (formVisitanteArea) {
-          formVisitanteArea.style.display = 'none';
-        }
-        if (escolherUsuarioArea) {
-          escolherUsuarioArea.style.display = '';
-        }
-      };
-
-      btnAgendar.onclick = function () {
-        const especialidadeSelect = modalBody.querySelector('#especialidade_id');
-        const duracaoInput = modalBody.querySelector('#duracao');
-        const adicionalReflexoCheckbox = modalBody.querySelector('#adicional_reflexo');
-        const horaSelecionada = hora || '';
-
-        const dados = {
-          data,
-          hora: horaSelecionada,
-          especialidade_id: especialidadeSelect ? especialidadeSelect.value : '',
-          duracao: duracaoInput ? duracaoInput.value : '',
-          adicional_reflexo: adicionalReflexoCheckbox && adicionalReflexoCheckbox.checked ? 1 : 0
-        };
-
-        const usuarioId = sel.value;
-        if (usuarioId) {
-          dados.usuario_id = usuarioId;
-        } else {
-          const guestName = modalBody.querySelector('#guest-name');
-          const guestEmail = modalBody.querySelector('#guest-email');
-          const guestPhone = modalBody.querySelector('#guest-phone');
-          const guestNascimento = modalBody.querySelector('#guest-nascimento');
-          const guestSexo = modalBody.querySelector('#guest-sexo');
-
-          dados.guest_name = guestName ? guestName.value : '';
-          dados.guest_email = guestEmail ? guestEmail.value : '';
-          dados.guest_phone = guestPhone ? guestPhone.value : '';
-          dados.guest_nascimento = guestNascimento ? guestNascimento.value : '';
-          dados.guest_sexo = guestSexo ? guestSexo.value : '';
-        }
-
-        fetch('novo_agendar_massat.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(dados)
-        })
-          .then(r => r.json())
-          .then(res => {
-            if (res.ok) {
-              alert('Agendado com sucesso!');
-              const modal = document.getElementById('options-modal');
-              if (modal) {
-                modal.style.display = 'none';
-              }
-            } else {
-              alert(res.msg);
-            }
-          });
-      };
-    }
+    // Ajuste as funções abrirBloquearHorario e abrirAgendamentoNovo para receber data e hora:
 
 
-function abrirAgendamentoFixo(data, hora) {
-  document.getElementById('modal-title').innerText = 'Agendamento Fixo';
+function abrirAgendamentoNovo(data, hora) {
+  document.getElementById('modal-title').innerText = 'Agendamento Novo';
   const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = `
-        <form method="post" action="agendarFixo.php" autocomplete="off">
-          <label>Usuário:
-            <input type="text" id="usuario_nome_fixo" placeholder="Digite o nome..." autocomplete="off" required>
-            <input type="hidden" name="usuario_id" id="usuario_id_fixo" required>
-            <div id="autocomplete-list-fixo" class="autocomplete-items"></div>
-          </label>
+        <form id="form-agendamento-fixo" method="post" action="agendarFixo.php" autocomplete="off">
+          <input type="hidden" name="visitante" id="agendamento-fixo-visitante-flag" value="0">
+          <div id="agendamento-fixo-usuario">
+            <label>Usuário:
+              <input type="text" id="usuario_nome_fixo" placeholder="Digite o nome..." autocomplete="off">
+              <input type="hidden" name="usuario_id" id="usuario_id_fixo">
+              <div id="autocomplete-list-fixo" class="autocomplete-items"></div>
+            </label>
+            <button type="button" id="btn-fixo-para-visitante" class="calendar-btn calendar-btn--secondary">Agendar para visitante</button>
+          </div>
+          <div id="agendamento-fixo-visitante" style="display:none;">
+            <div class="guest-form">
+              <label for="guest-name-fixo">Nome</label>
+              <input type="text" id="guest-name-fixo" name="guest_name">
+              <label for="guest-email-fixo">E-mail</label>
+              <input type="email" id="guest-email-fixo" name="guest_email">
+              <label for="guest-phone-fixo">Número de telefone</label>
+              <input type="tel" id="guest-phone-fixo" name="guest_phone" placeholder="+55" pattern="\\+?\\d{2,15}">
+              <label for="guest-nascimento-fixo">Data de nascimento</label>
+              <input type="date" id="guest-nascimento-fixo" name="guest_nascimento">
+              <label for="guest-sexo-fixo">Sexo</label>
+              <select id="guest-sexo-fixo" name="guest_sexo">
+                <option value="">Selecione...</option>
+                <option value="feminino">Feminino</option>
+                <option value="masculino">Masculino</option>
+                <option value="outro">Outro</option>
+                <option value="prefiro_nao_dizer">Prefiro não dizer</option>
+              </select>
+            </div>
+            <button type="button" id="btn-fixo-voltar-usuario" class="calendar-btn calendar-btn--ghost">Selecionar usuário cadastrado</button>
+          </div>
           <label>Especialidade:
             <select name="especialidade_id" required>
               <option value="1">Quick Massage</option>
@@ -2172,13 +2039,17 @@ function abrirAgendamentoFixo(data, hora) {
           <label>Repetições:
             <input type="number" name="repeticoes" value="1" min="1" required>
           </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" name="adicional_reflexo_fixo" value="1"> Adicional Escalda
+          </label>
           <div class="calendar-modal-actions">
-            <button type="submit" class="calendar-btn calendar-btn--primary">Agendar Fixo</button>
+            <button type="submit" class="calendar-btn calendar-btn--primary">Agendar</button>
             <button type="button" class="calendar-btn calendar-btn--secondary" onclick="mostrarModalOpcoes('${data}')">Voltar</button>
           </div>
         </form>
       `;
   setupAutocomplete('usuario_nome_fixo', 'usuario_id_fixo', 'autocomplete-list-fixo');
+
   const diaSemanaSelect = modalBody.querySelector('select[name="dia_semana"]');
   if (diaSemanaSelect) {
     const baseDate = new Date(`${data}T00:00:00`);
@@ -2188,10 +2059,74 @@ function abrirAgendamentoFixo(data, hora) {
       diaSemanaSelect.value = String(diaSemana);
     }
   }
+
   const horarioInput = modalBody.querySelector('input[name="horario"]');
   if (horarioInput && hora) {
     horarioInput.value = hora.substring(0, 5);
   }
+
+  const usuarioNomeInput = modalBody.querySelector('#usuario_nome_fixo');
+  const usuarioIdInput = modalBody.querySelector('#usuario_id_fixo');
+  const visitanteFlag = modalBody.querySelector('#agendamento-fixo-visitante-flag');
+  const usuarioSection = modalBody.querySelector('#agendamento-fixo-usuario');
+  const visitanteSection = modalBody.querySelector('#agendamento-fixo-visitante');
+  const btnParaVisitante = modalBody.querySelector('#btn-fixo-para-visitante');
+  const btnVoltarUsuario = modalBody.querySelector('#btn-fixo-voltar-usuario');
+  const visitanteCampos = visitanteSection ? visitanteSection.querySelectorAll('input, select') : [];
+
+  function atualizarModoVisitante(ativar) {
+    if (!usuarioSection || !visitanteSection || !visitanteFlag) {
+      return;
+    }
+
+    visitanteFlag.value = ativar ? '1' : '0';
+    usuarioSection.style.display = ativar ? 'none' : '';
+    visitanteSection.style.display = ativar ? '' : 'none';
+
+    if (usuarioNomeInput) {
+      usuarioNomeInput.required = !ativar;
+      if (ativar) {
+        usuarioNomeInput.value = '';
+      }
+    }
+
+    if (usuarioIdInput) {
+      usuarioIdInput.required = !ativar;
+      if (ativar) {
+        usuarioIdInput.value = '';
+      }
+    }
+
+    const camposObrigatorios = ['guest_name', 'guest_email', 'guest_phone'];
+    visitanteCampos.forEach((campo) => {
+      if (!(campo instanceof HTMLElement)) {
+        return;
+      }
+
+      if (ativar) {
+        campo.required = camposObrigatorios.includes(campo.name);
+      } else {
+        campo.required = false;
+        if ('value' in campo) {
+          campo.value = '';
+        }
+      }
+    });
+  }
+
+  if (btnParaVisitante) {
+    btnParaVisitante.addEventListener('click', function () {
+      atualizarModoVisitante(true);
+    });
+  }
+
+  if (btnVoltarUsuario) {
+    btnVoltarUsuario.addEventListener('click', function () {
+      atualizarModoVisitante(false);
+    });
+  }
+
+  atualizarModoVisitante(false);
 }
 
 
