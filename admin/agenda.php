@@ -1732,7 +1732,7 @@ if (!empty($eventos_bloqueados)) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Agenda Unificada</title>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
 </head>
