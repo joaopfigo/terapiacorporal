@@ -1715,6 +1715,20 @@ if ($res instanceof mysqli_result) {
         btnAgendar.textContent = 'Agendando...';
       }
 
+      const detectarCodigoResposta = (texto) => {
+        if (!texto) {
+          return null;
+        }
+        const normalizado = String(texto)
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toUpperCase();
+        if (normalizado.includes('HORARIO_INDISPONIVEL')) {
+          return 'HORARIO_INDISPONIVEL';
+        }
+        return null;
+      };
+
       const interpretarResposta = (payload) => {
         if (typeof payload === 'string') {
           const mensagem = payload.trim();
@@ -1723,7 +1737,8 @@ if ($res instanceof mysqli_result) {
           return {
             mensagem,
             sucesso,
-            id: partes.length > 1 ? partes[1] : null
+            id: partes.length > 1 ? partes[1] : null,
+            codigo: detectarCodigoResposta(mensagem)
           };
         }
 
@@ -1753,14 +1768,16 @@ if ($res instanceof mysqli_result) {
           return {
             mensagem,
             sucesso,
-            id: idResposta
+            id: idResposta,
+            codigo: detectarCodigoResposta(`${status}|${rawMensagem}`)
           };
         }
 
         return {
           mensagem: 'ERRO_AGENDAR: resposta inesperada do servidor.',
           sucesso: false,
-          id: null
+          id: null,
+          codigo: detectarCodigoResposta('ERRO_AGENDAR: resposta inesperada do servidor.')
         };
       };
 
@@ -1776,7 +1793,27 @@ if ($res instanceof mysqli_result) {
           return parsePromise.then(payload => ({ payload, response }));
         })
         .then(({ payload }) => {
-          const { mensagem, sucesso, id } = interpretarResposta(payload);
+          const { mensagem, sucesso, id, codigo } = interpretarResposta(payload);
+
+          if (codigo === 'HORARIO_INDISPONIVEL') {
+            const avisoHorario = 'O horário escolhido acabou de ficar indisponível. Atualizando horários disponíveis...';
+            alert(avisoHorario);
+            mostrarAvisoDisponibilidade(avisoHorario, 'alerta');
+            calendarioState.horarioSelecionado = null;
+            return carregarDisponibilidade({ mostrarErro: false })
+              .catch((erro) => {
+                console.error('Erro ao atualizar disponibilidade após conflito de horário:', erro);
+              })
+              .finally(() => {
+                if (!disponibilidadeState.erro) {
+                  mostrarAvisoDisponibilidade('Selecione um novo horário disponível.', 'alerta');
+                }
+                renderCalendar(calendarioState.ano, calendarioState.mes, { manterSelecao: true });
+                if (calendarioState.dataSelecionada) {
+                  renderSlots(calendarioState.dataSelecionada, { manterHorarioSelecionado: false });
+                }
+              });
+          }
 
           if (mensagem) {
             alert(mensagem);

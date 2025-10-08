@@ -339,6 +339,20 @@ if (!$user_id) {
 try {
     $conn->begin_transaction();
 
+    $stmt = $conn->prepare(
+        "SELECT 1 FROM agendamentos WHERE data_horario = ? AND status IN ('Pendente','Confirmado','Concluido','Indisponivel','Indisponível') LIMIT 1 FOR UPDATE"
+    );
+    $stmt->bind_param('s', $datetime);
+    $stmt->execute();
+    $stmt->store_result();
+    $ocupado = $stmt->num_rows > 0;
+    $stmt->close();
+
+    if ($ocupado) {
+        $conn->rollback();
+        die('HORARIO_INDISPONIVEL');
+    }
+
     if ($user_id) {
         $stmt = $conn->prepare("INSERT INTO agendamentos (usuario_id, especialidade_id, data_horario, duracao, preco_final, adicional_reflexo, status, servicos_csv, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
         $stmt->bind_param("iisidiss", $user_id, $servico_id, $datetime, $duracao_db, $preco_final, $add_reflexo, $status, $servicosCsv);
@@ -347,9 +361,7 @@ try {
         $stmt->bind_param("sssiisidiss", $nome, $email, $telefone, $idade, $servico_id, $datetime, $duracao_db, $preco_final, $add_reflexo, $status, $servicosCsv);
     }
 
-    if (!$stmt->execute()) {
-        throw new Exception('ERRO_AGENDAR');
-    }
+    $stmt->execute();
     $id_agendamento = $stmt->insert_id;
     $stmt->close();
 
@@ -376,6 +388,12 @@ try {
     notifyTherapistNewBooking($id_agendamento);
 
     echo "SUCESSO|$id_agendamento";
+} catch (mysqli_sql_exception $e) {
+    $conn->rollback();
+    if ((int) $e->getCode() === 1062) {
+        die('HORARIO_INDISPONIVEL');
+    }
+    die("ERRO_AGENDAR: " . $e->getMessage());
 } catch (Exception $e) {
     $conn->rollback();
     die("ERRO_AGENDAR: " . $e->getMessage());
