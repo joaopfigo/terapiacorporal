@@ -1255,6 +1255,9 @@ if (!empty($eventos_bloqueados)) {
     /* Calendar buttons melhorados */
     .fc-button,
     .fc-button-primary {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       background: #44b67b !important;
       border: none !important;
       border-radius: 8px !important;
@@ -2044,6 +2047,12 @@ if (!empty($eventos_bloqueados)) {
           start: 'prev,next today',
           center: 'title',
           end: ''
+        },
+        buttonIcons: false,
+        buttonText: {
+          prev: '‹',
+          next: '›',
+          today: 'Hoje'
         },
         footerToolbar: false,
         events: <?php echo json_encode($eventos_calendario); ?>,
