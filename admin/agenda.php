@@ -1733,6 +1733,7 @@ if (!empty($eventos_bloqueados)) {
   <title>Agenda Unificada</title>
 
   <link rel="stylesheet" href="fullcalendar.index.global.min.css">
+  <link rel="stylesheet" href="fullcalendar.daygrid.min.css">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
 </head>
