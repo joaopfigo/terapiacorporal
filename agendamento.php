@@ -326,6 +326,27 @@ if ($res instanceof mysqli_result) {
       gap: 10px;
       margin-bottom: 7px;
     }
+    .aviso-disponibilidade {
+      display: none;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .aviso-disponibilidade.aviso-info {
+      background: #e8f4ff;
+      color: #0c4a60;
+    }
+    .aviso-disponibilidade.aviso-alerta {
+      background: #fff3cd;
+      color: #664d03;
+    }
+    .aviso-disponibilidade.aviso-erro {
+      background: #f8d7da;
+      color: #842029;
+    }
     .slots {
       display: flex;
       flex-wrap: wrap;
@@ -347,6 +368,15 @@ if ($res instanceof mysqli_result) {
       background: #a788d9;
       color: #fff;
       border-color: #a788d9;
+    }
+    .cal-day.cal-selected {
+      box-shadow: 0 0 0 2px #7b5097 inset !important;
+    }
+    .slots-empty {
+      font-size: 0.95rem;
+      color: #7b5097;
+      font-weight: 600;
+      margin: 6px 0;
     }
     .booking-option {
       background: #f9f6f1;
@@ -961,75 +991,512 @@ if ($res instanceof mysqli_result) {
       document.getElementById('formulario-feedback').style.display = 'none'; // esconde feedback
       document.getElementById('formulario-section').style.display = 'block'; // mostra o formulário
     };
-    // Função calendário visual
-    function renderCalendar(year, month) {
-      const cal = document.getElementById('custom-calendar');
-      cal.innerHTML = '';
-      const dt = new Date(year, month, 1);
-      const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-      let html = `<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;'>
-        <button id='prev-month' style='background:none;border:none;font-size:1.3em;cursor:pointer;'>&lt;</button>
-        <span style='font-weight:700;color:#7b5097;'>${dt.toLocaleString('pt-BR', {month:'long'})} ${year}</span>
-        <button id='next-month' style='background:none;border:none;font-size:1.3em;cursor:pointer;'>&gt;</button>
-      </div>`;
-      html += `<div style='display:grid;grid-template-columns:repeat(7,1fr);gap:2px 0;font-weight:bold;'>${days.map(d=>`<span style='color:#bfa464'>${d}</span>`).join('')}</div>`;
-      let firstDay = dt.getDay();
-      let totalDays = new Date(year, month+1, 0).getDate();
-      html += `<div style='display:grid;grid-template-columns:repeat(7,1fr);gap:4px 0;'>`;
-      for(let i=0;i<firstDay;i++) html+="<span></span>";
-      for(let d=1;d<=totalDays;d++){
-  let btnDate = new Date(year, month, d, 0, 0, 0, 0);
-  let now = new Date();
-  now.setHours(0,0,0,0);
-  let isToday = btnDate.getTime() === now.getTime();
-  let isPast = btnDate.getTime() < now.getTime();
-  let isSunday = btnDate.getDay() === 0;
+    const calendarSection = document.querySelector('.calendar-section');
+    const calendarElement = document.getElementById('custom-calendar');
+    const slotsArea = document.getElementById('slots-area');
 
-  let disabled = isPast || isToday || isSunday;
-
-  let dayClass = `cal-day${isToday ? " today" : ""}${disabled ? " cal-disabled" : ""}`;
-  html += `<button class='${dayClass}' data-date='${year}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}'
-    style='margin:2px;padding:9px 0;border:none;background:${isToday||isPast||isSunday?'#eaeaea':'#fff9e2'};border-radius:8px;color:${isSunday?'#bdbdbd':'#756430'};font-size:1.02em;cursor:${disabled?'not-allowed':'pointer'};' 
-    ${disabled?'disabled':''}>${d}</button>`;
-}
-      html += `</div>`;
-      cal.innerHTML = html;
-      document.getElementById('prev-month').onclick = ()=>renderCalendar(month===0?year-1:year, month===0?11:month-1);
-      document.getElementById('next-month').onclick = ()=>renderCalendar(month===11?year+1:year, month===11?0:month+1);
-      document.querySelectorAll('.cal-day').forEach(btn=>{
-  btn.onclick = function(){
-    if (btn.disabled) return; // Não faz nada se o botão está desabilitado
-    document.querySelectorAll('.cal-day').forEach(b=>b.style.boxShadow='none');
-    this.style.boxShadow='0 0 0 2px #7b5097 inset';
-    const val = this.getAttribute('data-date');
-    renderSlots(val);
-  };
-});
+    if (slotsArea) {
+      slotsArea.innerHTML = '<p class="slots-empty">Selecione uma data no calendário para ver os horários disponíveis.</p>';
     }
-    // Slots
-    const horariosDisponiveis = {
-      '2024-05-22': ["10:00","10:30","12:00","13:30","14:00","15:00"],
-      '2024-05-23': ["09:30","11:00","13:00","14:30","16:00"],
-      '2024-05-24': ["09:00","10:00","11:30","13:30","16:30"]
+
+    const statusChavesDisponibilidade = ['pendente', 'confirmado', 'concluido', 'indisponivel'];
+
+    const agora = new Date();
+    const disponibilidadeState = {
+      horariosPadrao: [],
+      datas: {},
+      datasBloqueadas: new Set(),
+      carregado: false,
+      carregando: false,
+      erro: null,
     };
-    function renderSlots(val){
-      const slotsArea = document.getElementById('slots-area');
-      slotsArea.innerHTML = '';
-      let slots = horariosDisponiveis[val] || ["09:00","10:30","13:00","15:00","16:30"];
-      slots.forEach(h => {
-        const el = document.createElement('button');
-        el.type = 'button';
-        el.className = 'slot';
-        el.textContent = h;
-        el.onclick = function() {
-          document.querySelectorAll('.slot').forEach(b=>b.classList.remove('selected'));
-          this.classList.add('selected');
-        };
-        slotsArea.appendChild(el);
+
+    const calendarioState = {
+      ano: agora.getFullYear(),
+      mes: agora.getMonth(),
+      dataSelecionada: null,
+      horarioSelecionado: null,
+    };
+
+    let disponibilidadeRefreshTimer = null;
+
+    const avisoDisponibilidade = (() => {
+      let aviso = document.getElementById('aviso-disponibilidade');
+      if (aviso) {
+        return aviso;
+      }
+      aviso = document.createElement('div');
+      aviso.id = 'aviso-disponibilidade';
+      aviso.className = 'aviso-disponibilidade';
+      if (calendarSection && slotsArea) {
+        calendarSection.insertBefore(aviso, slotsArea);
+      } else if (calendarSection) {
+        calendarSection.appendChild(aviso);
+      }
+      return aviso;
+    })();
+
+    function mostrarAvisoDisponibilidade(mensagem, tipo = 'info') {
+      if (!avisoDisponibilidade) {
+        return;
+      }
+      if (!mensagem) {
+        avisoDisponibilidade.textContent = '';
+        avisoDisponibilidade.style.display = 'none';
+        avisoDisponibilidade.className = 'aviso-disponibilidade';
+        return;
+      }
+      const tipoClasse = ['erro', 'alerta', 'info'].includes(tipo) ? tipo : 'info';
+      avisoDisponibilidade.textContent = mensagem;
+      avisoDisponibilidade.style.display = 'block';
+      avisoDisponibilidade.className = `aviso-disponibilidade aviso-${tipoClasse}`;
+    }
+
+    function normalizarHorarioSlot(valor) {
+      if (valor === null || typeof valor === 'undefined') {
+        return null;
+      }
+      const texto = String(valor).trim();
+      if (!texto) {
+        return null;
+      }
+      const match = texto.match(/^(\d{1,2}):(\d{2})/);
+      if (!match) {
+        return null;
+      }
+      const horas = match[1].padStart(2, '0');
+      const minutos = match[2];
+      return `${horas}:${minutos}`;
+    }
+
+    function normalizarListaHorarios(lista) {
+      if (!Array.isArray(lista)) {
+        return [];
+      }
+      const conjunto = new Set();
+      lista.forEach(item => {
+        const horario = normalizarHorarioSlot(item);
+        if (horario) {
+          conjunto.add(horario);
+        }
+      });
+      return Array.from(conjunto).sort();
+    }
+
+    function normalizarStatusJS(status) {
+      if (!status && status !== 0) {
+        return null;
+      }
+      const texto = String(status)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim()
+        .toLowerCase();
+      switch (texto) {
+        case 'pendente':
+          return 'pendente';
+        case 'confirmado':
+          return 'confirmado';
+        case 'concluido':
+          return 'concluido';
+        case 'indisponivel':
+          return 'indisponivel';
+        default:
+          return null;
+      }
+    }
+
+    function isISODate(valor) {
+      if (typeof valor !== 'string') {
+        return false;
+      }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+        return false;
+      }
+      const data = new Date(`${valor}T00:00:00`);
+      return !Number.isNaN(data.getTime());
+    }
+
+    async function carregarDisponibilidade({ mostrarErro = true } = {}) {
+      disponibilidadeState.carregando = true;
+      try {
+        const resposta = await fetch('getDisponibilidade.php', {
+          cache: 'no-store',
+          credentials: 'same-origin',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!resposta.ok) {
+          throw new Error('Não foi possível carregar os horários disponíveis no momento.');
+        }
+
+        const contentType = resposta.headers.get('Content-Type') || '';
+        let payload;
+        if (contentType.includes('application/json')) {
+          payload = await resposta.json();
+        } else {
+          const texto = await resposta.text();
+          throw new Error(texto || 'Resposta inválida ao carregar disponibilidade.');
+        }
+
+        if (!payload || typeof payload !== 'object') {
+          throw new Error('Resposta inválida ao carregar disponibilidade.');
+        }
+
+        if (payload.success === false) {
+          const mensagem = typeof payload.message === 'string' && payload.message.trim()
+            ? payload.message.trim()
+            : 'Horários indisponíveis no momento.';
+          throw new Error(mensagem);
+        }
+
+        const dadosDatas = payload.horariosPorData || payload.datas || {};
+        const normalizadoDatas = {};
+
+        Object.keys(dadosDatas).forEach(dataISO => {
+          const item = dadosDatas[dataISO] || {};
+          const mapa = {};
+          Object.keys(item).forEach(chave => {
+            const status = normalizarStatusJS(chave);
+            if (!status) {
+              return;
+            }
+            mapa[status] = normalizarListaHorarios(item[chave]);
+          });
+
+          statusChavesDisponibilidade.forEach(status => {
+            if (!mapa[status]) {
+              mapa[status] = [];
+            }
+          });
+
+          normalizadoDatas[dataISO] = mapa;
+        });
+
+        disponibilidadeState.horariosPadrao = normalizarListaHorarios(payload.horariosPadrao || payload.horarios_padrao || []);
+        disponibilidadeState.datas = normalizadoDatas;
+        const bloqueios = Array.isArray(payload.datasBloqueadas) ? payload.datasBloqueadas : [];
+        disponibilidadeState.datasBloqueadas = new Set(bloqueios.filter(isISODate));
+        disponibilidadeState.carregado = true;
+        disponibilidadeState.erro = null;
+
+        return disponibilidadeState;
+      } catch (erro) {
+        disponibilidadeState.erro = erro instanceof Error ? erro : new Error('Não foi possível carregar os horários disponíveis no momento.');
+        if (mostrarErro) {
+          mostrarAvisoDisponibilidade(disponibilidadeState.erro.message, 'erro');
+        }
+        if (!disponibilidadeState.carregado) {
+          disponibilidadeState.horariosPadrao = [];
+          disponibilidadeState.datas = {};
+          disponibilidadeState.datasBloqueadas = new Set();
+        }
+        throw disponibilidadeState.erro;
+      } finally {
+        disponibilidadeState.carregando = false;
+      }
+    }
+
+    function obterSlotsDisponiveis(dataISO) {
+      if (!dataISO || !Array.isArray(disponibilidadeState.horariosPadrao)) {
+        return [];
+      }
+      if (disponibilidadeState.datasBloqueadas.has(dataISO)) {
+        return [];
+      }
+      const base = disponibilidadeState.horariosPadrao.slice();
+      if (!base.length) {
+        return [];
+      }
+      const dadosDia = disponibilidadeState.datas[dataISO];
+      if (!dadosDia) {
+        return base;
+      }
+      const ocupados = new Set();
+      statusChavesDisponibilidade.forEach(status => {
+        const lista = Array.isArray(dadosDia[status]) ? dadosDia[status] : [];
+        lista.forEach(hora => ocupados.add(hora));
+      });
+      return base.filter(hora => !ocupados.has(hora));
+    }
+
+    function atualizarSelecaoSlots() {
+      document.querySelectorAll('.slot').forEach(btn => {
+        const hora = btn.getAttribute('data-time') || btn.textContent.trim();
+        if (calendarioState.horarioSelecionado === hora) {
+          btn.classList.add('selected');
+        } else {
+          btn.classList.remove('selected');
+        }
       });
     }
-    const now = new Date();
-    renderCalendar(now.getFullYear(), now.getMonth());
+
+    function renderSlots(dataISO, { manterHorarioSelecionado = false } = {}) {
+      if (!slotsArea) {
+        return;
+      }
+
+      const dataNormalizada = typeof dataISO === 'string' ? dataISO.trim() : '';
+
+      if (!dataNormalizada) {
+        slotsArea.innerHTML = '<p class="slots-empty">Selecione uma data no calendário para ver os horários disponíveis.</p>';
+        return;
+      }
+
+      const slotAnterior = manterHorarioSelecionado ? calendarioState.horarioSelecionado : null;
+      if (!manterHorarioSelecionado) {
+        calendarioState.horarioSelecionado = null;
+      }
+
+      const slotsDisponiveis = obterSlotsDisponiveis(dataNormalizada);
+      let mensagem = null;
+
+      if (!Array.isArray(slotsDisponiveis) || slotsDisponiveis.length === 0) {
+        calendarioState.horarioSelecionado = null;
+        slotsArea.innerHTML = '<p class="slots-empty">Não há horários disponíveis para a data selecionada. Escolha outra data.</p>';
+        mensagem = 'Não há horários disponíveis para a data selecionada. Escolha outra data.';
+      } else {
+        slotsArea.innerHTML = '';
+        if (slotAnterior && slotsDisponiveis.includes(slotAnterior)) {
+          calendarioState.horarioSelecionado = slotAnterior;
+        } else if (slotAnterior) {
+          calendarioState.horarioSelecionado = null;
+          mensagem = 'O horário selecionado não está mais disponível. Escolha outra opção.';
+        }
+
+        slotsDisponiveis.forEach(horario => {
+          const botao = document.createElement('button');
+          botao.type = 'button';
+          botao.className = 'slot';
+          botao.textContent = horario;
+          botao.setAttribute('data-time', horario);
+          botao.addEventListener('click', () => {
+            calendarioState.horarioSelecionado = horario;
+            atualizarSelecaoSlots();
+            if (!disponibilidadeState.erro) {
+              mostrarAvisoDisponibilidade('');
+            }
+          });
+          slotsArea.appendChild(botao);
+        });
+
+        atualizarSelecaoSlots();
+      }
+
+      if (mensagem && !disponibilidadeState.erro) {
+        mostrarAvisoDisponibilidade(mensagem, 'alerta');
+      } else if (!mensagem && !disponibilidadeState.erro) {
+        mostrarAvisoDisponibilidade('');
+      }
+    }
+
+    function renderCalendar(year, month, { manterSelecao = false } = {}) {
+      if (!calendarElement) {
+        return;
+      }
+
+      calendarioState.ano = year;
+      calendarioState.mes = month;
+
+      const dataSelecionadaAnterior = manterSelecao ? calendarioState.dataSelecionada : null;
+      const horarioSelecionadoAnterior = manterSelecao ? calendarioState.horarioSelecionado : null;
+
+      if (!manterSelecao) {
+        calendarioState.dataSelecionada = null;
+        calendarioState.horarioSelecionado = null;
+      }
+
+      const dt = new Date(year, month, 1);
+      const mesLabel = dt.toLocaleString('pt-BR', { month: 'long' });
+      const tituloMes = mesLabel.charAt(0).toUpperCase() + mesLabel.slice(1);
+      const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+      let html = `<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;'>
+        <button id='prev-month' style='background:none;border:none;font-size:1.3em;cursor:pointer;'>&lt;</button>
+        <span style='font-weight:700;color:#7b5097;'>${tituloMes} ${year}</span>
+        <button id='next-month' style='background:none;border:none;font-size:1.3em;cursor:pointer;'>&gt;</button>
+      </div>`;
+
+      html += `<div style='display:grid;grid-template-columns:repeat(7,1fr);gap:2px 0;font-weight:bold;'>${days.map(d => `<span style='color:#bfa464'>${d}</span>`).join('')}</div>`;
+      html += "<div style='display:grid;grid-template-columns:repeat(7,1fr);gap:4px 0;'>";
+
+      const firstDay = dt.getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      for (let i = 0; i < firstDay; i++) {
+        html += '<span></span>';
+      }
+
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+
+      for (let dia = 1; dia <= totalDays; dia++) {
+        const dataISO = `${year}-${String(month + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+        const dataBtn = new Date(year, month, dia);
+        dataBtn.setHours(0, 0, 0, 0);
+        const isToday = dataBtn.getTime() === hoje.getTime();
+        const isPast = dataBtn.getTime() < hoje.getTime();
+        const isSunday = dataBtn.getDay() === 0;
+        const slotsDisponiveis = obterSlotsDisponiveis(dataISO);
+        const diaBloqueado = disponibilidadeState.datasBloqueadas.has(dataISO);
+        const semSlots = disponibilidadeState.carregado && slotsDisponiveis.length === 0;
+        const semInformacao = !disponibilidadeState.carregado;
+        const disabled = semInformacao || isPast || isToday || isSunday || diaBloqueado || semSlots;
+
+        let dayClass = 'cal-day';
+        if (isToday) {
+          dayClass += ' today';
+        }
+        if (disabled) {
+          dayClass += ' cal-disabled';
+        }
+        if (calendarioState.dataSelecionada === dataISO) {
+          dayClass += ' cal-selected';
+        }
+
+        const background = disabled ? '#eaeaea' : '#fff9e2';
+        const color = isSunday ? '#bdbdbd' : '#756430';
+        const cursor = disabled ? 'not-allowed' : 'pointer';
+
+        html += `<button class='${dayClass}' data-date='${dataISO}' data-available-slots='${slotsDisponiveis.length}' style='margin:2px;padding:9px 0;border:none;background:${background};border-radius:8px;color:${color};font-size:1.02em;cursor:${cursor};' ${disabled ? 'disabled' : ''}>${dia}</button>`;
+      }
+
+      html += '</div>';
+      calendarElement.innerHTML = html;
+
+      const prevBtn = calendarElement.querySelector('#prev-month');
+      const nextBtn = calendarElement.querySelector('#next-month');
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => navegarMes(-1));
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => navegarMes(1));
+      }
+
+      calendarElement.querySelectorAll('.cal-day').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.disabled) {
+            return;
+          }
+          calendarioState.dataSelecionada = btn.getAttribute('data-date');
+          calendarioState.horarioSelecionado = null;
+          calendarElement.querySelectorAll('.cal-day').forEach(b => b.classList.remove('cal-selected'));
+          btn.classList.add('cal-selected');
+          renderSlots(calendarioState.dataSelecionada);
+        });
+      });
+
+      if (manterSelecao && dataSelecionadaAnterior) {
+        const btnSelecionado = calendarElement.querySelector(`.cal-day[data-date='${dataSelecionadaAnterior}']`);
+        if (btnSelecionado && !btnSelecionado.disabled) {
+          calendarioState.dataSelecionada = dataSelecionadaAnterior;
+          calendarioState.horarioSelecionado = horarioSelecionadoAnterior;
+          btnSelecionado.classList.add('cal-selected');
+          renderSlots(calendarioState.dataSelecionada, { manterHorarioSelecionado: true });
+        } else {
+          if (!disponibilidadeState.erro) {
+            mostrarAvisoDisponibilidade('A data selecionada não está mais disponível. Escolha uma nova data.', 'alerta');
+          }
+          calendarioState.dataSelecionada = null;
+          calendarioState.horarioSelecionado = null;
+          if (slotsArea) {
+            slotsArea.innerHTML = '<p class="slots-empty">Selecione uma data no calendário para ver os horários disponíveis.</p>';
+          }
+        }
+      } else if (!manterSelecao && slotsArea) {
+        slotsArea.innerHTML = '<p class="slots-empty">Selecione uma data no calendário para ver os horários disponíveis.</p>';
+      }
+    }
+
+    function navegarMes(delta) {
+      let ano = calendarioState.ano;
+      let mes = calendarioState.mes + delta;
+
+      if (mes < 0) {
+        mes = 11;
+        ano -= 1;
+      } else if (mes > 11) {
+        mes = 0;
+        ano += 1;
+      }
+
+      calendarioState.ano = ano;
+      calendarioState.mes = mes;
+      calendarioState.dataSelecionada = null;
+      calendarioState.horarioSelecionado = null;
+
+      mostrarAvisoDisponibilidade('Atualizando horários disponíveis...', 'info');
+
+      carregarDisponibilidade()
+        .catch(erro => {
+          console.error('Erro ao carregar disponibilidade:', erro);
+        })
+        .finally(() => {
+          if (!disponibilidadeState.erro) {
+            mostrarAvisoDisponibilidade('');
+          }
+          renderCalendar(ano, mes);
+        });
+    }
+
+    function passoHorarioVisivel() {
+      const passo = document.getElementById('step-horario');
+      if (!passo) {
+        return false;
+      }
+      if (passo.offsetParent === null) {
+        return false;
+      }
+      const estilo = window.getComputedStyle(passo);
+      return estilo.display !== 'none' && estilo.visibility !== 'hidden' && Number(estilo.opacity || '1') > 0;
+    }
+
+    function iniciarAtualizacaoPeriodica() {
+      if (disponibilidadeRefreshTimer) {
+        clearInterval(disponibilidadeRefreshTimer);
+      }
+      disponibilidadeRefreshTimer = setInterval(() => {
+        if (!passoHorarioVisivel()) {
+          return;
+        }
+        carregarDisponibilidade()
+          .catch(erro => {
+            console.error('Erro ao atualizar disponibilidade:', erro);
+          })
+          .finally(() => {
+            if (!disponibilidadeState.erro) {
+              mostrarAvisoDisponibilidade('');
+            }
+            renderCalendar(calendarioState.ano, calendarioState.mes, { manterSelecao: true });
+            if (calendarioState.dataSelecionada) {
+              renderSlots(calendarioState.dataSelecionada, { manterHorarioSelecionado: true });
+            }
+          });
+      }, 60000);
+    }
+
+    async function inicializarCalendario() {
+      if (!calendarElement) {
+        return;
+      }
+      mostrarAvisoDisponibilidade('Carregando horários disponíveis...', 'info');
+      try {
+        await carregarDisponibilidade();
+        mostrarAvisoDisponibilidade('');
+      } catch (erro) {
+        console.error('Erro ao carregar disponibilidade:', erro);
+      } finally {
+        renderCalendar(calendarioState.ano, calendarioState.mes);
+        if (!disponibilidadeState.erro) {
+          mostrarAvisoDisponibilidade('');
+        }
+      }
+      iniciarAtualizacaoPeriodica();
+    }
+
+    inicializarCalendario();
   // O estado de login será determinado via AJAX abaixo, então inicialize como false
   let usuarioLogado = false;
   // O código correto para exibir os blocos será executado após a resposta do fetch('getPerfil.php')
@@ -1149,15 +1616,12 @@ if ($res instanceof mysqli_result) {
 
     // Função para pegar a data escolhida no calendário
     function obterDataSelecionada() {
-      // Pega o botão de slot selecionado e lê o atributo data-date do calendário
-      const btn = document.querySelector('.cal-day[style*="box-shadow"]');
-      return btn ? btn.getAttribute('data-date') : null;
+      return calendarioState.dataSelecionada;
     }
-      
+
     // Função para pegar o horário selecionado
     function obterHoraSelecionada() {
-      const slot = document.querySelector('.slot.selected');
-      return slot ? slot.textContent.trim() : null;
+      return calendarioState.horarioSelecionado;
     }
     document.getElementById('btn-agendar').onclick = function(e) {
       e.preventDefault();
