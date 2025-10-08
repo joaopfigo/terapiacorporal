@@ -1513,6 +1513,21 @@ if (!empty($eventos_bloqueados)) {
       .calendar-modal-actions .calendar-btn {
         flex: 1 1 100%;
       }
+
+      .fc-day-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        padding: 2px 4px;
+        margin: 2px auto 0;
+        font-size: 0;
+      }
+
+      .fc-day-status::before {
+        margin-right: 0;
+        font-size: 1.1rem;
+      }
     }
 
     .agendamento-novo-layout {
@@ -2016,6 +2031,8 @@ if (!empty($eventos_bloqueados)) {
       const badge = document.createElement('span');
       badge.className = 'fc-day-status' + (extraClass ? ' ' + extraClass : '');
       badge.textContent = texto;
+      badge.setAttribute('aria-label', texto);
+      badge.title = texto;
       top.insertAdjacentElement('afterend', badge);
     }
 
