@@ -144,8 +144,13 @@ $stmt->close();
 
   @media (max-width: 700px) {
     .container {
-      margin: 69px auto 0 auto;
-      padding: 24px 3vw 44px 3vw;
+      max-width: 100vw;
+      width: 100%;
+      margin: 60px 0 24px 0;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 28px 5vw 44px;
+      min-height: calc(100vh - 60px);
     }
 
     .header-admin {
