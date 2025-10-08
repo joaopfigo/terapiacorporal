@@ -1477,16 +1477,15 @@ if (!empty($eventos_bloqueados)) {
     }
 
     .fc-day-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      display: block;
+      width: 100%;
       font-size: 0.75rem;
       font-weight: 600;
       color: #a94442;
       background: rgba(248, 215, 218, 0.6);
       border-radius: 999px;
-      padding: 2px 10px;
-      margin-bottom: 4px;
+      padding: 4px 10px;
+      margin: 4px 0;
     }
 
     .fc-day-status::before {
@@ -2010,10 +2009,14 @@ if (!empty($eventos_bloqueados)) {
       if (frame.querySelector(selector)) {
         return;
       }
+      const top = frame.querySelector('.fc-daygrid-day-top');
+      if (!top) {
+        return;
+      }
       const badge = document.createElement('span');
       badge.className = 'fc-day-status' + (extraClass ? ' ' + extraClass : '');
       badge.textContent = texto;
-      frame.prepend(badge);
+      top.insertAdjacentElement('afterend', badge);
     }
 
     document.addEventListener('DOMContentLoaded', function () {
