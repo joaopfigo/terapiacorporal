@@ -63,6 +63,7 @@ $stmt->close();
   body { font-family: Roboto, Arial, sans-serif; background: #fcfaf7; margin:0; }
   .container { max-width:980px; margin:90px auto 0 auto; background:#fff; border-radius:18px; box-shadow:0 2px 32px #0001; padding:38px 3vw 44px 3vw; }
   h1 { color:#57643a; font-size:2.1rem; font-family:Playfair Display,serif; }
+  .table-responsive { overflow-x: auto; background: #fff; }
   .table-pacientes { width:100%; border-collapse:collapse; margin-top:32px; }
   .table-pacientes th,.table-pacientes td { border-bottom:1px solid #ece3d3; padding:13px 7px; text-align:left; }
   .table-pacientes th { background:#f7e6bc; color:#6A5036; font-size:1.07rem; }
@@ -153,6 +154,15 @@ $stmt->close();
       min-height: calc(100vh - 60px);
     }
 
+    .table-responsive {
+      margin: 0 -5vw;
+      padding: 0 5vw;
+    }
+
+    .table-responsive .table-pacientes {
+      min-width: 640px;
+    }
+
     .header-admin {
       font-size: 1.07rem;
       height: 49px;
@@ -226,7 +236,8 @@ $stmt->close();
     <button type="submit" class="btn-ver" style="padding:10px 22px;">Aplicar</button>
   </form>
   <a href='novo_paciente.php' class='btn-ver' style='background:#38b26d;margin-bottom:17px;display:inline-block;'>Criar paciente</a>
-  <table class='table-pacientes'>
+  <div class="table-responsive">
+    <table class='table-pacientes'>
     <tr>
       <th>Nome</th>
       <th>Email</th>
@@ -245,7 +256,8 @@ $stmt->close();
         <td><a href='paciente.php?id=<?= $pac['id'] ?>' class='btn-ver'>Acessar</a></td>
       </tr>
     <?php } ?>
-  </table>
+    </table>
+  </div>
 </div>
   <script>
     (function () {
