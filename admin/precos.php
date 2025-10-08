@@ -94,7 +94,7 @@ while ($row = $res->fetch_assoc()) {
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
         body { font-family: Arial, sans-serif; background: #faf8f2; }
-        .container { max-width: 600px; background: #fff; margin: 44px auto; border-radius: 16px; box-shadow: 0 4px 24px #b7b7b74a; padding: 36px 36px 30px 36px; }
+        .container { max-width: 600px; background: #fff; margin: 94px auto 44px auto; border-radius: 16px; box-shadow: 0 4px 24px #b7b7b74a; padding: 36px 36px 30px 36px; }
         h1 { color: #57643a; font-size: 2rem; margin-bottom: 27px; text-align:center; }
         .form-row { margin-bottom: 22px; display: flex; gap: 24px; align-items: center; }
         .form-row label { flex: 0 0 220px; font-weight: 600; color: #4a4a36; font-size: 1.07em; }
@@ -104,21 +104,144 @@ while ($row = $res->fetch_assoc()) {
         .btn:hover { background: #324a1d; }
         .msg-ok { color: #37692e; text-align: center; margin-bottom: 20px; font-weight: 600; font-size:1.04em; }
         @media(max-width:600px){ .container{padding:20px;} .form-row label{font-size:1em;} }
-        .header-admin { position: fixed; top: 0; left: 0; right: 0; height: 63px; display: flex; align-items: center; justify-content: space-between; background: #256d54; color: #fff; font-family: 'Playfair Display', serif; font-size: 1.27rem; box-shadow: 0 6px 30px #256d5412, 0 2px 10px #1d9a7718; z-index: 999; padding: 0 4vw; }
-        .header-admin .menu-horizontal { display: flex; gap: 14px; }
-        .header-admin .menu-btn { background: none; border: none; color: #fff; font-size: 1.09rem; font-weight: 600; padding: 8px 17px 7px 17px; border-radius: 12px; transition: background .17s, color .14s; cursor: pointer; text-decoration: none; outline: none; display: inline-block; }
-        .header-admin .menu-btn.active, .header-admin .menu-btn:hover { background: #ffd972; color: #256d54; }
+        .header-admin {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 63px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: #256d54;
+          color: #fff;
+          font-family: 'Playfair Display', serif;
+          font-size: 1.27rem;
+          box-shadow: 0 6px 30px #256d5412, 0 2px 10px #1d9a7718;
+          z-index: 999;
+          padding: 0 4vw;
+          gap: 16px;
+        }
+
+        .header-admin .header-brand {
+          font-weight: 700;
+          letter-spacing: .4px;
+        }
+
+        .header-admin .menu-container {
+          display: flex;
+          align-items: center;
+        }
+
+        .header-admin .menu-horizontal {
+          display: flex;
+          gap: 14px;
+        }
+
+        .header-admin .menu-toggle {
+          display: none;
+          background: none;
+          border: none;
+          color: #fff;
+          font-size: 1.7rem;
+          cursor: pointer;
+          line-height: 1;
+          padding: 6px 10px;
+          border-radius: 10px;
+          transition: background .17s;
+        }
+
+        .header-admin .menu-toggle:hover,
+        .header-admin.is-open .menu-toggle {
+          background: rgba(255, 255, 255, 0.12);
+        }
+
+        .header-admin .menu-btn {
+          background: none;
+          border: none;
+          color: #fff;
+          font-size: 1.09rem;
+          font-weight: 600;
+          padding: 8px 17px 7px 17px;
+          border-radius: 12px;
+          transition: background .17s, color .14s;
+          cursor: pointer;
+          text-decoration: none;
+          outline: none;
+          display: inline-block;
+        }
+
+        .header-admin .menu-btn.active,
+        .header-admin .menu-btn:hover {
+          background: #ffd972;
+          color: #256d54;
+        }
+
+        @media (max-width: 700px) {
+          .container {
+            margin: 69px auto 24px auto;
+            padding: 32px 24px;
+          }
+
+          .header-admin {
+            font-size: 1.07rem;
+            height: 49px;
+            border-radius: 0 0 16px 16px;
+            padding: 0 2vw;
+            gap: 10px;
+          }
+
+          .header-admin .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .header-admin .menu-container {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            padding: 12px 2vw 16px 2vw;
+            background: #256d54;
+            box-shadow: 0 6px 30px #256d5412, 0 2px 10px #1d9a7718;
+            border-radius: 0 0 16px 16px;
+          }
+
+          .header-admin .menu-horizontal {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+          }
+
+          .header-admin .menu-btn {
+            text-align: left;
+            padding: 10px 12px;
+          }
+
+          .header-admin.is-open .menu-container {
+            display: block;
+          }
+
+          .header-admin.is-open .menu-horizontal {
+            display: flex;
+          }
+        }
     </style>
 </head>
 <body>
     <div class="header-admin">
-      <div>Painel da Terapeuta</div>
-      <div class="menu-horizontal">
-        <a class="menu-btn" href="agenda.php">Agenda</a>
-        <a class="menu-btn" href="pacientes.php">Pacientes</a>
-        <a class="menu-btn active" href="precos.php">Preços</a>
-        <a class="menu-btn" href="blog.php">Blog</a>
-        <a class="menu-btn" href="index.php">Home</a>
+      <div class="header-brand">Painel da Terapeuta</div>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="admin-menu">☰</button>
+      <div class="menu-container">
+        <div class="menu-horizontal" id="admin-menu">
+          <a class="menu-btn" href="agenda.php">Agenda</a>
+          <a class="menu-btn" href="pacientes.php">Pacientes</a>
+          <a class="menu-btn active" href="precos.php">Preços</a>
+          <a class="menu-btn" href="blog.php">Blog</a>
+          <a class="menu-btn" href="index.php">Home</a>
+        </div>
       </div>
     </div>
     <div class="container">
@@ -162,6 +285,34 @@ while ($row = $res->fetch_assoc()) {
             </div>
         </form>
     </div>
+    <script>
+      (function () {
+        const header = document.querySelector('.header-admin');
+        if (!header) return;
+
+        const toggle = header.querySelector('.menu-toggle');
+        const menuLinks = header.querySelectorAll('.menu-horizontal a');
+        if (!toggle) return;
+
+        const closeMenu = () => {
+          header.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        };
+
+        toggle.addEventListener('click', () => {
+          const isOpen = header.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        menuLinks.forEach((link) => {
+          link.addEventListener('click', () => {
+            if (header.classList.contains('is-open')) {
+              closeMenu();
+            }
+          });
+        });
+      })();
+    </script>
 </body>
 </html>
 
