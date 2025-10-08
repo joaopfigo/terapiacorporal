@@ -104,6 +104,7 @@ function categoria_sel($cat, $valor) {
 <head>
       <link rel="icon" type="image/png" href="/favicon-transparente.png">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Painel Blog - Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
