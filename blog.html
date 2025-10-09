@@ -186,7 +186,7 @@
       lista.forEach((post, idx) => {
         main.innerHTML += `
         <div class="post-card">
-          <img src="${post.imagem ? post.imagem : 'iconeFinal.png'}" class="post-img" alt="${post.titulo}" onerror="this.onerror=null;this.src='iconeFinal.png';">
+          <img src="${post.imagem}" class="post-img" alt="${post.titulo}" onerror="this.onerror=null;this.src='iconeFinal.png';">
           <div class="post-content">
             <a href="#" class="post-title" data-idx="${idx}">${post.titulo}</a>
             <div class="post-cat">Categoria: ${post.categoria}</div>
@@ -216,7 +216,7 @@
       const post = (lista || postsBlog)[idx];
       document.getElementById('detalhe-titulo').innerText = post.titulo;
       document.getElementById('detalhe-cat').innerText = 'Categoria: ' + post.categoria;
-      document.getElementById('detalhe-img').src = post.imagem ? post.imagem : 'iconeFinal.png';
+      document.getElementById('detalhe-img').src = post.imagem;
       document.getElementById('detalhe-img').alt = post.titulo;
       document.getElementById('detalhe-body').innerHTML = post.conteudo;
       document.getElementById('detalhe-post').style.display = 'block';
