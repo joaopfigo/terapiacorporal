@@ -60,7 +60,7 @@ try {
     $mail->addAddress($email);
 
     $mail->isHTML(true);
-    $mail->Subject = "Redefinição de senha";
+    $mail->Subject = 'Alterar senha - Terapia Corporal Sistêmica';
     $mail->Body = <<<HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
