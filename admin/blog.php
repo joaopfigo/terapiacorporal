@@ -107,6 +107,29 @@ function resolve_post_image(?string $imagem): string {
     }
 
     if (preg_match('#^https?://#i', $imagem)) {
+        $context = stream_context_create([
+            'http' => [
+                'method'        => 'HEAD',
+                'timeout'       => 5,
+                'ignore_errors' => true,
+            ],
+            'https' => [
+                'method'        => 'HEAD',
+                'timeout'       => 5,
+                'ignore_errors' => true,
+            ],
+        ]);
+
+        $headers = @get_headers($imagem, 0, $context);
+        if ($headers === false) {
+            return $fallback;
+        }
+
+        $statusLine = $headers[0] ?? '';
+        if (stripos($statusLine, '404') !== false) {
+            return $fallback;
+        }
+
         return $imagem;
     }
 
@@ -352,7 +375,7 @@ function resolve_post_image(?string $imagem): string {
         <td><?=$post['data_post']?></td>
         <td>
             <?php $thumbSrc = resolve_post_image($post['imagem'] ?? null); ?>
-            <img src="<?=htmlspecialchars($thumbSrc)?>" class="img-mini" alt="Miniatura do post">
+            <img src="<?=htmlspecialchars($thumbSrc)?>" class="img-mini" alt="Miniatura do post" onerror="this.onerror=null;this.src='../iconeFinal.png';">
         </td>
         <td><?=$post['publicado'] ? '<span style="color:#249b43">Publicado</span>' : '<span style="color:#ad3e22">Arquivado</span>'?></td>
         <td>
