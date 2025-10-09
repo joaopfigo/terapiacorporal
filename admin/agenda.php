@@ -296,6 +296,46 @@ for ($h = 8; $h <= 20; $h++) {
   $horariosPadrao[] = sprintf('%02d:00', $h);
 }
 
+/**
+ * Calcula a quantidade de slots de 60 minutos ocupados a partir da duração.
+ */
+function calcularSlotsPorDuracao($duracao): int
+{
+  if (!is_numeric($duracao)) {
+    $duracao = 0;
+  }
+
+  $duracao = (int) $duracao;
+  if ($duracao <= 0) {
+    $duracao = 60;
+  }
+
+  $duracao = max(60, $duracao);
+
+  return max(1, (int) ceil($duracao / 60));
+}
+
+/**
+ * Gera os horários expandidos de acordo com a quantidade de slots.
+ *
+ * @return string[] Horários no formato HH:MM.
+ */
+function expandirHorarios(string $horaInicial, int $slots): array
+{
+  $slots = max(1, $slots);
+  $timestamp = strtotime($horaInicial);
+  if ($timestamp === false) {
+    return [$horaInicial];
+  }
+
+  $horarios = [];
+  for ($i = 0; $i < $slots; $i++) {
+    $horarios[] = date('H:i', strtotime(sprintf('+%d hour', $i), $timestamp));
+  }
+
+  return array_values(array_unique($horarios));
+}
+
 $horariosPorData = [];
 foreach ($agendamentosCalendario as $a) {
   $status = strtolower($a['status'] ?? '');
@@ -341,7 +381,10 @@ foreach ($agendamentosCalendario as $a) {
     ];
   }
 
-  $horariosPorData[$data][$statusKey][$hora] = true;
+  $slots = calcularSlotsPorDuracao($a['duracao'] ?? null);
+  foreach (expandirHorarios($hora, $slots) as $horaExpandida) {
+    $horariosPorData[$data][$statusKey][$horaExpandida] = true;
+  }
 }
 
 foreach ($horariosPorData as &$statusLista) {

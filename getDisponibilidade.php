@@ -38,7 +38,7 @@ for ($hora = 8; $hora <= 20; $hora++) {
     $horariosPadrao[] = sprintf('%02d:00', $hora);
 }
 
-$sql = 'SELECT data_horario, status FROM agendamentos';
+$sql = 'SELECT data_horario, status, duracao FROM agendamentos';
 
 $resultado = $conn->query($sql);
 if (!$resultado instanceof mysqli_result) {
@@ -48,6 +48,46 @@ if (!$resultado instanceof mysqli_result) {
         'message' => 'Não foi possível consultar a disponibilidade no momento.',
     ], JSON_UNESCAPED_UNICODE);
     exit;
+}
+
+/**
+ * Calcula a quantidade de slots de 60 minutos ocupados a partir da duração.
+ */
+function calcularSlotsPorDuracao($duracao): int
+{
+    if (!is_numeric($duracao)) {
+        $duracao = 0;
+    }
+
+    $duracao = (int) $duracao;
+    if ($duracao <= 0) {
+        $duracao = 60;
+    }
+
+    $duracao = max(60, $duracao);
+
+    return max(1, (int) ceil($duracao / 60));
+}
+
+/**
+ * Gera os horários expandidos de acordo com a quantidade de slots.
+ *
+ * @return string[] Horários no formato HH:MM.
+ */
+function expandirHorarios(string $horaInicial, int $slots): array
+{
+    $slots = max(1, $slots);
+    $timestamp = strtotime($horaInicial);
+    if ($timestamp === false) {
+        return [$horaInicial];
+    }
+
+    $horarios = [];
+    for ($i = 0; $i < $slots; $i++) {
+        $horarios[] = date('H:i', strtotime(sprintf('+%d hour', $i), $timestamp));
+    }
+
+    return array_values(array_unique($horarios));
 }
 
 $horariosPorData = [];
@@ -80,7 +120,10 @@ while ($row = $resultado->fetch_assoc()) {
         ];
     }
 
-    $horariosPorData[$data][$statusNormalizado][$hora] = true;
+    $slots = calcularSlotsPorDuracao($row['duracao'] ?? null);
+    foreach (expandirHorarios($hora, $slots) as $horaExpandida) {
+        $horariosPorData[$data][$statusNormalizado][$horaExpandida] = true;
+    }
 }
 
 $resultado->free();
