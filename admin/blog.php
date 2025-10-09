@@ -417,7 +417,7 @@ function resolve_post_image(?string $imagem): string {
         </td>
         <td><?=$post['publicado'] ? '<span style="color:#249b43">Publicado</span>' : '<span style="color:#ad3e22">Arquivado</span>'?></td>
         <td>
-            <a class="btn-edit" href="blog.php?edit=<?=$post['id']?>">Editar</a>
+            <a class="btn-edit" href="blog.php?edit=<?=$post['id']?>#editar-publicacao">Editar</a>
             <form method="post" style="display:inline-block;">
                 <input type="hidden" name="toggle_id" value="<?=$post['id']?>">
                 <button class="btn-toggle <?=$post['publicado']?'despub':'pub'?>" type="submit">
@@ -451,48 +451,58 @@ if ($editId !== null) {
 
 if ($edit):
 ?>
-    <h2 style="margin-top:38px;">Editar Publicação</h2>
-    <form class="form-section" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="edit_id" value="<?=$edit['id']?>">
-        <input type="hidden" name="salvar_edicao" value="1">
-        <div class="form-grid">
-            <div class="form-field">
-                <label for="edit_titulo">Título</label>
-                <input type="text" id="edit_titulo" name="edit_titulo" maxlength="200" value="<?=htmlspecialchars($edit['titulo'])?>" required>
+    <section id="editar-publicacao">
+        <h2 style="margin-top:38px;">Editar Publicação</h2>
+        <form class="form-section" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="edit_id" value="<?=$edit['id']?>">
+            <input type="hidden" name="salvar_edicao" value="1">
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="edit_titulo">Título</label>
+                    <input type="text" id="edit_titulo" name="edit_titulo" maxlength="200" value="<?=htmlspecialchars($edit['titulo'])?>" required>
+                </div>
+                <div class="form-field">
+                    <label for="edit_categoria">Categoria</label>
+                    <select id="edit_categoria" name="edit_categoria" required>
+                        <option value="">Selecione...</option>
+                        <option value="Massoterapia" <?=categoria_sel($edit['categoria'],'Massoterapia')?>>Massoterapia</option>
+                        <option value="Técnicas" <?=categoria_sel($edit['categoria'],'Técnicas')?>>Técnicas</option>
+                        <option value="Dicas" <?=categoria_sel($edit['categoria'],'Dicas')?>>Dicas</option>
+                    </select>
+                </div>
+                <div class="form-field full-width">
+                    <label for="editor-edit">Conteúdo</label>
+                    <div id="editor-edit" style="height:260px;background:#fff;"></div>
+                    <input type="hidden" name="edit_conteudo" id="conteudo-edit">
+                </div>
+                <div class="form-field">
+                    <label for="edit_data_post">Data da Publicação</label>
+                    <input type="date" id="edit_data_post" name="edit_data_post" required value="<?=$edit['data_post']?>">
+                </div>
+                <div class="form-field">
+                    <label for="edit_imagem">Imagem de Capa (preencher para trocar)</label>
+                    <input type="file" id="edit_imagem" name="edit_imagem" accept="image/*">
+                    <small>Substitua apenas se quiser atualizar a imagem.</small>
+                </div>
             </div>
-            <div class="form-field">
-                <label for="edit_categoria">Categoria</label>
-                <select id="edit_categoria" name="edit_categoria" required>
-                    <option value="">Selecione...</option>
-                    <option value="Massoterapia" <?=categoria_sel($edit['categoria'],'Massoterapia')?>>Massoterapia</option>
-                    <option value="Técnicas" <?=categoria_sel($edit['categoria'],'Técnicas')?>>Técnicas</option>
-                    <option value="Dicas" <?=categoria_sel($edit['categoria'],'Dicas')?>>Dicas</option>
-                </select>
+            <label class="form-checkbox">
+                <input type="checkbox" name="edit_publicado" <?=$edit['publicado']?'checked':''?>>
+                <span>Manter publicação visível</span>
+            </label>
+            <div class="form-actions">
+                <button class="btn" type="submit">Salvar Alterações</button>
             </div>
-            <div class="form-field full-width">
-                <label for="editor-edit">Conteúdo</label>
-                <div id="editor-edit" style="height:260px;background:#fff;"></div>
-                <input type="hidden" name="edit_conteudo" id="conteudo-edit">
-            </div>
-            <div class="form-field">
-                <label for="edit_data_post">Data da Publicação</label>
-                <input type="date" id="edit_data_post" name="edit_data_post" required value="<?=$edit['data_post']?>">
-            </div>
-            <div class="form-field">
-                <label for="edit_imagem">Imagem de Capa (preencher para trocar)</label>
-                <input type="file" id="edit_imagem" name="edit_imagem" accept="image/*">
-                <small>Substitua apenas se quiser atualizar a imagem.</small>
-            </div>
-        </div>
-        <label class="form-checkbox">
-            <input type="checkbox" name="edit_publicado" <?=$edit['publicado']?'checked':''?>>
-            <span>Manter publicação visível</span>
-        </label>
-        <div class="form-actions">
-            <button class="btn" type="submit">Salvar Alterações</button>
-        </div>
-    </form>
+        </form>
+    </section>
 <?php endif; ?>
+<script>
+  (function () {
+    var editSection = document.getElementById('editar-publicacao');
+    if (editSection) {
+      editSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  })();
+</script>
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
