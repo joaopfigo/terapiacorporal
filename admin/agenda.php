@@ -457,17 +457,25 @@ foreach ($agendamentosCalendario as $a) {
 
   if (in_array($status, ['confirmado', 'concluido'], true)) {
     $title = $a['usuario_nome'] ? $a['usuario_nome'] : 'Indisponível';
-    $eventos_calendario[] = [
+    $agendamentoId = isset($a['id']) ? (int) $a['id'] : null;
+    $evento = [
       'title' => $title,
       'start' => $dataHorario,
-      'url' => '#agendamento-' . $a['id'],
+      'url' => '#agendamento-' . ($agendamentoId !== null ? $agendamentoId : ''),
     ];
+
+    if ($agendamentoId !== null) {
+      $evento['id'] = 'agendamento-' . $agendamentoId;
+    }
+
+    $eventos_calendario[] = $evento;
   }
 
   if ($status === 'indisponivel') {
     $dia = date('Y-m-d', strtotime($dataHorario));
     if (!isset($eventos_bloqueados[$dia])) {
       $eventos_bloqueados[$dia] = [
+        'id' => 'bloqueio-' . $dia,
         'title' => '🚫 Indisponível',
         'start' => $dia,
         'allDay' => true,
@@ -1841,7 +1849,20 @@ if (!empty($eventos_bloqueados)) {
 
   <div class="agendas-list">
     <?php foreach ($agendamentosLista as $a): ?>
-      <div class="agenda-card" data-status="<?= strtolower($a['status']) ?>">
+      <?php
+      $timestampCard = isset($a['data_horario']) ? strtotime($a['data_horario']) : false;
+      $cardDate = $timestampCard ? date('Y-m-d', $timestampCard) : '';
+      $cardTime = $timestampCard ? date('H:i', $timestampCard) : '';
+      $cardDuration = isset($a['duracao']) && is_numeric($a['duracao']) ? (int) $a['duracao'] : 60;
+      $cardTitle = $a['usuario_nome'] ? $a['usuario_nome'] : 'Indisponível';
+      ?>
+      <div class="agenda-card"
+        data-status="<?= strtolower($a['status']) ?>"
+        data-date="<?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?>"
+        data-time="<?= htmlspecialchars($cardTime, ENT_QUOTES, 'UTF-8') ?>"
+        data-duration="<?= $cardDuration ?>"
+        data-id="<?= isset($a['id']) ? (int) $a['id'] : '' ?>"
+        data-title="<?= htmlspecialchars($cardTitle, ENT_QUOTES, 'UTF-8') ?>">
         <div class="ag-card-header">
           <div class="ag-card-title">
             <?php $servicoTitulo = trim((string)($a['servico_exibicao'] ?? $a['servico_nome'] ?? '')); ?>
@@ -1873,11 +1894,14 @@ if (!empty($eventos_bloqueados)) {
 
   <script>
 
-    function closeModal()
-    {
+    function closeModal() {
+      const modal = document.getElementById('options-modal');
+      if (!modal) {
+        return;
+      }
 
-        document.getElementById("options-modal").style.display = 'none';
-
+      modal.style.display = 'none';
+      delete modal.dataset.date;
     }
 
 
@@ -1926,6 +1950,13 @@ if (!empty($eventos_bloqueados)) {
       const fallbackHref = button.dataset.fallbackHref || '';
       const originalHtml = button.innerHTML;
       const loadingText = button.dataset.loadingText || 'Processando...';
+      const previousStatus = card ? card.dataset.status : '';
+      const cardDate = card ? card.dataset.date : '';
+      const cardTime = card ? card.dataset.time : '';
+      const cardDurationRaw = card ? Number(card.dataset.duration) : NaN;
+      const cardDuration = Number.isFinite(cardDurationRaw) && cardDurationRaw > 0 ? cardDurationRaw : 60;
+      const cardId = card ? card.dataset.id : '';
+      const cardTitle = card ? card.dataset.title : '';
 
       button.disabled = true;
       button.classList.add('is-loading');
@@ -1981,6 +2012,25 @@ if (!empty($eventos_bloqueados)) {
             if (data.remove_card) {
               card.classList.add('is-removing');
               setTimeout(() => card.remove(), 200);
+            }
+          }
+
+          const statusParaAtualizar = data.new_status || previousStatus;
+          if (cardDate && cardTime) {
+            const horariosAfetados = expandirHorariosJS(cardTime, calcularSlotsPorDuracaoJS(cardDuration));
+            if (horariosAfetados.length) {
+              atualizarHorariosDia(cardDate, horariosAfetados, statusParaAtualizar);
+              atualizarDatasBloqueadasParaDia(cardDate);
+              atualizarEventoAgendamento({
+                id: cardId,
+                data: cardDate,
+                hora: cardTime,
+                duracao: cardDuration,
+                status: statusParaAtualizar,
+                titulo: cardTitle
+              });
+              atualizarEventoBloqueioDia(cardDate);
+              atualizarModalSeNecessario(cardDate);
             }
           }
         })
@@ -2057,6 +2107,286 @@ if (!empty($eventos_bloqueados)) {
     const horariosPorData = <?php echo json_encode($horariosPorData, JSON_UNESCAPED_UNICODE); ?>;
     const horariosPadraoDia = <?php echo json_encode($horariosPadrao, JSON_UNESCAPED_UNICODE); ?>;
     const datasBloqueadasSet = new Set(datasBloqueadas);
+    const HORARIOS_STATUS_CHAVES = ['pendente', 'confirmado', 'concluido', 'cancelado', 'recusado', 'indisponivel'];
+    const STATUS_COM_LISTA = new Set(['pendente', 'confirmado', 'concluido', 'indisponivel']);
+
+    function normalizarStatus(status) {
+      if (typeof status !== 'string') {
+        return '';
+      }
+
+      const mapa = {
+        'concluído': 'concluido',
+        'concluido': 'concluido',
+        'indisponível': 'indisponivel',
+        'indisponivel': 'indisponivel',
+      };
+
+      const lower = status.toLowerCase();
+      if (Object.prototype.hasOwnProperty.call(mapa, lower)) {
+        return mapa[lower];
+      }
+
+      return lower;
+    }
+
+    function garantirEstruturaHorarios(data) {
+      if (!data) {
+        return null;
+      }
+
+      if (!horariosPorData[data] || typeof horariosPorData[data] !== 'object') {
+        horariosPorData[data] = {};
+      }
+
+      const infoDia = horariosPorData[data];
+      HORARIOS_STATUS_CHAVES.forEach(status => {
+        if (!Array.isArray(infoDia[status])) {
+          infoDia[status] = [];
+        }
+      });
+
+      return infoDia;
+    }
+
+    function calcularSlotsPorDuracaoJS(duracao) {
+      const numero = Number(duracao);
+      const minutos = Number.isFinite(numero) && numero > 0 ? numero : 60;
+      const minutosAjustados = Math.max(60, minutos);
+      return Math.max(1, Math.ceil(minutosAjustados / 60));
+    }
+
+    function expandirHorariosJS(horaInicial, slots) {
+      if (typeof horaInicial !== 'string' || !horaInicial.includes(':')) {
+        return [];
+      }
+
+      const [horaStr, minutoStr] = horaInicial.split(':');
+      const hora = parseInt(horaStr, 10);
+      const minuto = parseInt(minutoStr, 10);
+
+      if (Number.isNaN(hora) || Number.isNaN(minuto)) {
+        return [];
+      }
+
+      const horarios = new Set();
+      for (let i = 0; i < Math.max(1, slots); i++) {
+        const totalMinutos = hora * 60 + minuto + (i * 60);
+        const horasCalculada = Math.floor(totalMinutos / 60);
+        const minutosCalculados = totalMinutos % 60;
+        const hFormatado = String(horasCalculada).padStart(2, '0');
+        const mFormatado = String(minutosCalculados).padStart(2, '0');
+        horarios.add(`${hFormatado}:${mFormatado}`);
+      }
+
+      return Array.from(horarios);
+    }
+
+    function atualizarHorariosDia(data, horariosAfetados, novoStatus) {
+      if (!data || !Array.isArray(horariosAfetados) || horariosAfetados.length === 0) {
+        return;
+      }
+
+      const statusNormalizado = normalizarStatus(novoStatus);
+      const infoDia = garantirEstruturaHorarios(data);
+
+      if (!infoDia) {
+        return;
+      }
+
+      const horariosSet = new Set(horariosAfetados);
+
+      HORARIOS_STATUS_CHAVES.forEach(status => {
+        const lista = infoDia[status];
+        if (!Array.isArray(lista)) {
+          return;
+        }
+
+        for (let i = lista.length - 1; i >= 0; i--) {
+          if (horariosSet.has(lista[i])) {
+            lista.splice(i, 1);
+          }
+        }
+      });
+
+      if (STATUS_COM_LISTA.has(statusNormalizado)) {
+        const lista = infoDia[statusNormalizado];
+        horariosSet.forEach(horario => {
+          if (!lista.includes(horario)) {
+            lista.push(horario);
+          }
+        });
+        lista.sort();
+      }
+    }
+
+    function adicionarMinutosAoHorario(data, hora, minutos) {
+      if (!data || typeof hora !== 'string' || !hora.includes(':')) {
+        return null;
+      }
+
+      const [horaStr, minutoStr] = hora.split(':');
+      const horaBase = parseInt(horaStr, 10);
+      const minutoBase = parseInt(minutoStr, 10);
+
+      if (Number.isNaN(horaBase) || Number.isNaN(minutoBase)) {
+        return null;
+      }
+
+      const minutosTotais = horaBase * 60 + minutoBase + minutos;
+      const horasFinais = Math.floor(minutosTotais / 60);
+      const minutosFinais = minutosTotais % 60;
+
+      const horaFinal = String(horasFinais).padStart(2, '0');
+      const minutoFinal = String(minutosFinais).padStart(2, '0');
+
+      return `${data}T${horaFinal}:${minutoFinal}:00`;
+    }
+
+    function atualizarDatasBloqueadasParaDia(data) {
+      if (!data) {
+        return;
+      }
+
+      const infoDia = garantirEstruturaHorarios(data);
+      if (!infoDia) {
+        return;
+      }
+
+      datasBloqueadasSet.delete(data);
+
+      const bloqueiosDia = new Set(infoDia.indisponivel || []);
+      const todosBloqueados = horariosPadraoDia.length > 0 && horariosPadraoDia.every(horario => bloqueiosDia.has(horario));
+
+      if (todosBloqueados) {
+        datasBloqueadasSet.add(data);
+      }
+
+      atualizarIndicadoresDiaCalendario(data);
+    }
+
+    function atualizarIndicadoresDiaCalendario(data) {
+      const calendarEl = document.getElementById('calendar-admin');
+      if (!calendarEl) {
+        return;
+      }
+
+      const dayCell = calendarEl.querySelector(`.fc-daygrid-day[data-date="${data}"]`);
+      if (!dayCell) {
+        return;
+      }
+
+      dayCell.classList.remove('fc-day--bloqueado');
+      if (datasBloqueadasSet.has(data)) {
+        dayCell.classList.add('fc-day--bloqueado');
+      }
+
+      const frame = dayCell.querySelector('.fc-daygrid-day-frame');
+      if (!frame) {
+        return;
+      }
+
+      const indicadorBloqueado = frame.querySelector('.fc-day-status.fc-day-status--bloqueado');
+      if (indicadorBloqueado) {
+        indicadorBloqueado.remove();
+      }
+
+      if (datasBloqueadasSet.has(data)) {
+        adicionarIndicadorDia(dayCell, 'Indisponível', 'fc-day-status--bloqueado');
+      }
+    }
+
+    function atualizarEventoBloqueioDia(data) {
+      if (!data || !window.adminCalendar) {
+        return;
+      }
+
+      const calendar = window.adminCalendar;
+      const eventId = `bloqueio-${data}`;
+      const eventoExistente = calendar.getEventById(eventId);
+      const infoDia = garantirEstruturaHorarios(data);
+      const possuiBloqueios = !!(infoDia && Array.isArray(infoDia.indisponivel) && infoDia.indisponivel.length);
+
+      if (possuiBloqueios) {
+        if (eventoExistente) {
+          eventoExistente.setStart(data);
+        } else {
+          calendar.addEvent({
+            id: eventId,
+            title: '🚫 Indisponível',
+            start: data,
+            allDay: true,
+            display: 'block',
+            color: '#f8d7da',
+            textColor: '#b04a4a',
+            classNames: ['evento-bloqueado']
+          });
+        }
+      } else if (eventoExistente) {
+        eventoExistente.remove();
+      }
+    }
+
+    function atualizarEventoAgendamento({ id, data, hora, duracao, status, titulo }) {
+      if (!window.adminCalendar || !id || !data || !hora) {
+        return;
+      }
+
+      const calendar = window.adminCalendar;
+      const eventId = `agendamento-${id}`;
+      const eventoExistente = calendar.getEventById(eventId);
+      const statusNormalizado = normalizarStatus(status);
+      const deveExibirEvento = statusNormalizado === 'confirmado' || statusNormalizado === 'concluido';
+
+      if (deveExibirEvento) {
+        const inicio = `${data}T${hora}:00`;
+        const duracaoNumero = Number(duracao);
+        const minutosDuracao = Number.isFinite(duracaoNumero) && duracaoNumero > 0 ? duracaoNumero : 60;
+        const fim = adicionarMinutosAoHorario(data, hora, minutosDuracao);
+        const tituloFinal = titulo && typeof titulo === 'string' ? titulo : 'Agendamento';
+
+        if (eventoExistente) {
+          eventoExistente.setStart(inicio);
+          if (fim) {
+            eventoExistente.setEnd(fim);
+          }
+          eventoExistente.setProp('title', tituloFinal);
+          eventoExistente.setExtendedProp('status', statusNormalizado);
+        } else {
+          calendar.addEvent({
+            id: eventId,
+            title: tituloFinal,
+            start: inicio,
+            end: fim || undefined,
+            url: `#agendamento-${id}`,
+            extendedProps: {
+              status: statusNormalizado
+            }
+          });
+        }
+      } else if (eventoExistente) {
+        eventoExistente.remove();
+      }
+    }
+
+    function atualizarModalSeNecessario(data) {
+      if (!data) {
+        return;
+      }
+
+      const modal = document.getElementById('options-modal');
+      if (!modal || modal.style.display !== 'block') {
+        return;
+      }
+
+      if (modal.dataset.date === data) {
+        mostrarModalOpcoes(data);
+      }
+    }
+
+    if (horariosPorData && typeof horariosPorData === 'object') {
+      Object.keys(horariosPorData).forEach(data => garantirEstruturaHorarios(data));
+    }
 
     function adicionarIndicadorDia(dayEl, texto, extraClass) {
       const frame = dayEl.querySelector('.fc-daygrid-day-frame');
@@ -2168,6 +2498,8 @@ if (!empty($eventos_bloqueados)) {
 
       const calendar = new FullCalendar.Calendar(calendarEl, calendarConfig);
 
+      window.adminCalendar = calendar;
+
       calendar.render();
     });
 
@@ -2178,6 +2510,7 @@ if (!empty($eventos_bloqueados)) {
         horarios.push((h < 10 ? '0' : '') + h + ':00');
       }
 
+      garantirEstruturaHorarios(data);
       const infoDia = horariosPorData[data] || {};
       const horariosOcupados = new Set([...(infoDia.confirmado || []), ...(infoDia.concluido || [])]);
       const horariosBloqueados = new Set(infoDia.indisponivel || []);
@@ -2209,7 +2542,12 @@ if (!empty($eventos_bloqueados)) {
     </div>
   `;
 
-      document.getElementById('options-modal').style.display = 'block';
+      const modal = document.getElementById('options-modal');
+      if (modal) {
+        modal.style.display = 'block';
+        modal.dataset.date = data;
+      }
+
       document.getElementById('modal-title').innerText = 'Horários do dia';
       document.getElementById('modal-body').innerHTML = html;
     }
