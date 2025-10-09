@@ -56,7 +56,7 @@ try {
     $mail->SMTPSecure = 'tls';
     $mail->Port = 587;
 
-    $mail->setFrom('virleneterapiacorporal@gmail.com', 'Recuperação de Senha');
+    $mail->setFrom('virleneterapiacorporal@gmail.com', 'Alterar senha - Terapia Corporal Sistêmica');
     $mail->addAddress($email);
 
     $mail->isHTML(true);
