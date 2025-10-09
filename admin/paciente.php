@@ -184,22 +184,26 @@ if ($row = $res->fetch_assoc()) {
     <?php endif; ?>
     <tr id="anamnese-<?= $agendamento_id ?>" class="detail-row is-hidden">
       <td colspan="6" class="detail-cell">
-        <textarea id="anamnese-text-<?= $agendamento_id ?>" class="anamnese-textarea">
+        <div class="anamnese-expanded">
+          <div class="anamnese-editor">
+            <textarea id="anamnese-text-<?= $agendamento_id ?>" class="anamnese-textarea">
 <?= isset($anamneses[$agendamento_id][0]) ? htmlspecialchars($anamneses[$agendamento_id][0]['anamnese']) : '' ?></textarea>
-        <div class="detail-actions">
-          <button onclick="salvarAnamnese(<?= $agendamento_id ?>)" class="btn btn-primary btn-sm">Salvar</button>
-          <button onclick="toggleAnamnese(<?= $agendamento_id ?>)" class="btn btn-secondary btn-sm">Fechar</button>
-        </div>
-        <?php if (!empty($anamneses[$agendamento_id])): ?>
-          <div class="anamnese-historico">
-            <?php foreach ($anamneses[$agendamento_id] as $ana): ?>
-              <div class="bloco-anamnese">
-                <div><strong>Atualizado:</strong> <?= date('d/m/Y H:i', strtotime($ana['updated_at'])) ?></div>
-                <div><?= nl2br(htmlspecialchars($ana['anamnese'])) ?></div>
-              </div>
-            <?php endforeach; ?>
+            <div class="detail-actions">
+              <button onclick="salvarAnamnese(<?= $agendamento_id ?>)" class="btn btn-primary btn-sm">Salvar</button>
+              <button onclick="toggleAnamnese(<?= $agendamento_id ?>)" class="btn btn-secondary btn-sm">Fechar</button>
+            </div>
           </div>
-        <?php endif; ?>
+          <?php if (!empty($anamneses[$agendamento_id])): ?>
+            <div class="anamnese-historico">
+              <?php foreach ($anamneses[$agendamento_id] as $ana): ?>
+                <div class="bloco-anamnese">
+                  <div><strong>Atualizado:</strong> <?= date('d/m/Y H:i', strtotime($ana['updated_at'])) ?></div>
+                  <div><?= nl2br(htmlspecialchars($ana['anamnese'])) ?></div>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
+        </div>
       </td>
     </tr>
     <?php } ?>
