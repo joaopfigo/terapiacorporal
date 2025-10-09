@@ -164,7 +164,7 @@
             <div class="post-desc">${post.desc}</div>
             <button class="btn-continuar" data-idx="${idx}">Continue Lendo</button>
             ${isAdmin ? `<br>
-            <button class="btn-edit-admin" onclick="window.location.href='admin/blog.php?edit=${post.id}'">Editar</button>
+            <button class="btn-edit-admin" onclick="window.location.href='admin/blog.php?edit=${post.id}#editar-publicacao'">Editar</button>
             <button class="btn-toggle-admin" onclick="togglePost(${post.id})">${post.publicado ? 'Arquivar' : 'Publicar'}</button>` : ''}
           </div>
         </div>`;
