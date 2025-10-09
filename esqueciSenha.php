@@ -56,11 +56,11 @@ try {
     $mail->SMTPSecure = 'tls';
     $mail->Port = 587;
 
-    $mail->setFrom('virleneterapiacorporal@gmail.com', 'Alterar senha - Terapia Corporal Sistêmica');
+    $mail->setFrom('virleneterapiacorporal@gmail.com', 'Alterar senha - Terapia Corporal Sistemica');
     $mail->addAddress($email);
 
     $mail->isHTML(true);
-    $mail->Subject = 'Alterar senha - Terapia Corporal Sistêmica';
+    $mail->Subject = 'Alterar senha - Terapia Corporal Sistemica';
     $mail->Body = <<<HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
