@@ -23,6 +23,11 @@ $conn->query("CREATE TABLE IF NOT EXISTS blog_posts (
 
 // --- OPERAÇÕES DE ARQUIVAR, DESPUBLICAR, ATUALIZAR, ETC ---
 $msg = '';
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] === 'updated') {
+        $msg = 'Post atualizado com sucesso!';
+    }
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Nova publicação
     if (isset($_POST['titulo'], $_POST['conteudo'], $_POST['categoria'], $_POST['data_post'])) {
@@ -77,7 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $stmt->execute();
         $stmt->close();
-        $msg = 'Post atualizado com sucesso!';
+        header('Location: blog.php?msg=updated');
+        exit;
     }
     // Arquivar/despublicar
     if (isset($_POST['toggle_id'])) {
