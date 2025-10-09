@@ -11,19 +11,32 @@
   <style>
     /* --- Inline, cards em linha --- */
     body { background: #fcfaf7; margin: 0; font-family: 'Roboto', Arial, sans-serif; color: #423d38; }
-    .navbar { display: flex; align-items: center; justify-content: space-between; background: #57643a; color: #fff; padding: 0.4rem 2vw; height: 72px; min-height: 60px; }
+    .navbar { display: flex; flex-wrap: wrap; row-gap: 0.75rem; align-items: center; justify-content: space-between; background: #57643a; color: #fff; padding: 0.75rem 3vw; min-height: 64px; }
     .navbar-logo-central { height: 100%; display: flex; align-items: center; }
     .navbar-logo-central img { height: 54px; width: auto; max-width: 110px; object-fit: contain; display: block; margin-right: 12px; }
     .navbar-logo-central span { font-family: 'Dancing Script', cursive; font-size: 1.52rem; color: #fff2c6; font-weight: 700; margin-left: 10px; text-shadow: 0 2px 7px #b79b6350;}
     .navbar-menu { display: flex; gap: 1.4rem; list-style: none; margin: 0; padding: 0; align-items: center;}
     .navbar-menu a { color: #fff; text-decoration: none; font-weight: 600; font-size: 1rem; transition: color 0.18s;}
     .navbar-menu a:hover { color: #ffd970;}
-    .navbar-toggle { display: none; }
+    .navbar-toggle { display: none; background: transparent; border: 2px solid #fff; color: #fff; border-radius: 8px; padding: 0.4rem 0.6rem; font-size: 1.2rem; cursor: pointer; transition: background 0.16s, color 0.16s; }
+    .navbar-toggle:hover, .navbar-toggle:focus { background: #fff; color: #57643a; outline: none; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
     @media (max-width: 900px) {
       .blog-container { flex-direction: column; gap: 24px; }
       .sidebar { width: 98vw; }
       .post-card { flex-direction: column; align-items: flex-start; }
       .post-img { width: 100%; height: 170px; }
+    }
+    @media (max-width: 700px) {
+      .navbar { justify-content: center; padding: 1rem 5vw; }
+      .navbar-logo-central { width: 100%; justify-content: center; text-align: center; }
+      .navbar-logo-central img { margin-right: 8px; height: 50px; }
+      .navbar-logo-central span { margin-left: 6px; font-size: 1.4rem; }
+      .navbar-toggle { display: inline-flex; align-items: center; justify-content: center; margin-left: auto; }
+      .navbar-menu { display: none; width: 100%; flex-direction: column; align-items: center; gap: 0.9rem; background: #57643a; padding: 0.8rem 0.6rem; border-radius: 10px; }
+      .navbar-menu li { width: 100%; text-align: center; }
+      .navbar-menu.is-open { display: flex; }
+      .navbar-menu a { font-size: 1.05rem; }
     }
     .banner-blog-card {
       max-width: 660px;
@@ -83,7 +96,11 @@
       <img src="img/logo.png" alt="Consultório de Terapia Corporal Sistêmica" />
       <span>Virlene Figueiredo</span>
     </div>
-    <ul class="navbar-menu">
+    <button class="navbar-toggle" type="button" aria-expanded="false" aria-controls="navbar-menu">
+      <span class="sr-only">Abrir menu</span>
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <ul class="navbar-menu" id="navbar-menu">
       <li><a href="index.html">Home</a></li>
       <li><a href="espaco.html">O Espaço</a></li>
       <li><a href="servicos.html">Serviços</a></li>
@@ -120,6 +137,41 @@
     let postsBlog = [];
     let allCategories = [];
     let isAdmin = false;
+    const navbarToggle = document.querySelector('.navbar-toggle');
+    const navbarMenu = document.getElementById('navbar-menu');
+    const mobileMedia = window.matchMedia('(max-width: 700px)');
+
+    if (navbarToggle && navbarMenu) {
+      const closeMenu = () => {
+        navbarMenu.classList.remove('is-open');
+        navbarToggle.setAttribute('aria-expanded', 'false');
+      };
+
+      navbarToggle.addEventListener('click', () => {
+        const isOpen = navbarMenu.classList.toggle('is-open');
+        navbarToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+
+      navbarMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          if (mobileMedia.matches) {
+            closeMenu();
+          }
+        });
+      });
+
+      const handleMediaChange = (event) => {
+        if (!event.matches) {
+          closeMenu();
+        }
+      };
+
+      if (mobileMedia.addEventListener) {
+        mobileMedia.addEventListener('change', handleMediaChange);
+      } else if (mobileMedia.addListener) {
+        mobileMedia.addListener(handleMediaChange);
+      }
+    }
     // Busca dados do blog do backend
     fetch('getPostsBlog.php')
       .then(res => res.json())
