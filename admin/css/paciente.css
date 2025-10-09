@@ -275,8 +275,8 @@ body {
   margin-top: 20px;
 }
 
-.is-hidden {
-  display: none;
+.detail-row.is-hidden {
+  display: none !important;
 }
 
 .responsive-table td[data-label] {
