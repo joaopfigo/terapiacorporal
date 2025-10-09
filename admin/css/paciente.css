@@ -283,6 +283,11 @@ body {
   position: relative;
 }
 
+.table-consultas-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
 @media (max-width: 768px) {
   body {
     font-size: 0.95rem;
@@ -298,58 +303,71 @@ body {
     padding: 16px;
   }
 
-  .table-consultas thead {
-    display: none;
+  .table-consultas-wrapper {
+    margin-top: 16px;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .table-consultas,
-  .responsive-table,
-  .table-consultas tbody,
-  .table-consultas tr,
+  .table-consultas {
+    min-width: 620px;
+    border-radius: 10px;
+  }
+
+  .table-consultas thead {
+    display: table-header-group;
+  }
+
+  .table-consultas th,
   .table-consultas td {
-    display: block;
-    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.92rem;
+  }
+
+  .table-consultas td {
+    padding-top: 9px;
+    padding-bottom: 9px;
   }
 
   .table-row {
-    margin-bottom: 18px;
-    border-radius: 12px;
-    border: 1px solid #dbe6d8;
-    overflow: hidden;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    box-shadow: none;
   }
 
   .table-row td {
     border: none;
-    padding: 12px 14px 12px 120px;
+    border-bottom: 1px solid #e2ecdf;
+  }
+
+  .table-consultas tbody tr.table-row:last-of-type td {
+    border-bottom: none;
   }
 
   .table-row td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 16px;
-    top: 12px;
-    font-weight: 600;
-    color: #285e44;
+    content: none;
+  }
+
+  .responsive-table td[data-label] {
+    position: static;
   }
 
   .text-center {
-    text-align: left;
+    text-align: center;
   }
 
   .detail-row {
-    margin-bottom: 18px;
+    background: transparent;
   }
 
   .detail-cell {
     border-radius: 12px;
     border: 1px solid #dbe6d8;
     border-top: 2px solid #c2d8bd;
-    padding: 22px clamp(18px, 6vw, 26px);
+    padding: 18px clamp(16px, 6vw, 22px);
   }
 
   .detail-actions {
     justify-content: flex-start;
+    gap: 8px;
   }
 
   .modal-content {
@@ -358,12 +376,17 @@ body {
 }
 
 @media (max-width: 480px) {
-  .table-row td {
-    padding-left: 100px;
+  .table-consultas {
+    min-width: 560px;
   }
 
-  .table-row td::before {
-    left: 14px;
+  .table-consultas th,
+  .table-consultas td {
+    padding: 8px 10px;
+  }
+
+  .table-row td {
+    padding: 8px 10px;
   }
 
   .btn,
