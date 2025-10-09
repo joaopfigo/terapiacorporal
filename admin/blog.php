@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $msg = 'Post publicado com sucesso!';
     }
     // Atualizar publicação
-    if (isset($_POST['edit_id'])) {
+    if (isset($_POST['edit_id'], $_POST['salvar_edicao'])) {
         $id = intval($_POST['edit_id']);
         $titulo = trim($_POST['edit_titulo']);
         $conteudo = trim($_POST['edit_conteudo']);
@@ -123,7 +123,7 @@ function categoria_sel($cat, $valor) {
         .table-posts th { background:#f0e7c9; color:#3c4725; }
         .table-posts td { background:#fff; }
         .img-mini { width:58px; border-radius:8px; }
-        .btn-edit, .btn-toggle { background:#e8b14a; color:#fff; border:none; border-radius:6px; padding:4px 13px; margin-right:7px; font-weight:600; cursor:pointer; }
+        .btn-edit, .btn-toggle { background:#e8b14a; color:#fff; border:none; border-radius:6px; padding:4px 13px; margin-right:7px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; }
         .btn-toggle.pub { background:#2c7650; }
         .btn-toggle.despub { background:#ae3829; }
         .btn-edit:hover { background:#eb9800; }
@@ -333,14 +333,7 @@ function categoria_sel($cat, $valor) {
         <td><?php if($post['imagem']): ?><img src="../<?=$post['imagem']?>" class="img-mini"><?php endif; ?></td>
         <td><?=$post['publicado'] ? '<span style="color:#249b43">Publicado</span>' : '<span style="color:#ad3e22">Arquivado</span>'?></td>
         <td>
-            <form method="post" enctype="multipart/form-data" style="display:inline-block;">
-                <input type="hidden" name="edit_id" value="<?=$post['id']?>">
-                <input type="hidden" name="edit_titulo" value="<?=htmlspecialchars($post['titulo'],ENT_QUOTES)?>">
-                <input type="hidden" name="edit_categoria" value="<?=htmlspecialchars($post['categoria'],ENT_QUOTES)?>">
-                <input type="hidden" name="edit_conteudo" value="<?=htmlspecialchars($post['conteudo'],ENT_QUOTES)?>">
-                <input type="hidden" name="edit_data_post" value="<?=$post['data_post']?>">
-                <button class="btn-edit" type="submit">Editar</button>
-            </form>
+            <a class="btn-edit" href="blog.php?edit=<?=$post['id']?>">Editar</a>
             <form method="post" style="display:inline-block;">
                 <input type="hidden" name="toggle_id" value="<?=$post['id']?>">
                 <button class="btn-toggle <?=$post['publicado']?'despub':'pub'?>" type="submit">
@@ -354,15 +347,30 @@ function categoria_sel($cat, $valor) {
 </div>
 
 <?php
-// Formulário de edição, renderizado apenas se veio um POST de edição
-if (isset($_POST['edit_id'])):
-    $edit = null;
-    foreach ($posts as $p) if ($p['id'] == $_POST['edit_id']) $edit = $p;
-    if ($edit):
+// Determina se há um post sendo preparado para edição
+$edit = null;
+$editId = null;
+if (isset($_GET['edit'])) {
+    $editId = intval($_GET['edit']);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_id']) && !isset($_POST['salvar_edicao'])) {
+    $editId = intval($_POST['edit_id']);
+}
+
+if ($editId !== null) {
+    foreach ($posts as $p) {
+        if ($p['id'] == $editId) {
+            $edit = $p;
+            break;
+        }
+    }
+}
+
+if ($edit):
 ?>
     <h2 style="margin-top:38px;">Editar Publicação</h2>
     <form method="post" enctype="multipart/form-data">
         <input type="hidden" name="edit_id" value="<?=$edit['id']?>">
+        <input type="hidden" name="salvar_edicao" value="1">
         <div class="form-row">
             <div class="form-col">
                 <label>Título</label>
@@ -397,7 +405,7 @@ if (isset($_POST['edit_id'])):
         <br>
         <button class="btn" type="submit">Salvar Alterações</button>
     </form>
-<?php endif; endif; ?>
+<?php endif; ?>
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
