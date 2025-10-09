@@ -113,6 +113,7 @@ if ($row = $res->fetch_assoc()) {
   </div>
 
   <div class='subtitulo'>Histórico de Consultas</div>
+  <div class="table-consultas-wrapper">
   <table class='table-consultas responsive-table'>
     <thead>
       <tr>
@@ -210,6 +211,7 @@ if ($row = $res->fetch_assoc()) {
     <?php } ?>
     </tbody>
   </table>
+  </div>
   <div class="icon-legend" id="anamnese-legenda">
     <strong>Legenda:</strong>
     <span><span aria-hidden="true">✅</span> <span class="sr-only">Ícone de anamnese preenchida</span> Anamnese preenchida</span>
