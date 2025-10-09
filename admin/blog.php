@@ -161,11 +161,20 @@ function resolve_post_image(?string $imagem): string {
         .container { max-width:800px; margin:94px auto 50px auto; background:#fff; border-radius:15px; box-shadow:0 3px 24px #b7b7b752; padding:38px 30px 30px 30px; }
         h1 { color:#496a4c; text-align:center; }
         .msg-ok { background:#d0f0e0; color:#2c7650; padding:10px 0; border-radius:7px; text-align:center; font-weight:600; margin-bottom:22px; }
-        form input, form select, form textarea { width:100%; margin:6px 0 16px 0; padding:7px 9px; border-radius:7px; border:1px solid #bbb6a6; font-size:1em; }
-        .form-row { display: flex; gap: 12px; }
-        .form-col { flex:1; }
+        form input, form select, form textarea { width:100%; margin:6px 0 16px 0; padding:11px 12px; border-radius:10px; border:1px solid #d7d0ba; font-size:1em; font-family:'Roboto', sans-serif; color:#2c3a2e; background:#fff; box-shadow:0 2px 8px rgba(73,106,76,0.06); }
+        .form-section { background:#fdfcf8; border:1px solid #e7ddc4; border-radius:18px; padding:26px 28px 30px; box-shadow:0 12px 28px rgba(73,106,76,0.08); display:block; margin-top:26px; }
+        .form-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:22px 28px; }
+        .form-field { display:flex; flex-direction:column; }
+        .form-field.full-width { grid-column:1 / -1; }
+        .form-field small { color:#6b6f60; font-size:0.85rem; margin-top:6px; }
+        .form-actions { display:flex; justify-content:flex-end; margin-top:26px; gap:14px; }
+        form label { display:block; font-weight:600; color:#2f3d2f; margin-bottom:8px; letter-spacing:0.2px; }
+        .form-checkbox { display:flex; align-items:center; gap:10px; font-weight:600; color:#2f3d2f; margin-top:6px; }
+        .form-checkbox input[type="checkbox"] { width:auto; margin:0; accent-color:#256d54; }
+        .form-row { display:flex; flex-wrap:wrap; gap:22px; }
+        .form-row > * { flex:1 1 240px; }
         textarea { min-height:130px; }
-        .btn { background:#496a4c; color:#fff; padding:9px 26px; border:none; border-radius:8px; font-weight:700; font-size:1.05em; cursor:pointer; transition:background .18s; }
+        .btn { background:#496a4c; color:#fff; padding:11px 30px; border:none; border-radius:10px; font-weight:700; font-size:1.05em; cursor:pointer; transition:background .18s; }
         .btn:hover { background:#1a2e1d; }
         .table-posts { width:100%; border-collapse:collapse; margin-top:40px; }
         .table-posts th, .table-posts td { border:1px solid #e8e0cf; padding:8px 10px; }
@@ -256,6 +265,23 @@ function resolve_post_image(?string $imagem): string {
             padding:10px;
             margin:69px auto 40px auto;
           }
+          .form-section {
+            padding:20px 18px 24px;
+            margin-top:20px;
+          }
+          .form-grid {
+            grid-template-columns:1fr;
+            gap:18px;
+          }
+          .form-actions {
+            flex-direction:column;
+            align-items:stretch;
+            margin-top:22px;
+          }
+          .form-actions .btn {
+            width:100%;
+            line-height:1.5;
+          }
 
           .table-posts th,
           .table-posts td {
@@ -299,6 +325,10 @@ function resolve_post_image(?string $imagem): string {
             padding: 10px 12px;
           }
 
+          .btn {
+            line-height:1.5;
+          }
+
           .header-admin.is-open .menu-container {
             display: block;
           }
@@ -328,39 +358,41 @@ function resolve_post_image(?string $imagem): string {
   <h1>Painel do Blog</h1>
   <?php if($msg) echo '<div class="msg-ok">'.htmlspecialchars($msg).'</div>'; ?>
   <h2>Nova Publicação</h2>
-  <form method="post" enctype="multipart/form-data" autocomplete="off" id="formBlog">
-    <div class="form-row">
-      <div class="form-col">
-        <label>Título</label>
-        <input type="text" name="titulo" maxlength="200" required>
+  <form class="form-section" method="post" enctype="multipart/form-data" autocomplete="off" id="formBlog">
+    <div class="form-grid">
+      <div class="form-field">
+        <label for="titulo">Título</label>
+        <input type="text" id="titulo" name="titulo" maxlength="200" required>
       </div>
-      <div class="form-col">
-        <label>Categoria</label>
-        <select name="categoria" required>
+      <div class="form-field">
+        <label for="categoria">Categoria</label>
+        <select id="categoria" name="categoria" required>
           <option value="">Selecione...</option>
           <option value="Massoterapia">Massoterapia</option>
           <option value="Técnicas">Técnicas</option>
           <option value="Dicas">Dicas</option>
         </select>
       </div>
-    </div>
-    <label>Conteúdo</label>
-    <!-- Quill Editor visual: -->
-    <div id="editor-container" style="height:260px;background:#fff;"></div>
-    <input type="hidden" name="conteudo" id="conteudo-blog">
-    <div class="form-row">
-      <div class="form-col">
-        <label>Data da Publicação</label>
-        <input type="date" name="data_post" required value="<?=date('Y-m-d')?>">
+      <div class="form-field full-width">
+        <label for="editor-container">Conteúdo</label>
+        <!-- Quill Editor visual: -->
+        <div id="editor-container" style="height:260px;background:#fff;"></div>
+        <input type="hidden" name="conteudo" id="conteudo-blog">
       </div>
-      <div class="form-col">
-        <label>Imagem de Capa</label>
-        <input type="file" name="imagem" accept="image/*">
+      <div class="form-field">
+        <label for="data_post">Data da Publicação</label>
+        <input type="date" id="data_post" name="data_post" required value="<?=date('Y-m-d')?>">
+      </div>
+      <div class="form-field">
+        <label for="imagem">Imagem de Capa</label>
+        <input type="file" id="imagem" name="imagem" accept="image/*">
+        <small>JPG, PNG ou WEBP até 5MB (opcional).</small>
       </div>
     </div>
-    <label><input type="checkbox" name="publicado" checked> Publicar agora</label>
-    <br>
-    <button class="btn" type="submit">Publicar</button>
+    <label class="form-checkbox"><input type="checkbox" name="publicado" checked><span>Publicar agora</span></label>
+    <div class="form-actions">
+      <button class="btn" type="submit">Publicar</button>
+    </div>
   </form>
   <h2 style="margin-top:44px;">Posts Publicados</h2>
 <table class="table-posts">
@@ -420,42 +452,45 @@ if ($editId !== null) {
 if ($edit):
 ?>
     <h2 style="margin-top:38px;">Editar Publicação</h2>
-    <form method="post" enctype="multipart/form-data">
+    <form class="form-section" method="post" enctype="multipart/form-data">
         <input type="hidden" name="edit_id" value="<?=$edit['id']?>">
         <input type="hidden" name="salvar_edicao" value="1">
-        <div class="form-row">
-            <div class="form-col">
-                <label>Título</label>
-                <input type="text" name="edit_titulo" maxlength="200" value="<?=htmlspecialchars($edit['titulo'])?>" required>
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="edit_titulo">Título</label>
+                <input type="text" id="edit_titulo" name="edit_titulo" maxlength="200" value="<?=htmlspecialchars($edit['titulo'])?>" required>
             </div>
-            <div class="form-col">
-                <label>Categoria</label>
-                <select name="edit_categoria" required>
+            <div class="form-field">
+                <label for="edit_categoria">Categoria</label>
+                <select id="edit_categoria" name="edit_categoria" required>
                     <option value="">Selecione...</option>
                     <option value="Massoterapia" <?=categoria_sel($edit['categoria'],'Massoterapia')?>>Massoterapia</option>
                     <option value="Técnicas" <?=categoria_sel($edit['categoria'],'Técnicas')?>>Técnicas</option>
                     <option value="Dicas" <?=categoria_sel($edit['categoria'],'Dicas')?>>Dicas</option>
                 </select>
             </div>
-        </div>
-        <label>Conteúdo</label>
-        <div id="editor-edit" style="height:260px;background:#fff;"></div>
-        <input type="hidden" name="edit_conteudo" id="conteudo-edit">
-        <div class="form-row">
-            <div class="form-col">
-                <label>Data da Publicação</label>
-                <input type="date" name="edit_data_post" required value="<?=$edit['data_post']?>">
+            <div class="form-field full-width">
+                <label for="editor-edit">Conteúdo</label>
+                <div id="editor-edit" style="height:260px;background:#fff;"></div>
+                <input type="hidden" name="edit_conteudo" id="conteudo-edit">
             </div>
-            <div class="form-col">
-                <label>Imagem de Capa (preencher para trocar)</label>
-                <input type="file" name="edit_imagem" accept="image/*">
+            <div class="form-field">
+                <label for="edit_data_post">Data da Publicação</label>
+                <input type="date" id="edit_data_post" name="edit_data_post" required value="<?=$edit['data_post']?>">
+            </div>
+            <div class="form-field">
+                <label for="edit_imagem">Imagem de Capa (preencher para trocar)</label>
+                <input type="file" id="edit_imagem" name="edit_imagem" accept="image/*">
+                <small>Substitua apenas se quiser atualizar a imagem.</small>
             </div>
         </div>
-        <label>
-            <input type="checkbox" name="edit_publicado" <?=$edit['publicado']?'checked':''?>> Publicado
+        <label class="form-checkbox">
+            <input type="checkbox" name="edit_publicado" <?=$edit['publicado']?'checked':''?>>
+            <span>Manter publicação visível</span>
         </label>
-        <br>
-        <button class="btn" type="submit">Salvar Alterações</button>
+        <div class="form-actions">
+            <button class="btn" type="submit">Salvar Alterações</button>
+        </div>
     </form>
 <?php endif; ?>
 
