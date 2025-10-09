@@ -104,6 +104,52 @@ function renderActionButtons(array $agendamento): string
   return implode("\n", $parts);
 }
 
+function renderAgendaCardItem(array $agendamento): void
+{
+  $timestampCard = isset($agendamento['data_horario']) ? strtotime($agendamento['data_horario']) : false;
+  $cardDate = $timestampCard ? date('Y-m-d', $timestampCard) : '';
+  $cardTime = $timestampCard ? date('H:i', $timestampCard) : '';
+  $cardDuration = isset($agendamento['duracao']) && is_numeric($agendamento['duracao']) ? (int) $agendamento['duracao'] : 60;
+  $cardTitle = $agendamento['usuario_nome'] ? $agendamento['usuario_nome'] : 'Indisponível';
+  $servicoTitulo = trim((string)($agendamento['servico_exibicao'] ?? $agendamento['servico_nome'] ?? ''));
+  $status = strtolower((string)($agendamento['status'] ?? ''));
+  $dataHorarioTimestamp = $timestampCard ?: null;
+  $dataFormatada = $dataHorarioTimestamp ? date('d/m/Y', $dataHorarioTimestamp) : '';
+  $horaFormatada = $dataHorarioTimestamp ? date('H:i', $dataHorarioTimestamp) : '';
+  $duracaoExibicao = isset($agendamento['duracao']) && $agendamento['duracao'] !== '' ? (int)$agendamento['duracao'] : $cardDuration;
+  ?>
+  <div class="agenda-card"
+    data-status="<?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?>"
+    data-date="<?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?>"
+    data-time="<?= htmlspecialchars($cardTime, ENT_QUOTES, 'UTF-8') ?>"
+    data-duration="<?= $cardDuration ?>"
+    data-id="<?= isset($agendamento['id']) ? (int)$agendamento['id'] : '' ?>"
+    data-title="<?= htmlspecialchars($cardTitle, ENT_QUOTES, 'UTF-8') ?>">
+    <div class="ag-card-header">
+      <div class="ag-card-title">
+        <?= $agendamento['usuario_nome'] ? htmlspecialchars($agendamento['usuario_nome']) : '<span class="bloqueado">Indisponível</span>' ?>
+        <?php if ($servicoTitulo !== ''): ?>
+          <span style="font-weight:400;color:#b3a76c;font-size:.97rem;margin-left:9px;">
+            <?= htmlspecialchars($servicoTitulo) ?>
+          </span>
+        <?php endif; ?>
+      </div>
+      <div class="ag-card-status" data-status="<?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?>">
+        <?= getStatusLabel($agendamento['status'] ?? '') ?>
+      </div>
+    </div>
+    <div class="ag-card-body">
+      <div><span class="ag-card-label">Data:</span> <span class="ag-card-value"><?= htmlspecialchars($dataFormatada, ENT_QUOTES, 'UTF-8') ?></span></div>
+      <div><span class="ag-card-label">Hora:</span> <span class="ag-card-value"><?= htmlspecialchars($horaFormatada, ENT_QUOTES, 'UTF-8') ?></span></div>
+      <div><span class="ag-card-label">Duração:</span> <span class="ag-card-value"><?= htmlspecialchars((string)$duracaoExibicao, ENT_QUOTES, 'UTF-8') ?> min</span></div>
+    </div>
+    <div class="ag-card-actions">
+      <?= renderActionButtons($agendamento); ?>
+    </div>
+  </div>
+  <?php
+}
+
 // ----------- AÇÕES DE STATUS -----------
 $acoesStatus = [
   'confirmar' => 'Confirmado',
@@ -444,6 +490,85 @@ foreach ($agendamentosLista as &$ag) {
   $ag['servicos_lista'] = $listaServicos;
 }
 unset($ag);
+
+$timezoneId = 'America/Sao_Paulo';
+if (function_exists('date_default_timezone_set')) {
+  date_default_timezone_set($timezoneId);
+}
+
+$timezone = new DateTimeZone($timezoneId);
+$inicioHoje = new DateTimeImmutable('today', $timezone);
+$agendamentosFuturos = [];
+$agendamentosPassados = [];
+
+foreach ($agendamentosLista as $agendamentoItem) {
+  $dataHorario = $agendamentoItem['data_horario'] ?? null;
+  $dataAgendamento = null;
+
+  if ($dataHorario) {
+    $dataAgendamento = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $dataHorario, $timezone);
+
+    if ($dataAgendamento === false) {
+      $timestampBruto = strtotime($dataHorario);
+      if ($timestampBruto !== false) {
+        $dataAgendamento = (new DateTimeImmutable('@' . $timestampBruto))->setTimezone($timezone);
+      }
+    }
+  }
+
+  if ($dataAgendamento instanceof DateTimeImmutable) {
+    if ($dataAgendamento >= $inicioHoje) {
+      $agendamentosFuturos[] = $agendamentoItem;
+    } else {
+      $agendamentosPassados[] = $agendamentoItem;
+    }
+  } else {
+    $agendamentosFuturos[] = $agendamentoItem;
+  }
+}
+
+$obterTimestampAgendamento = static function (array $agendamento): ?int {
+  $timestamp = strtotime($agendamento['data_horario'] ?? '');
+  return $timestamp === false ? null : $timestamp;
+};
+
+usort($agendamentosFuturos, static function (array $a, array $b) use ($obterTimestampAgendamento): int {
+  $timestampA = $obterTimestampAgendamento($a);
+  $timestampB = $obterTimestampAgendamento($b);
+
+  if ($timestampA === null && $timestampB === null) {
+    return 0;
+  }
+
+  if ($timestampA === null) {
+    return 1;
+  }
+
+  if ($timestampB === null) {
+    return -1;
+  }
+
+  return $timestampA <=> $timestampB;
+});
+
+usort($agendamentosPassados, static function (array $a, array $b) use ($obterTimestampAgendamento): int {
+  $timestampA = $obterTimestampAgendamento($a);
+  $timestampB = $obterTimestampAgendamento($b);
+
+  if ($timestampA === null && $timestampB === null) {
+    return 0;
+  }
+
+  if ($timestampA === null) {
+    return 1;
+  }
+
+  if ($timestampB === null) {
+    return -1;
+  }
+
+  return $timestampB <=> $timestampA;
+});
 // Separar eventos para o calendário
 $eventos_calendario = [];
 $eventos_bloqueados = [];
@@ -942,6 +1067,26 @@ if (!empty($eventos_bloqueados)) {
       font-size: 2rem;
       color: #256d54;
       font-weight: 700;
+      letter-spacing: .2px;
+      text-shadow: 0 1px 0 #f6f8f8;
+    }
+
+    .agenda-group {
+      margin-top: 36px;
+    }
+
+    .agenda-group + .agenda-group {
+      margin-top: 44px;
+    }
+
+    .agenda-group-title {
+      margin-left: 24px;
+      margin-right: 24px;
+      margin-bottom: 14px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: #256d54;
+      font-weight: 600;
       letter-spacing: .2px;
       text-shadow: 0 1px 0 #f6f8f8;
     }
@@ -1847,50 +1992,23 @@ if (!empty($eventos_bloqueados)) {
     <div class="no-results-alert"><?= htmlspecialchars($mensagemAgendamentos) ?></div>
   <?php endif; ?>
 
-  <div class="agendas-list">
-    <?php foreach ($agendamentosLista as $a): ?>
-      <?php
-      $timestampCard = isset($a['data_horario']) ? strtotime($a['data_horario']) : false;
-      $cardDate = $timestampCard ? date('Y-m-d', $timestampCard) : '';
-      $cardTime = $timestampCard ? date('H:i', $timestampCard) : '';
-      $cardDuration = isset($a['duracao']) && is_numeric($a['duracao']) ? (int) $a['duracao'] : 60;
-      $cardTitle = $a['usuario_nome'] ? $a['usuario_nome'] : 'Indisponível';
-      ?>
-      <div class="agenda-card"
-        data-status="<?= strtolower($a['status']) ?>"
-        data-date="<?= htmlspecialchars($cardDate, ENT_QUOTES, 'UTF-8') ?>"
-        data-time="<?= htmlspecialchars($cardTime, ENT_QUOTES, 'UTF-8') ?>"
-        data-duration="<?= $cardDuration ?>"
-        data-id="<?= isset($a['id']) ? (int) $a['id'] : '' ?>"
-        data-title="<?= htmlspecialchars($cardTitle, ENT_QUOTES, 'UTF-8') ?>">
-        <div class="ag-card-header">
-          <div class="ag-card-title">
-            <?php $servicoTitulo = trim((string)($a['servico_exibicao'] ?? $a['servico_nome'] ?? '')); ?>
-            <?= $a['usuario_nome'] ? htmlspecialchars($a['usuario_nome']) : '<span class="bloqueado">Indisponível</span>' ?>
-            <?php if ($servicoTitulo !== ''): ?>
-              <span style="font-weight:400;color:#b3a76c;font-size:.97rem;margin-left:9px;">
-                <?= htmlspecialchars($servicoTitulo) ?>
-              </span>
-            <?php endif; ?>
-          </div>
-          <div class="ag-card-status" data-status="<?= strtolower($a['status']) ?>">
-            <?= getStatusLabel($a['status']) ?>
-          </div>
-        </div>
-        <div class="ag-card-body">
-          <div><span class="ag-card-label">Data:</span> <span
-              class="ag-card-value"><?= date('d/m/Y', strtotime($a['data_horario'])) ?></span></div>
-          <div><span class="ag-card-label">Hora:</span> <span
-              class="ag-card-value"><?= date('H:i', strtotime($a['data_horario'])) ?></span></div>
-          <div><span class="ag-card-label">Duração:</span> <span class="ag-card-value"><?= $a['duracao'] ?> min</span>
-          </div>
-        </div>
-        <div class="ag-card-actions">
-          <?= renderActionButtons($a); ?>
-        </div>
-      </div>
-    <?php endforeach; ?>
-  </div>
+  <section class="agenda-group">
+    <h3 class="agenda-group-title">Agendamentos a partir de hoje</h3>
+    <div id="agendamentos-futuros" class="agendas-list">
+      <?php foreach ($agendamentosFuturos as $a): ?>
+        <?php renderAgendaCardItem($a); ?>
+      <?php endforeach; ?>
+    </div>
+  </section>
+
+  <section class="agenda-group">
+    <h3 class="agenda-group-title">Agendamentos anteriores</h3>
+    <div id="agendamentos-passados" class="agendas-list">
+      <?php foreach ($agendamentosPassados as $a): ?>
+        <?php renderAgendaCardItem($a); ?>
+      <?php endforeach; ?>
+    </div>
+  </section>
 
   <script>
 
@@ -1906,37 +2024,160 @@ if (!empty($eventos_bloqueados)) {
 
 
     function setupStatusActionHandlers() {
-      const agendasList = document.querySelector('.agendas-list');
-      if (!agendasList || agendasList.dataset.statusListeners === 'true') {
+      const agendasListas = document.querySelectorAll('.agendas-list');
+      if (!agendasListas.length) {
         return;
       }
 
-      agendasList.dataset.statusListeners = 'true';
+      agendasListas.forEach(list => {
+        if (list.dataset.statusListeners === 'true') {
+          return;
+        }
 
-      agendasList.addEventListener('click', function (event) {
-        const button = event.target.closest('.ag-card-action-btn');
-        if (!button) {
-          return;
-        }
-        event.preventDefault();
-        if (button.disabled) {
-          return;
-        }
-        processStatusAction(button);
-      });
+        list.dataset.statusListeners = 'true';
 
-      agendasList.addEventListener('keydown', function (event) {
-        const button = event.target.closest('.ag-card-action-btn');
-        if (!button) {
-          return;
-        }
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          if (!button.disabled) {
-            processStatusAction(button);
+        list.addEventListener('click', function (event) {
+          const button = event.target.closest('.ag-card-action-btn');
+          if (!button) {
+            return;
           }
+          event.preventDefault();
+          if (button.disabled) {
+            return;
+          }
+          processStatusAction(button);
+        });
+
+        list.addEventListener('keydown', function (event) {
+          const button = event.target.closest('.ag-card-action-btn');
+          if (!button) {
+            return;
+          }
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            if (!button.disabled) {
+              processStatusAction(button);
+            }
+          }
+        });
+      });
+    }
+
+    function obterTimestampCard(card) {
+      if (!card) {
+        return null;
+      }
+
+      const data = (card.dataset.date || '').trim();
+      if (!data) {
+        return null;
+      }
+
+      const horaBruta = (card.dataset.time || '00:00').trim();
+      const horaNormalizada = horaBruta.length === 5 ? `${horaBruta}:00` : horaBruta;
+      const candidatoIso = `${data}T${horaNormalizada}`;
+      let timestamp = Date.parse(candidatoIso);
+      const isoInvalido = typeof Number.isNaN === 'function' ? Number.isNaN(timestamp) : isNaN(timestamp);
+
+      if (!isoInvalido) {
+        return timestamp;
+      }
+
+      timestamp = Date.parse(`${data} ${horaNormalizada}`);
+      const alternativoInvalido = typeof Number.isNaN === 'function' ? Number.isNaN(timestamp) : isNaN(timestamp);
+      return alternativoInvalido ? null : timestamp;
+    }
+
+    function reclassificarAgendamentos() {
+      const containerFuturos = document.getElementById('agendamentos-futuros');
+      const containerPassados = document.getElementById('agendamentos-passados');
+
+      if (!containerFuturos || !containerPassados) {
+        return;
+      }
+
+      const cards = Array.from(document.querySelectorAll('#agendamentos-futuros .agenda-card, #agendamentos-passados .agenda-card'));
+      const meiaNoiteHoje = new Date();
+      meiaNoiteHoje.setHours(0, 0, 0, 0);
+
+      const futuros = [];
+      const passados = [];
+
+      cards.forEach(card => {
+        const timestamp = obterTimestampCard(card);
+        if (timestamp === null || timestamp >= meiaNoiteHoje.getTime()) {
+          futuros.push({ card, timestamp });
+        } else {
+          passados.push({ card, timestamp });
         }
       });
+
+      futuros.sort((a, b) => {
+        const valorA = typeof a.timestamp === 'number' ? a.timestamp : Number.POSITIVE_INFINITY;
+        const valorB = typeof b.timestamp === 'number' ? b.timestamp : Number.POSITIVE_INFINITY;
+        if (valorA === valorB) {
+          return 0;
+        }
+        return valorA < valorB ? -1 : 1;
+      });
+
+      passados.sort((a, b) => {
+        const valorA = typeof a.timestamp === 'number' ? a.timestamp : Number.NEGATIVE_INFINITY;
+        const valorB = typeof b.timestamp === 'number' ? b.timestamp : Number.NEGATIVE_INFINITY;
+        if (valorA === valorB) {
+          return 0;
+        }
+        return valorA > valorB ? -1 : 1;
+      });
+
+      containerFuturos.innerHTML = '';
+      containerPassados.innerHTML = '';
+
+      futuros.forEach(item => {
+        containerFuturos.appendChild(item.card);
+      });
+      passados.forEach(item => {
+        containerPassados.appendChild(item.card);
+      });
+    }
+
+    if (typeof window !== 'undefined') {
+      window.reclassificarAgendamentos = reclassificarAgendamentos;
+    }
+
+    function inicializarReclassificacaoAgendamentos() {
+      const containerFuturos = document.getElementById('agendamentos-futuros');
+      const containerPassados = document.getElementById('agendamentos-passados');
+
+      if (!containerFuturos || !containerPassados) {
+        return;
+      }
+
+      reclassificarAgendamentos();
+
+      const agora = new Date();
+      const proximaMeiaNoite = new Date(agora);
+      proximaMeiaNoite.setDate(proximaMeiaNoite.getDate() + 1);
+      proximaMeiaNoite.setHours(0, 0, 0, 0);
+
+      let tempoAteProximaMeiaNoite = proximaMeiaNoite.getTime() - agora.getTime();
+      if (tempoAteProximaMeiaNoite < 0) {
+        tempoAteProximaMeiaNoite = 0;
+      }
+
+      if (typeof window !== 'undefined') {
+        if (window.__agendaReclassificacaoTimeoutId) {
+          clearTimeout(window.__agendaReclassificacaoTimeoutId);
+        }
+        if (window.__agendaReclassificacaoIntervalId) {
+          clearInterval(window.__agendaReclassificacaoIntervalId);
+        }
+
+        window.__agendaReclassificacaoTimeoutId = setTimeout(() => {
+          reclassificarAgendamentos();
+          window.__agendaReclassificacaoIntervalId = setInterval(reclassificarAgendamentos, 24 * 60 * 60 * 1000);
+        }, tempoAteProximaMeiaNoite);
+      }
     }
 
     function processStatusAction(button) {
@@ -2033,6 +2274,8 @@ if (!empty($eventos_bloqueados)) {
               atualizarModalSeNecessario(cardDate);
             }
           }
+
+          reclassificarAgendamentos();
         })
         .catch(error => {
           console.error(error);
@@ -2410,12 +2653,13 @@ if (!empty($eventos_bloqueados)) {
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+      setupStatusActionHandlers();
+      inicializarReclassificacaoAgendamentos();
+
       const calendarEl = document.getElementById('calendar-admin');
       if (!calendarEl) {
         return;
       }
-
-      setupStatusActionHandlers();
 
       if (!window.FullCalendar || !FullCalendar.Calendar) {
         console.warn('FullCalendar não está disponível. Verifique se os assets foram carregados corretamente.');
