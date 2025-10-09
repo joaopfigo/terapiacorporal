@@ -1,5 +1,6 @@
 <?php
 require_once 'conexao.php';
+require_once 'lib/blog_images.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -18,7 +19,7 @@ while ($row = $result->fetch_assoc()) {
         "titulo" => $row['titulo'],
         "desc" => $desc,
         "categoria" => $row['categoria'],
-        "imagem" => $row['imagem'],
+        "imagem" => resolve_post_image($row['imagem'] ?? null),
         "conteudo" => $row['conteudo'],
         "publicado" => $row['publicado']
     ];
