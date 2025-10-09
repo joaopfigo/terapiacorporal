@@ -65,6 +65,28 @@ if ($row = $res->fetch_assoc()) {
 <meta charset='UTF-8'>
 <title>Paciente: <?= htmlspecialchars($pac['nome']) ?></title>
 <link rel="stylesheet" href="css/paciente.css">
+<style>
+.btn-link .anamnese-icon {
+  margin-right: 0.4rem;
+}
+.icon-legend {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+.icon-legend span + span {
+  margin-left: 1.5rem;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+</style>
 </head>
 <body>
 <div class='paciente-container'>
@@ -124,8 +146,21 @@ if ($row = $res->fetch_assoc()) {
           <span title="Sem formulário">&mdash;</span>
         <?php endif; ?>
       </td>
+      <?php
+        $anamneseAtual = $anamneses[$agendamento_id][0] ?? null;
+        $temAnamnese = !empty($anamneses[$agendamento_id]);
+        $iconeAnamnese = $temAnamnese ? '✅' : '✏️';
+        $tituloAnamnese = $temAnamnese
+          ? 'Anamnese preenchida. Última atualização em ' . date('d/m/Y H:i', strtotime($anamneseAtual['updated_at']))
+          : 'Nenhuma anamnese registrada. Clique para preencher.';
+        $descricaoStatus = $temAnamnese ? 'Anamnese preenchida' : 'Anamnese não preenchida';
+      ?>
       <td class="text-center" data-label="Anamnese">
-        <button onclick="toggleAnamnese(<?= $agendamento_id ?>)" class="btn-link">Anamnese</button>
+        <button onclick="toggleAnamnese(<?= $agendamento_id ?>)" class="btn-link" title="<?= htmlspecialchars($tituloAnamnese) ?>" aria-describedby="anamnese-legenda">
+          <span class="anamnese-icon" aria-hidden="true"><?= $iconeAnamnese ?></span>
+          <span class="sr-only"><?= htmlspecialchars($descricaoStatus) ?> - </span>
+          Anamnese
+        </button>
       </td>
     </tr>
     <?php if ($tem_formulario): ?>
@@ -170,6 +205,11 @@ if ($row = $res->fetch_assoc()) {
     <?php } ?>
     </tbody>
   </table>
+  <div class="icon-legend" id="anamnese-legenda">
+    <strong>Legenda:</strong>
+    <span><span aria-hidden="true">✅</span> <span class="sr-only">Ícone de anamnese preenchida</span> Anamnese preenchida</span>
+    <span><span aria-hidden="true">✏️</span> <span class="sr-only">Ícone de anamnese pendente</span> Anamnese pendente</span>
+  </div>
 </div>
 <div id="modal-pacote" class="modal-overlay">
   <div class="modal-content">
