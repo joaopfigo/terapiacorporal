@@ -98,6 +98,26 @@ while($row = $res->fetch_assoc()) $posts[] = $row;
 function categoria_sel($cat, $valor) {
     return $cat == $valor ? 'selected' : '';
 }
+
+function resolve_post_image(?string $imagem): string {
+    $fallback = '../iconeFinal.png';
+
+    if (empty($imagem)) {
+        return $fallback;
+    }
+
+    if (preg_match('#^https?://#i', $imagem)) {
+        return $imagem;
+    }
+
+    if (strpos($imagem, '../') === 0) {
+        return $imagem;
+    }
+
+    $imagem = ltrim($imagem, '/');
+
+    return '../' . $imagem;
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -330,7 +350,10 @@ function categoria_sel($cat, $valor) {
         <td><?=htmlspecialchars($post['titulo'])?></td>
         <td><?=htmlspecialchars($post['categoria'])?></td>
         <td><?=$post['data_post']?></td>
-        <td><?php if($post['imagem']): ?><img src="../<?=$post['imagem']?>" class="img-mini"><?php endif; ?></td>
+        <td>
+            <?php $thumbSrc = resolve_post_image($post['imagem'] ?? null); ?>
+            <img src="<?=htmlspecialchars($thumbSrc)?>" class="img-mini" alt="Miniatura do post">
+        </td>
         <td><?=$post['publicado'] ? '<span style="color:#249b43">Publicado</span>' : '<span style="color:#ad3e22">Arquivado</span>'?></td>
         <td>
             <a class="btn-edit" href="blog.php?edit=<?=$post['id']?>">Editar</a>
