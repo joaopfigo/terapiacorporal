@@ -279,6 +279,25 @@ function toggleAnamnese(id){
     updateToggleControls(rowId, !isHidden);
   }
 }
+function resetDetailRows(){
+  document.querySelectorAll('.detail-row').forEach((row) => {
+    const controls = row.id
+      ? document.querySelectorAll('[aria-controls="' + row.id + '"]')
+      : [];
+    const anyExpanded = Array.from(controls).some(
+      (btn) => btn.getAttribute('aria-expanded') === 'true'
+    );
+    if (!anyExpanded) {
+      row.classList.add('is-hidden');
+      row.hidden = true;
+      controls.forEach((btn) => {
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+}
+window.addEventListener('pageshow', resetDetailRows);
+document.addEventListener('DOMContentLoaded', resetDetailRows);
 function salvarAnamnese(id){
   const txt = document.getElementById('anamnese-text-' + id).value;
   fetch('salvarAnamnese.php', {
