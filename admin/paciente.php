@@ -65,7 +65,7 @@ if ($row = $res->fetch_assoc()) {
 <meta charset='UTF-8'>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Paciente: <?= htmlspecialchars($pac['nome']) ?></title>
-<link rel="stylesheet" href="css/paciente.css">
+<link rel="stylesheet" href="css/paciente.css?v=<?= filemtime(__DIR__ . '/css/paciente.css') ?>">
 <style>
 .btn-link .anamnese-icon {
   margin-right: 0.4rem;
