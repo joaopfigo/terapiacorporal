@@ -310,7 +310,8 @@ body {
   }
 
   .table-consultas {
-    min-width: 620px;
+    width: 100%;
+    min-width: 0;
     border-radius: 10px;
   }
 
@@ -320,13 +321,13 @@ body {
 
   .table-consultas th,
   .table-consultas td {
-    padding: 10px 12px;
-    font-size: 0.92rem;
+    padding: 6px 10px;
+    font-size: clamp(0.85rem, 2.6vw, 0.95rem);
   }
 
   .table-consultas td {
-    padding-top: 9px;
-    padding-bottom: 9px;
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
 
   .table-row {
@@ -359,15 +360,36 @@ body {
   }
 
   .detail-cell {
+    display: grid;
     border-radius: 12px;
     border: 1px solid #dbe6d8;
     border-top: 2px solid #c2d8bd;
-    padding: 18px clamp(16px, 6vw, 22px);
+    padding: 14px clamp(14px, 5vw, 20px);
+    row-gap: clamp(10px, 3vw, 14px);
   }
 
   .detail-actions {
     justify-content: flex-start;
-    gap: 8px;
+    gap: 6px;
+  }
+
+  .anamnese-expanded {
+    gap: clamp(10px, 3vw, 16px);
+    margin: 12px 0 10px;
+    padding: 10px 0;
+  }
+
+  .anamnese-editor {
+    gap: clamp(10px, 3vw, 16px);
+  }
+
+  .anamnese-historico {
+    gap: clamp(10px, 4vw, 14px);
+  }
+
+  .bloco-anamnese {
+    padding: 16px clamp(14px, 6vw, 20px);
+    margin: 4px 0;
   }
 
   .modal-content {
@@ -377,16 +399,36 @@ body {
 
 @media (max-width: 480px) {
   .table-consultas {
-    min-width: 560px;
+    width: 100%;
+    min-width: 0;
   }
 
   .table-consultas th,
   .table-consultas td {
-    padding: 8px 10px;
+    padding: 6px 10px;
   }
 
   .table-row td {
-    padding: 8px 10px;
+    padding: 6px 10px;
+  }
+
+  .detail-cell {
+    padding: 12px clamp(12px, 6vw, 18px);
+    row-gap: clamp(8px, 4vw, 12px);
+  }
+
+  .anamnese-expanded {
+    gap: clamp(8px, 4.5vw, 14px);
+    margin: 10px 0 8px;
+    padding: 8px 0;
+  }
+
+  .bloco-anamnese {
+    padding: 14px clamp(12px, 7vw, 18px);
+  }
+
+  .anamnese-historico {
+    gap: clamp(8px, 5vw, 12px);
   }
 
   .btn,
