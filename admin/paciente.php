@@ -143,7 +143,13 @@ if ($row = $res->fetch_assoc()) {
       <td data-label="Status"><?= htmlspecialchars($cons['status']) ?></td>
       <td class="text-center" data-label="Queixa">
         <?php if ($tem_formulario): ?>
-          <button onclick="toggleFormulario(<?= $agendamento_id ?>)" title="Ver formulário de queixa" class="btn-icon">📋</button>
+          <button
+            onclick="toggleFormulario(<?= $agendamento_id ?>)"
+            title="Ver formulário de queixa"
+            class="btn-icon"
+            aria-controls="formulario-<?= $agendamento_id ?>"
+            aria-expanded="false"
+          >📋</button>
         <?php else: ?>
           <span title="Sem formulário">&mdash;</span>
         <?php endif; ?>
@@ -158,7 +164,14 @@ if ($row = $res->fetch_assoc()) {
         $descricaoStatus = $temAnamnese ? 'Anamnese preenchida' : 'Anamnese não preenchida';
       ?>
       <td class="text-center" data-label="Anamnese">
-        <button onclick="toggleAnamnese(<?= $agendamento_id ?>)" class="btn-link" title="<?= htmlspecialchars($tituloAnamnese) ?>" aria-describedby="anamnese-legenda">
+        <button
+          onclick="toggleAnamnese(<?= $agendamento_id ?>)"
+          class="btn-link"
+          title="<?= htmlspecialchars($tituloAnamnese) ?>"
+          aria-describedby="anamnese-legenda"
+          aria-controls="anamnese-<?= $agendamento_id ?>"
+          aria-expanded="false"
+        >
           <span class="anamnese-icon" aria-hidden="true"><?= $iconeAnamnese ?></span>
           <span class="sr-only"><?= htmlspecialchars($descricaoStatus) ?> - </span>
           Anamnese
@@ -166,7 +179,7 @@ if ($row = $res->fetch_assoc()) {
       </td>
     </tr>
     <?php if ($tem_formulario): ?>
-    <tr id="formulario-<?= $agendamento_id ?>" class="detail-row is-hidden">
+    <tr id="formulario-<?= $agendamento_id ?>" class="detail-row is-hidden" hidden>
       <td colspan="6" class="detail-cell">
         <?php
           $fq = $conn->query("SELECT * FROM formularios_queixa WHERE agendamento_id = $agendamento_id")->fetch_assoc();
@@ -179,12 +192,17 @@ if ($row = $res->fetch_assoc()) {
           }
         ?>
         <div class="detail-actions">
-          <button onclick="toggleFormulario(<?= $agendamento_id ?>)" class="btn btn-secondary btn-sm">Fechar</button>
+          <button
+            onclick="toggleFormulario(<?= $agendamento_id ?>)"
+            class="btn btn-secondary btn-sm"
+            aria-controls="formulario-<?= $agendamento_id ?>"
+            aria-expanded="false"
+          >Fechar</button>
         </div>
       </td>
     </tr>
     <?php endif; ?>
-    <tr id="anamnese-<?= $agendamento_id ?>" class="detail-row is-hidden">
+    <tr id="anamnese-<?= $agendamento_id ?>" class="detail-row is-hidden" hidden>
       <td colspan="6" class="detail-cell">
         <div class="anamnese-expanded">
           <div class="anamnese-editor">
@@ -192,7 +210,12 @@ if ($row = $res->fetch_assoc()) {
 <?= isset($anamneses[$agendamento_id][0]) ? htmlspecialchars($anamneses[$agendamento_id][0]['anamnese']) : '' ?></textarea>
             <div class="detail-actions">
               <button onclick="salvarAnamnese(<?= $agendamento_id ?>)" class="btn btn-primary btn-sm">Salvar</button>
-              <button onclick="toggleAnamnese(<?= $agendamento_id ?>)" class="btn btn-secondary btn-sm">Fechar</button>
+              <button
+                onclick="toggleAnamnese(<?= $agendamento_id ?>)"
+                class="btn btn-secondary btn-sm"
+                aria-controls="anamnese-<?= $agendamento_id ?>"
+                aria-expanded="false"
+              >Fechar</button>
             </div>
           </div>
           <?php if (!empty($anamneses[$agendamento_id])): ?>
@@ -232,16 +255,28 @@ if ($row = $res->fetch_assoc()) {
 </div>
 
 <script>
+function updateToggleControls(rowId, expanded) {
+  const buttons = document.querySelectorAll('[aria-controls="' + rowId + '"]');
+  buttons.forEach((btn) => {
+    btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  });
+}
 function toggleFormulario(id){
-  const row = document.getElementById('formulario-' + id);
+  const rowId = 'formulario-' + id;
+  const row = document.getElementById(rowId);
   if (row) {
-    row.classList.toggle('is-hidden');
+    const isHidden = row.classList.toggle('is-hidden');
+    row.hidden = isHidden;
+    updateToggleControls(rowId, !isHidden);
   }
 }
 function toggleAnamnese(id){
-  const row = document.getElementById('anamnese-' + id);
+  const rowId = 'anamnese-' + id;
+  const row = document.getElementById(rowId);
   if (row) {
-    row.classList.toggle('is-hidden');
+    const isHidden = row.classList.toggle('is-hidden');
+    row.hidden = isHidden;
+    updateToggleControls(rowId, !isHidden);
   }
 }
 function salvarAnamnese(id){
