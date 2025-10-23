@@ -387,6 +387,13 @@ body {
     gap: clamp(10px, 3vw, 16px);
   }
 
+  .anamnese-textarea {
+    min-height: clamp(160px, 35vh, 240px);
+    font-size: clamp(1.02rem, 2.7vw, 1.08rem);
+    line-height: 1.6;
+    padding: clamp(14px, 3vw, 18px);
+  }
+
   .anamnese-historico {
     gap: clamp(10px, 4vw, 14px);
   }
@@ -425,6 +432,13 @@ body {
     gap: clamp(8px, 4.5vw, 14px);
     margin: 10px 0 8px;
     padding: 8px 0;
+  }
+
+  .anamnese-textarea {
+    min-height: clamp(180px, 45vh, 280px);
+    font-size: clamp(1.03rem, 4vw, 1.12rem);
+    line-height: 1.65;
+    padding: clamp(16px, 5.5vw, 20px);
   }
 
   .bloco-anamnese {
