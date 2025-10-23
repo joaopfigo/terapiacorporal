@@ -370,6 +370,8 @@ body {
     border-top: 2px solid #c2d8bd;
     padding: 14px clamp(14px, 5vw, 20px);
     row-gap: clamp(10px, 3vw, 14px);
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
   }
 
   .detail-actions {
@@ -381,6 +383,8 @@ body {
     gap: clamp(10px, 3vw, 16px);
     margin: 12px 0 10px;
     padding: 10px 0;
+    width: min(100%, 92vw);
+    margin-inline: auto;
   }
 
   .anamnese-editor {
@@ -388,10 +392,14 @@ body {
   }
 
   .anamnese-textarea {
+    width: 100%;
     min-height: clamp(160px, 35vh, 240px);
     font-size: clamp(1.02rem, 2.7vw, 1.08rem);
     line-height: 1.6;
     padding: clamp(14px, 3vw, 18px);
+    box-sizing: border-box;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(40, 94, 68, 0.18);
   }
 
   .anamnese-historico {
@@ -424,21 +432,30 @@ body {
   }
 
   .detail-cell {
+    display: grid;
     padding: 12px clamp(12px, 6vw, 18px);
     row-gap: clamp(8px, 4vw, 12px);
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
   }
 
   .anamnese-expanded {
     gap: clamp(8px, 4.5vw, 14px);
     margin: 10px 0 8px;
     padding: 8px 0;
+    width: min(100%, 92vw);
+    margin-inline: auto;
   }
 
   .anamnese-textarea {
+    width: 100%;
     min-height: clamp(180px, 45vh, 280px);
     font-size: clamp(1.03rem, 4vw, 1.12rem);
     line-height: 1.65;
     padding: clamp(16px, 5.5vw, 20px);
+    box-sizing: border-box;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(40, 94, 68, 0.18);
   }
 
   .bloco-anamnese {
