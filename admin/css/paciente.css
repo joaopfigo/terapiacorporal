@@ -383,8 +383,8 @@ body {
     gap: clamp(10px, 3vw, 16px);
     margin: 12px 0 10px;
     padding: 10px 0;
-    width: min(100%, 92vw);
-    margin-inline: auto;
+    width: 100%;
+    justify-self: stretch;
   }
 
   .anamnese-editor {
@@ -443,8 +443,8 @@ body {
     gap: clamp(8px, 4.5vw, 14px);
     margin: 10px 0 8px;
     padding: 8px 0;
-    width: min(100%, 92vw);
-    margin-inline: auto;
+    width: 100%;
+    justify-self: stretch;
   }
 
   .anamnese-textarea {
