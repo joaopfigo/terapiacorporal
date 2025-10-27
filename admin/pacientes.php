@@ -59,6 +59,7 @@ $stmt->close();
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <title>Painel Admin - Pacientes</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/header-admin.css?v=<?= filemtime(__DIR__ . '/css/header-admin.css') ?>">
 <style>
   body { font-family: Roboto, Arial, sans-serif; background: #fcfaf7; margin:0; }
   .container { max-width:980px; margin:90px auto 0 auto; background:#fff; border-radius:18px; box-shadow:0 2px 32px #0001; padding:38px 3vw 44px 3vw; }
@@ -70,79 +71,6 @@ $stmt->close();
   .table-pacientes tr:hover { background:#f6f4ee; }
   .btn-ver { background:#6A5036; color:#fff; border-radius:8px; border:none; font-size:1rem; font-weight:700; padding:7px 18px; cursor:pointer; transition:background .16s; }
   .btn-ver:hover { background:#8b6f4e; }
-  .header-admin {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 63px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #256d54;
-    color: #fff;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.27rem;
-    box-shadow: 0 6px 30px #256d5412, 0 2px 10px #1d9a7718;
-    z-index: 999;
-    padding: 0 4vw;
-    gap: 16px;
-  }
-
-  .header-admin .header-brand {
-    font-weight: 700;
-    letter-spacing: .4px;
-  }
-
-  .header-admin .menu-container {
-    display: flex;
-    align-items: center;
-  }
-
-  .header-admin .menu-horizontal {
-    display: flex;
-    gap: 14px;
-  }
-
-  .header-admin .menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 1.7rem;
-    cursor: pointer;
-    line-height: 1;
-    padding: 6px 10px;
-    border-radius: 10px;
-    transition: background .17s;
-  }
-
-  .header-admin .menu-toggle:hover,
-  .header-admin.is-open .menu-toggle {
-    background: rgba(255, 255, 255, 0.12);
-  }
-
-  .header-admin .menu-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 1.09rem;
-    font-weight: 600;
-    padding: 8px 17px 7px 17px;
-    border-radius: 12px;
-    transition: background .17s, color .14s;
-    cursor: pointer;
-    text-decoration: none;
-    outline: none;
-    display: inline-block;
-  }
-
-  .header-admin .menu-btn.active,
-  .header-admin .menu-btn:hover {
-    background: #ffd972;
-    color: #256d54;
-  }
-
   @media (max-width: 700px) {
     .container {
       max-width: 100vw;
@@ -161,51 +89,6 @@ $stmt->close();
 
     .table-responsive .table-pacientes {
       min-width: 640px;
-    }
-
-    .header-admin {
-      font-size: 1.07rem;
-      height: 49px;
-      border-radius: 0 0 16px 16px;
-      padding: 0 2vw;
-      gap: 10px;
-    }
-
-    .header-admin .menu-toggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .header-admin .menu-container {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      padding: 12px 2vw 16px 2vw;
-      background: #256d54;
-      box-shadow: 0 6px 30px #256d5412, 0 2px 10px #1d9a7718;
-      border-radius: 0 0 16px 16px;
-    }
-
-    .header-admin .menu-horizontal {
-      display: none;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .header-admin .menu-btn {
-      text-align: left;
-      padding: 10px 12px;
-    }
-
-    .header-admin.is-open .menu-container {
-      display: block;
-    }
-
-    .header-admin.is-open .menu-horizontal {
-      display: flex;
     }
   }
 </style>
