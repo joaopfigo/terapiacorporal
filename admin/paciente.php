@@ -181,53 +181,57 @@ if ($row = $res->fetch_assoc()) {
     <?php if ($tem_formulario): ?>
     <tr id="formulario-<?= $agendamento_id ?>" class="detail-row is-hidden" hidden>
       <td colspan="6" class="detail-cell">
-        <?php
-          $fq = $conn->query("SELECT * FROM formularios_queixa WHERE agendamento_id = $agendamento_id")->fetch_assoc();
-          if ($fq) {
-            echo "<strong>Desconforto principal:</strong> ".htmlspecialchars($fq['desconforto_principal'] ?? '')."<br>";
-            echo "<strong>Queixa secundária:</strong> ".htmlspecialchars($fq['queixa_secundaria'] ?? '')."<br>";
-            echo "<strong>Tempo de desconforto:</strong> ".htmlspecialchars($fq['tempo_desconforto'] ?? '')."<br>";
-            echo "<strong>Classificação da dor:</strong> ".htmlspecialchars($fq['classificacao_dor'] ?? '')."<br>";
-            echo "<strong>Tratamento médico:</strong> ".htmlspecialchars($fq['tratamento_medico'] ?? '')."<br>";
-          }
-        ?>
-        <div class="detail-actions">
-          <button
-            onclick="toggleFormulario(<?= $agendamento_id ?>)"
-            class="btn btn-secondary btn-sm"
-            aria-controls="formulario-<?= $agendamento_id ?>"
-            aria-expanded="false"
-          >Fechar</button>
+        <div class="detail-cell-content">
+          <?php
+            $fq = $conn->query("SELECT * FROM formularios_queixa WHERE agendamento_id = $agendamento_id")->fetch_assoc();
+            if ($fq) {
+              echo "<strong>Desconforto principal:</strong> ".htmlspecialchars($fq['desconforto_principal'] ?? '')."<br>";
+              echo "<strong>Queixa secundária:</strong> ".htmlspecialchars($fq['queixa_secundaria'] ?? '')."<br>";
+              echo "<strong>Tempo de desconforto:</strong> ".htmlspecialchars($fq['tempo_desconforto'] ?? '')."<br>";
+              echo "<strong>Classificação da dor:</strong> ".htmlspecialchars($fq['classificacao_dor'] ?? '')."<br>";
+              echo "<strong>Tratamento médico:</strong> ".htmlspecialchars($fq['tratamento_medico'] ?? '')."<br>";
+            }
+          ?>
+          <div class="detail-actions">
+            <button
+              onclick="toggleFormulario(<?= $agendamento_id ?>)"
+              class="btn btn-secondary btn-sm"
+              aria-controls="formulario-<?= $agendamento_id ?>"
+              aria-expanded="false"
+            >Fechar</button>
+          </div>
         </div>
       </td>
     </tr>
     <?php endif; ?>
     <tr id="anamnese-<?= $agendamento_id ?>" class="detail-row is-hidden" hidden>
       <td colspan="6" class="detail-cell">
-        <div class="anamnese-expanded">
-          <div class="anamnese-editor">
-            <textarea id="anamnese-text-<?= $agendamento_id ?>" class="anamnese-textarea">
+        <div class="detail-cell-content">
+          <div class="anamnese-expanded">
+            <div class="anamnese-editor">
+              <textarea id="anamnese-text-<?= $agendamento_id ?>" class="anamnese-textarea">
 <?= isset($anamneses[$agendamento_id][0]) ? htmlspecialchars($anamneses[$agendamento_id][0]['anamnese']) : '' ?></textarea>
-            <div class="detail-actions">
-              <button onclick="salvarAnamnese(<?= $agendamento_id ?>)" class="btn btn-primary btn-sm">Salvar</button>
-              <button
-                onclick="toggleAnamnese(<?= $agendamento_id ?>)"
-                class="btn btn-secondary btn-sm"
-                aria-controls="anamnese-<?= $agendamento_id ?>"
-                aria-expanded="false"
-              >Fechar</button>
+              <div class="detail-actions">
+                <button onclick="salvarAnamnese(<?= $agendamento_id ?>)" class="btn btn-primary btn-sm">Salvar</button>
+                <button
+                  onclick="toggleAnamnese(<?= $agendamento_id ?>)"
+                  class="btn btn-secondary btn-sm"
+                  aria-controls="anamnese-<?= $agendamento_id ?>"
+                  aria-expanded="false"
+                >Fechar</button>
+              </div>
             </div>
+            <?php if (!empty($anamneses[$agendamento_id])): ?>
+              <div class="anamnese-historico">
+                <?php foreach ($anamneses[$agendamento_id] as $ana): ?>
+                  <div class="bloco-anamnese">
+                    <div><strong>Atualizado:</strong> <?= date('d/m/Y H:i', strtotime($ana['updated_at'])) ?></div>
+                    <div><?= nl2br(htmlspecialchars($ana['anamnese'])) ?></div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
           </div>
-          <?php if (!empty($anamneses[$agendamento_id])): ?>
-            <div class="anamnese-historico">
-              <?php foreach ($anamneses[$agendamento_id] as $ana): ?>
-                <div class="bloco-anamnese">
-                  <div><strong>Atualizado:</strong> <?= date('d/m/Y H:i', strtotime($ana['updated_at'])) ?></div>
-                  <div><?= nl2br(htmlspecialchars($ana['anamnese'])) ?></div>
-                </div>
-              <?php endforeach; ?>
-            </div>
-          <?php endif; ?>
         </div>
       </td>
     </tr>
