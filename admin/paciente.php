@@ -65,6 +65,8 @@ if ($row = $res->fetch_assoc()) {
 <meta charset='UTF-8'>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Paciente: <?= htmlspecialchars($pac['nome']) ?></title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/header-admin.css?v=<?= filemtime(__DIR__ . '/css/header-admin.css') ?>">
 <link rel="stylesheet" href="css/paciente.css?v=<?= filemtime(__DIR__ . '/css/paciente.css') ?>">
 <style>
 .btn-link .anamnese-icon {
@@ -90,6 +92,19 @@ if ($row = $res->fetch_assoc()) {
 </style>
 </head>
 <body>
+  <div class="header-admin">
+    <div class="header-brand">Painel da Terapeuta</div>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="admin-menu">☰</button>
+    <div class="menu-container">
+      <div class="menu-horizontal" id="admin-menu">
+        <a class="menu-btn" href="agenda.php">Agenda</a>
+        <a class="menu-btn active" href="pacientes.php">Pacientes</a>
+        <a class="menu-btn" href="precos.php">Preços</a>
+        <a class="menu-btn" href="blog.php">Blog</a>
+        <a class="menu-btn" href="index.php">Home</a>
+      </div>
+    </div>
+  </div>
 <div class='paciente-container'>
   <h2 class='h2-paciente'>Paciente: <?= htmlspecialchars($pac['nome']) ?></h2>
   <div class='dados'>
@@ -257,6 +272,35 @@ if ($row = $res->fetch_assoc()) {
     </div>
   </div>
 </div>
+
+  <script>
+    (function () {
+      const header = document.querySelector('.header-admin');
+      if (!header) return;
+
+      const toggle = header.querySelector('.menu-toggle');
+      const menuLinks = header.querySelectorAll('.menu-horizontal a');
+      if (!toggle) return;
+
+      const closeMenu = () => {
+        header.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+
+      toggle.addEventListener('click', () => {
+        const isOpen = header.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+
+      menuLinks.forEach((link) => {
+        link.addEventListener('click', () => {
+          if (header.classList.contains('is-open')) {
+            closeMenu();
+          }
+        });
+      });
+    })();
+  </script>
 
 <script>
 function updateToggleControls(rowId, expanded) {
