@@ -86,8 +86,9 @@ main {
       justify-content: space-between;
       background: var(--cor-principal);
       color: #fff;
-      padding: 1.6rem 3vw;
-      min-height: 140px;
+      padding: 0.8rem 3vw;
+      height: 96px;
+      min-height: 72px;
       box-shadow: 0 2px 16px #0003;
       z-index: 1000;
     }
@@ -97,12 +98,12 @@ main {
       align-items: center;
     }
     .navbar-logo-central img {
-      height: 130px;
+      height: 140px;
       width: auto;
       max-width: 210px;
       object-fit: contain;
       display: block;
-      margin: 0 12px 0 0;
+      margin-right: 12px;
     }
     .navbar-menu {
       display: flex;
@@ -134,7 +135,7 @@ main {
     @media (max-width: 1050px) {
       .navbar-menu {
         position: fixed;
-        top: 140px;
+        top: 96px;
         right: 0;
         width: 84vw;
         max-width: 420px;
@@ -143,7 +144,7 @@ main {
         flex-direction: column;
         align-items: flex-start;
         gap: 1.6rem;
-        padding: 2.8rem 2rem;
+        padding: 2.4rem 2rem;
         box-shadow: -3px 0 24px #0003;
         transform: translateX(110%);
         transition: transform 0.28s;
