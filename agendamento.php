@@ -84,9 +84,8 @@ if ($res instanceof mysqli_result) {
       justify-content: space-between;
       background: var(--cor-nav);
       color: #fff;
-      padding: 0.4rem 2vw;
-      height: 72px;
-      min-height: 60px;
+      padding: 1.6rem 2vw;
+      min-height: 140px;
       position: relative;
       z-index: 1000;
     }
@@ -97,12 +96,12 @@ if ($res instanceof mysqli_result) {
       align-items: center;
     }
     .navbar-logo-central img {
-      height: 200px; /* Aqui aumentei um pouco a logo, ajuste conforme seu gosto, mas sem passar de 72px */
+      height: 130px;
       width: auto;
       max-width: 210px;
       object-fit: contain;
       display: block;
-      margin-right: 12px;
+      margin: 0 12px 0 0;
     }
 
     /* MENU */
@@ -141,7 +140,7 @@ if ($res instanceof mysqli_result) {
     @media (max-width: 1050px) {
       .navbar-menu {
         position: fixed;
-        top: 72px;
+        top: 140px;
         right: 0;
         width: 68vw;
         max-width: 320px;
@@ -165,9 +164,19 @@ if ($res instanceof mysqli_result) {
     }
 
     @media (max-width: 700px) {
-      .navbar { padding: 0.3rem 2vw; height: 54px; }
-      .navbar-logo-central img { height: 150px; max-width: 105px; }
-      .navbar-menu { gap: 0.6rem; padding: 1.2rem 2vw; top: 54px; }
+      .navbar {
+        padding: 1.4rem 2vw;
+        min-height: 140px;
+      }
+      .navbar-logo-central img {
+        height: 120px;
+        max-width: 160px;
+      }
+      .navbar-menu {
+        gap: 0.6rem;
+        padding: 1.8rem 2vw;
+        top: 140px;
+      }
     }
 
     .container {
