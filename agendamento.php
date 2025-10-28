@@ -84,9 +84,9 @@ if ($res instanceof mysqli_result) {
       justify-content: space-between;
       background: var(--cor-nav);
       color: #fff;
-      padding: 0.8rem 3vw;
-      height: 96px;
-      min-height: 72px;
+      padding: 1.4rem 3vw 1.2rem;
+      height: auto;
+      min-height: 140px;
       position: relative;
       z-index: 1000;
     }
@@ -97,12 +97,13 @@ if ($res instanceof mysqli_result) {
       align-items: center;
     }
     .navbar-logo-central img {
-      height: 140px;
+      height: 150px;
       width: auto;
       max-width: 210px;
       object-fit: contain;
       display: block;
       margin-right: 12px;
+      margin-top: 6px;
     }
 
     /* MENU */
@@ -141,7 +142,7 @@ if ($res instanceof mysqli_result) {
     @media (max-width: 1050px) {
       .navbar-menu {
         position: fixed;
-        top: 96px;
+        top: 140px;
         right: 0;
         width: 68vw;
         max-width: 320px;
@@ -166,18 +167,19 @@ if ($res instanceof mysqli_result) {
 
     @media (max-width: 700px) {
       .navbar {
-        padding: 0.8rem 4vw;
-        height: 96px;
-        min-height: 72px;
+        padding: 1.2rem 4vw 1rem;
+        height: auto;
+        min-height: 140px;
       }
       .navbar-logo-central img {
-        height: 120px;
-        max-width: 160px;
+        height: 140px;
+        max-width: 180px;
+        margin-top: 4px;
       }
       .navbar-menu {
         gap: 0.6rem;
         padding: 1.8rem 2vw;
-        top: 96px;
+        top: 140px;
       }
     }
 
