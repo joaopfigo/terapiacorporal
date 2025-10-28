@@ -92,16 +92,6 @@ main {
       box-shadow: 0 2px 16px #0003;
       z-index: 1000;
     }
-    .navbar-logo-central span {
-      font-family: 'Dancing Script', cursive;
-      font-size: 1.52rem;
-      color: #fff2c6;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      margin-left: 10px;
-      text-shadow: 0 2px 7px #b79b6350;
-      transition: color 0.18s;
-    }
     .navbar-logo-central {
       height: 100%;
       display: flex;
@@ -297,7 +287,6 @@ main {
   <nav class="navbar">
     <div class="navbar-logo-central">
       <img src="img/logo.png" alt="Consultório de Terapia Corporal Sistêmica" />
-      <span>Virlene Figueiredo</span>
     </div>
     <button class="navbar-toggle" aria-label="Abrir menu">&#9776;</button>
     <ul class="navbar-menu">
