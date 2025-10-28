@@ -148,6 +148,7 @@ body {
 
 .table-consultas {
   width: 100%;
+  min-width: 720px;
   border-collapse: collapse;
   margin-top: 20px;
   background: #ffffff;
@@ -340,88 +341,12 @@ body {
     -webkit-overflow-scrolling: touch;
   }
 
-  .table-consultas {
-    width: 100%;
-    min-width: 0;
-    border-radius: 10px;
-  }
-
-  .table-consultas thead {
-    display: table-header-group;
-  }
-
-  .table-consultas th,
-  .table-consultas td {
-    padding: 6px 10px;
-    font-size: clamp(0.85rem, 2.6vw, 0.95rem);
-  }
-
-  .table-consultas td {
-    padding-top: 6px;
-    padding-bottom: 6px;
-  }
-
-  .table-row {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(8px, 3vw, 16px) clamp(12px, 4vw, 20px);
-    padding: clamp(6px, 2.5vw, 12px) clamp(6px, 4vw, 14px);
-    box-shadow: none;
-    border-bottom: 1px solid #e2ecdf;
-  }
-
-  .table-row td {
-    border: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: clamp(2px, 1vw, 6px);
-  }
-
-  .table-consultas tbody tr.table-row:last-of-type {
-    border-bottom: none;
-  }
-
-  .table-row td::before {
-    content: attr(data-label);
-    font-size: clamp(0.7rem, 2.2vw, 0.78rem);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #4c6b5a;
-  }
-
-  .table-row td:nth-child(1) {
-    grid-column: 1;
-  }
-
-  .table-row td:nth-child(2) {
-    grid-column: 2;
-  }
-
-  .table-row td:nth-child(3) {
-    grid-column: 1;
-  }
-
-  .table-row td:nth-child(4) {
-    grid-column: 2;
-  }
-
-  .table-row td:nth-child(5) {
-    grid-column: 1 / -1;
-  }
-
   .acoes-consulta {
     display: flex;
     flex-wrap: wrap;
     gap: clamp(6px, 2vw, 10px);
     justify-content: flex-start;
     width: 100%;
-  }
-
-  .responsive-table td[data-label] {
-    position: static;
   }
 
   .text-center {
@@ -505,16 +430,6 @@ body {
     box-sizing: border-box;
   }
 
-  .table-consultas {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .table-consultas th,
-  .table-consultas td {
-    padding: 6px 10px;
-  }
-
   .detail-cell {
     padding: 0;
     border-top: none;
@@ -572,20 +487,6 @@ body {
   .pacote-atual {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .table-row {
-    gap: clamp(6px, 4vw, 12px) clamp(10px, 6vw, 16px);
-    padding: clamp(6px, 3vw, 10px) clamp(6px, 6vw, 12px);
-  }
-
-  .table-row td {
-    gap: clamp(2px, 2vw, 4px);
-  }
-
-  .table-row td::before {
-    font-size: clamp(0.66rem, 3.5vw, 0.72rem);
-    letter-spacing: 0.06em;
   }
 
   .acoes-consulta {
