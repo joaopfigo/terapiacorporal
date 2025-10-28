@@ -86,9 +86,9 @@ main {
       justify-content: space-between;
       background: var(--cor-principal);
       color: #fff;
-      padding: 0.8rem 3vw;
-      height: 96px;
-      min-height: 72px;
+      padding: 1.4rem 3vw 1.2rem;
+      height: auto;
+      min-height: 140px;
       box-shadow: 0 2px 16px #0003;
       z-index: 1000;
     }
@@ -98,12 +98,13 @@ main {
       align-items: center;
     }
     .navbar-logo-central img {
-      height: 140px;
+      height: 150px;
       width: auto;
       max-width: 210px;
       object-fit: contain;
       display: block;
       margin-right: 12px;
+      margin-top: 6px;
     }
     .navbar-menu {
       display: flex;
@@ -135,7 +136,7 @@ main {
     @media (max-width: 1050px) {
       .navbar-menu {
         position: fixed;
-        top: 96px;
+        top: 140px;
         right: 0;
         width: 84vw;
         max-width: 420px;
@@ -270,8 +271,9 @@ main {
     border-radius: 7px;
   }
   .navbar-logo-central img {
-    max-width: 150px;
-    height: 110px;
+    max-width: 170px;
+    height: 130px;
+    margin-top: 4px;
   }
   .pacote-bloco button {
     font-size: 0.96em;
