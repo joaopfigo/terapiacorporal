@@ -136,8 +136,7 @@ if ($row = $res->fetch_assoc()) {
         <th>Especialidade</th>
         <th>Duração</th>
         <th>Status</th>
-        <th class="text-center">Queixa</th>
-        <th class="text-center">Anamnese</th>
+        <th class="text-center">Ações</th>
       </tr>
     </thead>
     <tbody>
@@ -156,19 +155,6 @@ if ($row = $res->fetch_assoc()) {
       <td data-label="Especialidade"><?= htmlspecialchars($servicoTitulo) ?></td>
       <td data-label="Duração"><?= $cons['duracao'] ?> min</td>
       <td data-label="Status"><?= htmlspecialchars($cons['status']) ?></td>
-      <td class="text-center" data-label="Queixa">
-        <?php if ($tem_formulario): ?>
-          <button
-            onclick="toggleFormulario(<?= $agendamento_id ?>)"
-            title="Ver formulário de queixa"
-            class="btn-icon"
-            aria-controls="formulario-<?= $agendamento_id ?>"
-            aria-expanded="false"
-          >📋</button>
-        <?php else: ?>
-          <span title="Sem formulário">&mdash;</span>
-        <?php endif; ?>
-      </td>
       <?php
         $anamneseAtual = $anamneses[$agendamento_id][0] ?? null;
         $temAnamnese = !empty($anamneses[$agendamento_id]);
@@ -178,24 +164,37 @@ if ($row = $res->fetch_assoc()) {
           : 'Nenhuma anamnese registrada. Clique para preencher.';
         $descricaoStatus = $temAnamnese ? 'Anamnese preenchida' : 'Anamnese não preenchida';
       ?>
-      <td class="text-center" data-label="Anamnese">
-        <button
-          onclick="toggleAnamnese(<?= $agendamento_id ?>)"
-          class="btn-link"
-          title="<?= htmlspecialchars($tituloAnamnese) ?>"
-          aria-describedby="anamnese-legenda"
-          aria-controls="anamnese-<?= $agendamento_id ?>"
-          aria-expanded="false"
-        >
-          <span class="anamnese-icon" aria-hidden="true"><?= $iconeAnamnese ?></span>
-          <span class="sr-only"><?= htmlspecialchars($descricaoStatus) ?> - </span>
-          Anamnese
-        </button>
+      <td class="text-center" data-label="Ações">
+        <div class="acoes-consulta">
+          <?php if ($tem_formulario): ?>
+            <button
+              onclick="toggleFormulario(<?= $agendamento_id ?>)"
+              title="Ver formulário de queixa"
+              class="btn-icon"
+              aria-controls="formulario-<?= $agendamento_id ?>"
+              aria-expanded="false"
+            >📋</button>
+          <?php else: ?>
+            <span title="Sem formulário">&mdash;</span>
+          <?php endif; ?>
+          <button
+            onclick="toggleAnamnese(<?= $agendamento_id ?>)"
+            class="btn-link"
+            title="<?= htmlspecialchars($tituloAnamnese) ?>"
+            aria-describedby="anamnese-legenda"
+            aria-controls="anamnese-<?= $agendamento_id ?>"
+            aria-expanded="false"
+          >
+            <span class="anamnese-icon" aria-hidden="true"><?= $iconeAnamnese ?></span>
+            <span class="sr-only"><?= htmlspecialchars($descricaoStatus) ?> - </span>
+            Anamnese
+          </button>
+        </div>
       </td>
     </tr>
     <?php if ($tem_formulario): ?>
     <tr id="formulario-<?= $agendamento_id ?>" class="detail-row is-hidden" hidden>
-      <td colspan="6" class="detail-cell">
+      <td colspan="5" class="detail-cell">
         <div class="detail-cell-content">
           <?php
             $fq = $conn->query("SELECT * FROM formularios_queixa WHERE agendamento_id = $agendamento_id")->fetch_assoc();
@@ -220,7 +219,7 @@ if ($row = $res->fetch_assoc()) {
     </tr>
     <?php endif; ?>
     <tr id="anamnese-<?= $agendamento_id ?>" class="detail-row is-hidden" hidden>
-      <td colspan="6" class="detail-cell">
+      <td colspan="5" class="detail-cell">
         <div class="detail-cell-content">
           <div class="anamnese-expanded">
             <div class="anamnese-editor">

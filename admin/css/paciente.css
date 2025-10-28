@@ -183,6 +183,19 @@ body {
   text-align: center;
 }
 
+.acoes-consulta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.acoes-consulta span {
+  display: inline-flex;
+  align-items: center;
+}
+
 .detail-row {
   background: #f6f9f5;
 }
@@ -349,20 +362,62 @@ body {
   }
 
   .table-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(8px, 3vw, 16px) clamp(12px, 4vw, 20px);
+    padding: clamp(6px, 2.5vw, 12px) clamp(6px, 4vw, 14px);
     box-shadow: none;
+    border-bottom: 1px solid #e2ecdf;
   }
 
   .table-row td {
     border: none;
-    border-bottom: 1px solid #e2ecdf;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: clamp(2px, 1vw, 6px);
   }
 
-  .table-consultas tbody tr.table-row:last-of-type td {
+  .table-consultas tbody tr.table-row:last-of-type {
     border-bottom: none;
   }
 
   .table-row td::before {
-    content: none;
+    content: attr(data-label);
+    font-size: clamp(0.7rem, 2.2vw, 0.78rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #4c6b5a;
+  }
+
+  .table-row td:nth-child(1) {
+    grid-column: 1;
+  }
+
+  .table-row td:nth-child(2) {
+    grid-column: 2;
+  }
+
+  .table-row td:nth-child(3) {
+    grid-column: 1;
+  }
+
+  .table-row td:nth-child(4) {
+    grid-column: 2;
+  }
+
+  .table-row td:nth-child(5) {
+    grid-column: 1 / -1;
+  }
+
+  .acoes-consulta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(6px, 2vw, 10px);
+    justify-content: flex-start;
+    width: 100%;
   }
 
   .responsive-table td[data-label] {
@@ -460,10 +515,6 @@ body {
     padding: 6px 10px;
   }
 
-  .table-row td {
-    padding: 6px 10px;
-  }
-
   .detail-cell {
     padding: 0;
     border-top: none;
@@ -521,5 +572,23 @@ body {
   .pacote-atual {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .table-row {
+    gap: clamp(6px, 4vw, 12px) clamp(10px, 6vw, 16px);
+    padding: clamp(6px, 3vw, 10px) clamp(6px, 6vw, 12px);
+  }
+
+  .table-row td {
+    gap: clamp(2px, 2vw, 4px);
+  }
+
+  .table-row td::before {
+    font-size: clamp(0.66rem, 3.5vw, 0.72rem);
+    letter-spacing: 0.06em;
+  }
+
+  .acoes-consulta {
+    gap: clamp(6px, 3vw, 12px);
   }
 }
