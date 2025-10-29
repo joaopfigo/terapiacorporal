@@ -441,6 +441,7 @@
       <li><a href="blog.html">Blog</a></li>
       <li><a href="contato.html">Contato</a></li>
       <li id="li-perfil-login"><a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a></li>
+      <li><a href="registrar.html" onclick="logout()">Sair</a></li>
     </ul>
   </nav>
   <div class="banner-terra">Meu Perfil</div>
@@ -564,32 +565,10 @@
     }
 
     // Preenche dados usuário
-    const liPerfilLogin = document.getElementById('li-perfil-login');
-    const logoutButton = document.querySelector('.perfil-logout');
-    if (logoutButton) {
-      logoutButton.style.display = 'none';
-    }
-
     fetch("getPerfil.php")
-      .then(res => res.ok ? res.json() : Promise.reject(res))
+      .then(res => res.json())
       .then(data => {
         usuario = data.usuario || {};
-
-        if (usuario && usuario.nome) {
-          if (liPerfilLogin) {
-            liPerfilLogin.innerHTML = '<a href="perfil.html"><i class="fa-solid fa-user"></i> Perfil</a>';
-          }
-          if (logoutButton) {
-            logoutButton.style.display = 'flex';
-          }
-        } else {
-          if (liPerfilLogin) {
-            liPerfilLogin.innerHTML = '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
-          }
-          if (logoutButton) {
-            logoutButton.style.display = 'none';
-          }
-        }
 
         const alertaCompletar = document.getElementById('alerta-completar');
         const params = new URLSearchParams(window.location.search);
@@ -681,15 +660,7 @@
           destino.appendChild(card);
         });
       })
-      .catch(err => {
-        console.error("Erro ao carregar perfil:", err);
-        if (liPerfilLogin) {
-          liPerfilLogin.innerHTML = '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
-        }
-        if (logoutButton) {
-          logoutButton.style.display = 'none';
-        }
-      });
+      .catch(err => console.error("Erro ao carregar perfil:", err));
 
     // Próximas sessões (só mostra as não concluídas/canceladas)
     function renderProximasSessoes(listaSessoes = sessoes) {
