@@ -565,7 +565,9 @@
     }
 
     // Preenche dados usuário
-    fetch("getPerfil.php", { credentials: 'include' })
+    fetch("getPerfil.php", {
+      credentials: 'include'
+    })
       .then(res => res.json())
       .then(data => {
         usuario = data.usuario || {};
