@@ -566,8 +566,20 @@
 
     // Preenche dados usuário
       fetch("getPerfil.php", { credentials: 'include' })
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : Promise.reject())
       .then(data => {
+        const perfilLoginEl = document.getElementById('li-perfil-login');
+        if (perfilLoginEl) {
+          if (data.usuario && data.usuario.nome) {
+            if (data.usuario.tipo === 'terapeuta' || data.usuario.is_admin == 1) {
+              perfilLoginEl.innerHTML = '<a href="admin/index.php"><i class="fa-solid fa-lock"></i> Painel Adm.</a>';
+            } else {
+              perfilLoginEl.innerHTML = '<a href="perfil.html"><i class="fa-solid fa-user"></i> Perfil</a>';
+            }
+          } else {
+            perfilLoginEl.innerHTML = '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+          }
+        }
         usuario = data.usuario || {};
 
         const alertaCompletar = document.getElementById('alerta-completar');
@@ -660,7 +672,13 @@
           destino.appendChild(card);
         });
       })
-      .catch(err => console.error("Erro ao carregar perfil:", err));
+      .catch(err => {
+        console.error("Erro ao carregar perfil:", err);
+        const perfilLoginEl = document.getElementById('li-perfil-login');
+        if (perfilLoginEl) {
+          perfilLoginEl.innerHTML = '<a href="registrar.html"><i class="fa-solid fa-user"></i> Login</a>';
+        }
+      });
 
     // Próximas sessões (só mostra as não concluídas/canceladas)
     function renderProximasSessoes(listaSessoes = sessoes) {
