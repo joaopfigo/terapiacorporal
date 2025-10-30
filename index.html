@@ -93,26 +93,30 @@
 
 @media (max-width: 1050px) {
   .navbar {
-    height: 192px;
-    min-height: 192px;
-    align-items: center;
-    justify-content: center;
+    height: 240px;
+    min-height: 240px;
+    align-items: flex-start;
+    justify-content: space-between;
   }
 
   .navbar-logo-central {
     width: 100%;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-top: 24px;
+    padding-bottom: 24px;
+    padding-left: 5vw;
   }
 
   .navbar-logo-central img {
-    height: 440px;
-    max-width: min(650px, 90vw);
+    height: 520px;
+    max-width: min(760px, 92vw);
     margin-right: 0;
+    margin-top: 12px;
   }
 
   .navbar-menu {
     position: fixed;
-    top: 192px;
+    top: 240px;
     right: 0;
     width: 84vw;
     max-width: 420px;
@@ -134,7 +138,8 @@
 
   .navbar-toggle {
     display: block;
-    font-size: 2.6rem;
+    font-size: 3rem;
+    padding: 0.6rem;
   }
 
   .navbar-menu a {
@@ -145,7 +150,7 @@
   }
 
   .hero {
-    padding-top: 72px;
+    padding-top: 168px;
   }
 }
 
