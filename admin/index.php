@@ -32,125 +32,195 @@ if (!isset($_SESSION['usuario_id']) || ($_SESSION['tipo'] ?? '') !== 'terapeuta'
   html, body { height: 100%; margin: 0; padding: 0; background: var(--main-bg); font-family: Roboto, Arial, sans-serif; color: var(--text); }
   body { min-height: 100vh; }
   .admin-app {
-    max-width: 450px;
+    max-width: 1120px;
     margin: 0 auto;
-    padding-bottom: 40px;
-    min-height: 100vh;
-    display: flex; flex-direction: column; justify-content: flex-start;
-  }
-.header {
-  background: var(--primary);
-  color: #fff;
-  text-align: center;
-  padding: 36px 0 18px 0;
-  font-family: 'Playfair Display', serif;
-  font-size: 2.15rem;
-  letter-spacing: 1px;
-  border-radius: 0;          /* Retangular, sem curva */
-  box-shadow: 0 3px 18px #1d9a7712;
-  margin-bottom: 32px;
-  font-weight: 700;
-  border-bottom: 1.5px solid #e4f0ec; /* Linha clara e sofisticada */
-  position: static;
-}
-  .welcome {
-    font-size: 1.15rem;
-    font-family: Roboto,sans-serif;
-    color: #204e46;
-    text-align: center;
-    margin-bottom: 26px;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-  }
-  .menu-vertical {
+    padding: 0 40px 64px;
+    min-height: calc(100vh - 220px);
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    margin: 0 0 0 0;
-    align-items: stretch;
+    justify-content: flex-start;
+    gap: 28px;
+  }
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, #1d7f63 100%);
+    color: #fff;
+    width: 100%;
+    box-shadow: 0 8px 32px #1d9a7718;
+  }
+  .header-content {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 60px 40px 52px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 4vw, 3.2rem);
+    letter-spacing: 1.2px;
+    margin: 0;
+    font-weight: 700;
+  }
+  .header-subtitle {
+    font-size: 1.18rem;
+    font-weight: 500;
+    color: #e9f7f1;
+    letter-spacing: 0.4px;
+    margin: 0;
+  }
+  .welcome {
+    font-size: 1.12rem;
+    font-family: Roboto,sans-serif;
+    color: #315950;
+    text-align: left;
+    margin-bottom: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .menu-vertical {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 26px;
+    margin: 0;
     width: 100%;
   }
   .menu-btn {
     border: none;
     background: var(--card-bg);
-    border-radius: 18px;
-    padding: 21px 0;
+    border-radius: 24px;
+    padding: 28px 32px;
     font-weight: 700;
     font-size: 1.17rem;
     color: var(--primary-dark);
     box-shadow: var(--shadow);
-    transition: background 0.16s, color 0.16s, box-shadow 0.18s;
+    transition: transform 0.18s ease, background 0.18s ease, color 0.16s, box-shadow 0.18s;
     cursor: pointer;
     outline: none;
-    margin: 0 0;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: center;
-    letter-spacing: 0.7px;
+    gap: 10px;
+    letter-spacing: 0.4px;
     border: 2.5px solid transparent;
+    text-align: left;
   }
   .menu-btn:hover, .menu-btn:focus {
     background: var(--accent);
     color: var(--primary);
-    box-shadow: 0 3px 18px #e2e2cc;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
     border: 2.5px solid var(--primary);
   }
   .menu-btn:active {
     background: #c5f7e1;
     color: var(--primary-dark);
   }
+  .menu-icon {
+    font-size: 2rem;
+  }
+  .menu-title {
+    font-size: 1.26rem;
+    font-weight: 700;
+  }
+  .menu-description {
+    font-size: 0.98rem;
+    font-weight: 500;
+    color: #4f6b64;
+    letter-spacing: 0.2px;
+  }
   .logout-btn {
     margin-top: 42px;
-    font-size: 1.06rem;
+    font-size: 1.04rem;
     background: var(--danger);
     color: #fff;
     font-weight: 600;
-    border-radius: 11px;
+    border-radius: 14px;
     border: none;
-    padding: 15px 0;
-    box-shadow: 0 2px 8px #0001;
+    padding: 15px 24px;
+    box-shadow: 0 6px 18px #0002;
     cursor: pointer;
-    transition: background 0.18s;
+    transition: background 0.18s ease, transform 0.18s ease;
+    align-self: flex-start;
   }
-  .logout-btn:active { background: #ba3232; }
+  .logout-btn:hover {
+    background: #d94b4b;
+    transform: translateY(-2px);
+  }
+  .logout-btn:active { background: #ba3232; transform: translateY(0); }
   /* Mobile-first improvements */
   @media (max-width: 600px) {
-    .admin-app { max-width: 100vw; padding-bottom: 22vw; }
-    .header { font-size: 1.28rem; padding: 18vw 0 7vw 0; border-radius: 0 0 18vw 18vw; }
-    .menu-vertical { gap: 12vw; }
-    .menu-btn { font-size: 1.12rem; border-radius: 9vw; padding: 6vw 0; }
-    .logout-btn { padding: 5vw 0; font-size: 1.02rem; border-radius: 8vw; }
+    .header-content { padding: 18vw 9vw 10vw; }
+    .header-title { font-size: 1.8rem; }
+    .header-subtitle { font-size: 1.02rem; }
+    .admin-app { max-width: 100vw; padding: 0 7vw 22vw; gap: 18vw; min-height: auto; }
+    .menu-vertical { display: flex; flex-direction: column; gap: 12vw; }
+    .menu-btn {
+      font-size: 1.12rem;
+      border-radius: 9vw;
+      padding: 6vw 7vw;
+      align-items: center;
+      text-align: center;
+    }
+    .menu-icon { font-size: 1.8rem; }
+    .menu-description { font-size: 0.96rem; }
+    .logout-btn { padding: 5vw 7vw; font-size: 1.02rem; border-radius: 8vw; align-self: stretch; }
+    .encerrar-btn { max-width: none; width: 100%; border-radius: 8vw; }
   }
-    .encerrar-btn {
-  margin-top: 64px;
-  background: #f6f7f8;
-  color: #888;
-  border: none;
-  border-radius: 9px;
-  padding: 12px 0;
-  font-size: 1rem;
-  font-weight: 500;
-  box-shadow: 0 2px 5px #0001;
-  width: 100%;
-  cursor: pointer;
-  transition: background 0.16s, color 0.13s;
-  display: block;
-}
-.encerrar-btn:hover {
-  background: #ffd972;
-  color: #175f4c;
-}
+  .encerrar-btn {
+    margin-top: 24px;
+    background: #f0f5f4;
+    color: #3f5f58;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px #0001;
+    width: 100%;
+    max-width: 320px;
+    cursor: pointer;
+    transition: background 0.16s ease, color 0.13s ease, transform 0.16s ease;
+    align-self: flex-start;
+  }
+  .encerrar-btn:hover {
+    background: #dff0ed;
+    color: var(--primary-dark);
+    transform: translateY(-2px);
+  }
 </style>
 </head>
 <body>
+<header class="header">
+  <div class="header-content">
+    <h1 class="header-title">Painel Administrativo</h1>
+    <p class="header-subtitle">Bem-vinda ao seu centro de gestão terapêutica.</p>
+  </div>
+</header>
 <div class="admin-app">
-  <div class="header">Painel Administrativo</div>
-  <div class="welcome">Bem-vinda ao Painel, Terapeuta!</div>
+  <div class="welcome">Escolha uma área para gerenciar:</div>
   <div class="menu-vertical">
-    <button class="menu-btn" onclick="location.href='agenda.php'">Agenda</button>
-    <button class="menu-btn" onclick="location.href='pacientes.php'">Pacientes</button>
-    <button class="menu-btn" onclick="location.href='blog.php'">Blog</button>
-    <button class="menu-btn" onclick="location.href='precos.php'">Preços</button>
+    <button class="menu-btn" onclick="location.href='agenda.php'">
+      <span class="menu-icon" aria-hidden="true">🗓️</span>
+      <span class="menu-title">Agenda</span>
+      <span class="menu-description">Visualize sessões, confirme presenças e ajuste horários.</span>
+    </button>
+    <button class="menu-btn" onclick="location.href='pacientes.php'">
+      <span class="menu-icon" aria-hidden="true">👥</span>
+      <span class="menu-title">Pacientes</span>
+      <span class="menu-description">Acesse históricos, contatos e notas de acompanhamento.</span>
+    </button>
+    <button class="menu-btn" onclick="location.href='blog.php'">
+      <span class="menu-icon" aria-hidden="true">📝</span>
+      <span class="menu-title">Blog</span>
+      <span class="menu-description">Crie conteúdos inspiradores e mantenha sua comunidade engajada.</span>
+    </button>
+    <button class="menu-btn" onclick="location.href='precos.php'">
+      <span class="menu-icon" aria-hidden="true">💳</span>
+      <span class="menu-title">Preços</span>
+      <span class="menu-description">Atualize planos, valores e pacotes promocionais.</span>
+    </button>
   </div>
   <button class="logout-btn" onclick="location.href='../index.html'">Sair/Home</button>
   <button class="encerrar-btn" onclick="confirmLogout()">Encerrar Sessão</button>
