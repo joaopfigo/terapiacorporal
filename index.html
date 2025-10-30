@@ -114,13 +114,15 @@
     margin-top: 30px;
   }
 
+  :root { --menu-gutter: 8vw; }
+  
   .navbar-menu {
     position: fixed;
     top: 240px;
     right: 0;
-    width: 84vw;
-    max-width: 420px;
-    height: 100vh;
+    width: calc(100vw - var(--menu-gutter));
+    max-width: none;
+    height: 100dvh;
     background: var(--cor-principal);
     flex-direction: column;
     align-items: flex-start;
@@ -144,10 +146,11 @@
   }
 
   .navbar-menu a {
-    font-size: 1.8rem;
-    padding: 0.8rem 0;
+    font-size: 2.4rem;
+    line-height: 1.35;
+    padding: 1rem 0;
     width: 100%;
-    font-weight: 700;
+    font-weight: 800;
   }
 
   .hero {
