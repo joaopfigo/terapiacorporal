@@ -92,9 +92,27 @@
 }
 
 @media (max-width: 1050px) {
+  .navbar {
+    height: 192px;
+    min-height: 192px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .navbar-logo-central {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .navbar-logo-central img {
+    height: 440px;
+    max-width: min(650px, 90vw);
+    margin-right: 0;
+  }
+
   .navbar-menu {
     position: fixed;
-    top: 96px;
+    top: 192px;
     right: 0;
     width: 84vw;
     max-width: 420px;
@@ -124,6 +142,10 @@
     padding: 0.8rem 0;
     width: 100%;
     font-weight: 700;
+  }
+
+  .hero {
+    padding-top: 72px;
   }
 }
 
