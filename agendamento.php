@@ -82,30 +82,28 @@ if ($res instanceof mysqli_result) {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--cor-nav);
+      background: var(--cor-principal);
       color: #fff;
       padding: 0.8rem 3vw;
       height: 96px;
       min-height: 72px;
-      position: relative;
+      box-shadow: 0 2px 16px #0003;
       z-index: 1000;
     }
-    /* LOGO CENTRAL */
     .navbar-logo-central {
       height: 100%;
       display: flex;
       align-items: center;
+      padding-top: 24px;
     }
     .navbar-logo-central img {
-      height: 140px;
+      height: 220px;
       width: auto;
-      max-width: 210px;
+      max-width: 325px;
       object-fit: contain;
       display: block;
       margin-right: 12px;
     }
-
-    /* MENU */
     .navbar-menu {
       display: flex;
       gap: 1.4rem;
@@ -114,7 +112,6 @@ if ($res instanceof mysqli_result) {
       padding: 0;
       align-items: center;
     }
-
     .navbar-menu a {
       color: #fff;
       text-decoration: none;
@@ -125,8 +122,6 @@ if ($res instanceof mysqli_result) {
     .navbar-menu a:hover {
       color: #ffd970;
     }
-
-    /* Botão do menu sanduíche só aparece em telas pequenas */
     .navbar-toggle {
       display: none;
       background: none;
@@ -143,15 +138,15 @@ if ($res instanceof mysqli_result) {
         position: fixed;
         top: 96px;
         right: 0;
-        width: 68vw;
-        max-width: 320px;
+        width: 84vw;
+        max-width: 420px;
         height: 100vh;
         background: var(--cor-principal);
         flex-direction: column;
         align-items: flex-start;
-        gap: 1.2rem;
-        padding: 2.1rem 1.3rem;
-        box-shadow: -2px 0 18px #2222;
+        gap: 1.6rem;
+        padding: 2.4rem 2rem;
+        box-shadow: -3px 0 24px #0003;
         transform: translateX(110%);
         transition: transform 0.28s;
         z-index: 999;
@@ -161,6 +156,14 @@ if ($res instanceof mysqli_result) {
       }
       .navbar-toggle {
         display: block;
+        font-size: 2.6rem;
+      }
+      .navbar-menu a {
+        font-size: 1.2rem;
+        line-height: 1.6;
+        padding: 0.6rem 0;
+        width: 100%;
+        font-weight: 700;
       }
     }
 
