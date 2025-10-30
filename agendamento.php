@@ -136,7 +136,7 @@ if ($res instanceof mysqli_result) {
     @media (max-width: 1050px) {
       .navbar-menu {
         position: fixed;
-        top: 96px;
+        top: 120px;
         right: 0;
         width: 84vw;
         max-width: 420px;
@@ -144,7 +144,7 @@ if ($res instanceof mysqli_result) {
         background: var(--cor-principal);
         flex-direction: column;
         align-items: flex-start;
-        gap: 1.6rem;
+        gap: 2.5rem;
         padding: 2.4rem 2rem;
         box-shadow: -3px 0 24px #0003;
         transform: translateX(110%);
@@ -159,11 +159,15 @@ if ($res instanceof mysqli_result) {
         font-size: 2.6rem;
       }
       .navbar-menu a {
-        font-size: 1.2rem;
+        font-size: 2.2rem;
         line-height: 1.6;
-        padding: 0.6rem 0;
+        padding: 1.2rem 0;
         width: 100%;
         font-weight: 700;
+      }
+      .navbar-logo-central img {
+        height: 520px;
+        max-width: min(760px, 92vw);
       }
     }
 
