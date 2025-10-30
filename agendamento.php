@@ -136,7 +136,7 @@ if ($res instanceof mysqli_result) {
     @media (max-width: 1050px) {
       .navbar-menu {
         position: fixed;
-        top: 130px;
+        top: 120px;
         right: 0;
         width: 64vw;
         max-width: 320px;
@@ -159,7 +159,7 @@ if ($res instanceof mysqli_result) {
         font-size: 2.6rem;
       }
       .navbar-menu a {
-        font-size: 1.8rem;
+        font-size: 1.4rem;
         line-height: 1.6;
         padding: 1.2rem 0;
         width: 100%;
