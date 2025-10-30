@@ -824,6 +824,19 @@ if ($res instanceof mysqli_result) {
   </div>
 
   <script>
+    const navbarToggle = document.querySelector('.navbar-toggle');
+    const navbarMenu = document.querySelector('.navbar-menu');
+    if (navbarToggle && navbarMenu) {
+      navbarToggle.addEventListener('click', () => {
+        navbarMenu.classList.toggle('open');
+      });
+      document.querySelectorAll('.navbar-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+          navbarMenu.classList.remove('open');
+        });
+      });
+    }
+
     let formularioEnviado = false;
     let sessoesDisponiveis = 0;
     let pacoteId = null;
