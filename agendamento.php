@@ -136,10 +136,10 @@ if ($res instanceof mysqli_result) {
     @media (max-width: 1050px) {
       .navbar-menu {
         position: fixed;
-        top: 140px;
+        top: 130px;
         right: 0;
-        width: 84vw;
-        max-width: 420px;
+        width: 64vw;
+        max-width: 320px;
         height: 100vh;
         background: var(--cor-principal);
         flex-direction: column;
