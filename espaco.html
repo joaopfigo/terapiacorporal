@@ -375,9 +375,39 @@
       }
     }
 
+    @media (max-width: 600px) {
+      .hero-espaco {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 24px;
+        padding: 56px 6vw 40px;
+      }
+
+      .hero-content {
+        margin: 0 auto;
+      }
+
+      .hero-content h1 {
+        font-size: clamp(1.8rem, 8vw, 2.2rem);
+        line-height: 1.25;
+      }
+
+      .hero-subtitle {
+        letter-spacing: 0.16em;
+      }
+
+      .hero-highlight {
+        width: clamp(160px, 50vw, 240px);
+        margin-top: -12px;
+        opacity: 0.75;
+      }
+    }
+
     @media (max-width: 500px) {
       .hero-subtitle {
-        letter-spacing: 0.2em;
+        letter-spacing: 0.14em;
         font-size: 0.85rem;
       }
 
