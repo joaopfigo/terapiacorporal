@@ -19,7 +19,8 @@
       margin: 0;
       font-family: 'Roboto', Arial, sans-serif;
       color: var(--cor-texto);
-      font-size: 1.07rem;
+      font-size: 1.05rem;
+      line-height: 1.7;
     }
     .navbar {
       display: flex;
@@ -118,115 +119,287 @@
         font-weight: 700;
       }
     }
-    @media (max-width: 800px) {
-      .content-box { padding: 24px 2vw 12px 2vw; }
-      .fotos-espaco { flex-direction: column; gap: 18px; }
-      .fotos-espaco img { width: 98vw; max-width: 99vw; min-width: unset; }
-    }
-    .banner-terra {
-    max-width: 660px;
-    margin: 38px auto 32px auto;
-    background: linear-gradient(90deg, #6A5036 0%, #44331E 100%);
-    color: #fff;
-    font-family: 'Playfair Display', serif;
-    font-size: 2.1rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    border-radius: 19px;
-    padding: 31px 0 21px 46px;
-    box-shadow: 0 5px 38px rgba(106,80,54,0.10);
-    border-left: 6px solid #e4c7a6;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    text-align: left;
-    }
-    @media (max-width: 800px) {
-    .banner-terra { font-size: 1.22rem; padding: 18px 0 13px 18px; }
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 72px;
+      padding-bottom: 96px;
     }
 
-    .content-box {
-      max-width: 1120px;
-      margin: 0 auto;
-      background: var(--cor-box);
-      border-radius: 18px;
-      box-shadow: 0 4px 24px rgba(48,121,91,0.06);
-      padding: 36px 3vw 30px 3vw;
-      margin-top: 22px;
-      margin-bottom: 38px;
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
+      line-height: 1.2;
+      color: #2e3b29;
+      margin: 0 0 18px;
     }
-    .intro-text {
-      font-size: 1.18rem;
-      line-height: 1.55;
-      margin-bottom: 18px;
-    }
-    .intro-text b {
-      color: var(--cor-titulo);
+
+    h1 {
+      font-size: clamp(2.2rem, 3.4vw, 3.4rem);
       font-weight: 700;
     }
-    .intro-text strong {
-      color: #232c24;
-      font-weight: 700;
+
+    h2 {
+      font-size: clamp(1.8rem, 2.6vw, 2.6rem);
+      font-weight: 600;
     }
-    .endereco {
-      font-size: 1.12rem;
-      font-weight: 700;
-      margin-top: 16px;
-      margin-bottom: 12px;
-      color: var(--cor-titulo);
+
+    h3 {
+      font-size: clamp(1.3rem, 2vw, 1.7rem);
+      font-weight: 600;
     }
-    .horarios-title {
-      font-size: 1.09rem;
-      font-weight: bold;
-      margin-top: 20px;
-      margin-bottom: 0;
-      color: #232c24;
-      letter-spacing: .01em;
+
+    p {
+      margin: 0 0 16px;
+      color: #2f2f2f;
     }
-    .horarios {
-      margin: 3px 0 26px 0;
-      font-size: 1.09rem;
-      line-height: 1.52;
-      color: #292929;
+
+    .hero-espaco {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 48px;
+      padding: 120px min(8vw, 120px) 100px;
+      background: linear-gradient(135deg, #57643a 0%, #88a06b 100%);
+      color: #f9f9f6;
+      position: relative;
+      overflow: hidden;
     }
-    .fotos-espaco {
-      display: flex;
-      gap: 32px;
-      margin-top: 36px;
+
+    .hero-content {
+      max-width: 560px;
+      z-index: 1;
+    }
+
+    .hero-subtitle {
+      font-size: 0.95rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.76);
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .hero-description {
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 1.05rem;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
-      align-items: flex-start;
-      flex-wrap: wrap;
+      margin-top: 28px;
+      padding: 14px 34px;
+      border-radius: 999px;
+      background: #f7e8c6;
+      color: #2c3b2a;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 24px rgba(32, 48, 28, 0.2);
     }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(32, 48, 28, 0.28);
+    }
+
+    .hero-highlight {
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0));
+      border-radius: 50%;
+      aspect-ratio: 1;
+      width: clamp(260px, 38vw, 420px);
+      justify-self: center;
+      align-self: center;
+      box-shadow: 0 0 60px rgba(255, 255, 255, 0.3);
+    }
+
+    .galeria-espaco {
+      padding: 0 min(8vw, 120px);
+      display: grid;
+      gap: 36px;
+    }
+
+    .galeria-header {
+      max-width: 620px;
+    }
+
+    .galeria-header p {
+      font-size: 1.05rem;
+      color: #495243;
+    }
+
+    .fotos-espaco {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 28px;
+    }
+
+    .fotos-espaco figure {
+      margin: 0;
+      display: grid;
+      gap: 12px;
+    }
+
     .fotos-espaco img {
-      width: 348px;
-      min-width: 265px;
-      height: 298px;
+      width: 100%;
+      height: clamp(240px, 45vw, 420px);
       object-fit: cover;
-      border-radius: 19px;
-      box-shadow: 0 2px 18px rgba(48,121,91,0.11);
-      background: #e4f1e6;
+      border-radius: 28px;
+      box-shadow: 0 18px 38px rgba(51, 82, 59, 0.16);
+      border: 1px solid rgba(87, 100, 58, 0.15);
     }
-    @media (max-width: 600px) {
-      .content-box { border-radius: 8px; padding: 14px 2vw 14px 2vw; }
-      .fotos-espaco img { height: 42vw; min-width: 40vw; }
+
+    .fotos-espaco figcaption {
+      font-size: 0.95rem;
+      color: #566151;
     }
+
+    .info-espaco {
+      background: linear-gradient(180deg, rgba(245, 248, 242, 0.85) 0%, rgba(225, 232, 214, 0.85) 100%), url('img/espaco2.png') no-repeat center/cover;
+      padding: 96px min(8vw, 120px);
+      position: relative;
+    }
+
+    .info-espaco::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(252, 250, 247, 0.9);
+      backdrop-filter: blur(4px);
+    }
+
+    .info-content {
+      position: relative;
+      display: grid;
+      gap: 44px;
+      grid-template-columns: minmax(260px, 2fr) minmax(220px, 1fr);
+      align-items: start;
+    }
+
+    .info-texto p {
+      font-size: 1.05rem;
+    }
+
+    .info-detalhes {
+      display: grid;
+      gap: 18px;
+    }
+
+    .info-card {
+      background: #fff;
+      border-radius: 22px;
+      padding: 26px;
+      box-shadow: 0 16px 36px rgba(44, 59, 42, 0.12);
+      border: 1px solid rgba(136, 160, 107, 0.25);
+    }
+
+    .info-card p,
+    .info-card li {
+      margin: 0;
+      color: #374135;
+    }
+
+    .info-card ul {
+      padding-left: 18px;
+      margin: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .maps-section {
+      padding: 0 min(8vw, 120px);
+    }
+
+    .maps-wrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 36px;
+      align-items: center;
+      background: linear-gradient(145deg, rgba(87, 100, 58, 0.08) 0%, rgba(197, 210, 178, 0.2) 100%);
+      border-radius: 28px;
+      padding: 48px;
+      box-shadow: 0 18px 34px rgba(33, 54, 37, 0.12);
+    }
+
+    .maps-texto p {
+      font-size: 1.05rem;
+    }
+
     .maps-gps-container {
-    margin: 30px auto 35px auto;
-    border-radius: 16px;
-    overflow: hidden;
-    max-width: 670px;
-    box-shadow: 0 4px 28px #29455c13;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 16px 32px rgba(38, 62, 44, 0.18);
     }
+
     .maps-gps-container iframe {
-    width: 100%;
-    min-height: 240px;
-    border: none;
-    display: block;
-    border-radius: 16px;
+      width: 100%;
+      min-height: 320px;
+      border: none;
+      display: block;
+      border-radius: 0;
     }
+
+    @media (max-width: 960px) {
+      main {
+        gap: 60px;
+      }
+
+      .hero-espaco {
+        padding: 100px 8vw 80px;
+      }
+
+      .info-content {
+        grid-template-columns: 1fr;
+      }
+
+      .info-detalhes {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+    }
+
     @media (max-width: 700px) {
-    .maps-gps-container { max-width: 98vw; }
-    .maps-gps-container iframe { min-height: 160px; }
+      .hero-espaco {
+        padding: 80px 6vw 72px;
+      }
+
+      .hero-highlight {
+        width: clamp(220px, 60vw, 340px);
+      }
+
+      .maps-wrapper {
+        padding: 36px 28px;
+      }
+
+      .maps-gps-container iframe {
+        min-height: 240px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .hero-subtitle {
+        letter-spacing: 0.2em;
+        font-size: 0.85rem;
+      }
+
+      .hero-cta {
+        width: 100%;
+      }
+
+      .maps-wrapper {
+        padding: 28px 22px;
+      }
+
+      .fotos-espaco {
+        gap: 22px;
+      }
+
+      .fotos-espaco img {
+        border-radius: 22px;
+      }
+
+      .maps-gps-container iframe {
+        min-height: 210px;
+      }
     }
 
   </style>
@@ -249,36 +422,82 @@
     </ul>
   </nav>
 
-  <div class="banner-terra">
-    O seu espaço de terapia corporal em Belo Horizonte MG
-  </div>
+  <main>
+    <section class="hero-espaco">
+      <div class="hero-content">
+        <p class="hero-subtitle">Consultório de Terapia Corporal Sistêmica</p>
+        <h1>Um refúgio acolhedor para corpo e mente</h1>
+        <p class="hero-description">
+          Coordenado por <strong>Virlene Figueiredo</strong>, o consultório reúne massoterapia, medicina chinesa e práticas integrativas para proporcionar equilíbrio energético e bem-estar profundo.
+        </p>
+        <a class="hero-cta" href="contato.html">Agende sua visita</a>
+      </div>
+      <div class="hero-highlight" aria-hidden="true"></div>
+    </section>
 
-  <div class="content-box">
-    <div class="intro-text">
-      <b>O Consultório de Terapia Corporal Sistêmica</b>, coordenado por <strong>Virlene Figueiredo</strong>, oferece atendimentos terapêuticos com base na massoterapia, medicina chinesa e práticas integrativas. Cada sessão é um convite à escuta do corpo, ao relaxamento profundo e ao equilíbrio energético.<br><br>
-      Com mais de <b>30 anos de experiência</b>, o espaço acolhe pessoas em busca de bem-estar físico, emocional e energético.<br>
-      <span class="endereco">
-        Endereço: <b>Rua Ouro Fino, 395 – Bairro Cruzeiro – Sala 304</b>
-      </span>
-    </div>
-    <div class="horarios-title">Horário de Atendimento:</div>
-    <div class="horarios">
-      <b>Seg a Sex</b> – 09h00 às 22h00<br>
-      <b>Sáb</b> – 10h00 às 17h00<br>
-    </div>
-    <!-- GPS MAPA -->
-    <div class="maps-gps-container">
-      <iframe
-        src="https://www.google.com/maps?q=R.+Ouro+Fino,+395+-+Cruzeiro,+Belo+Horizonte+-+MG,+30310-110&output=embed"
-        width="100%" height="320" style="border:0; border-radius:16px;" allowfullscreen="" loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"></iframe>
-    </div>
+    <section class="galeria-espaco" aria-labelledby="galeria-title">
+      <div class="galeria-header">
+        <h2 id="galeria-title">Conheça nosso espaço</h2>
+        <p>Ambientes pensados para acolher, relaxar e despertar novas experiências sensoriais.</p>
+      </div>
+      <div class="fotos-espaco">
+        <figure>
+          <img src="img/espaco1.png" alt="Sala de atendimento com maca preparada para sessão" loading="lazy">
+          <figcaption>Preparada para terapias corporais individualizadas.</figcaption>
+        </figure>
+        <figure>
+          <img src="img/espaco2.png" alt="Sala de relaxamento com poltronas confortáveis" loading="lazy">
+          <figcaption>Ambiente de acolhimento para momentos de pausa.</figcaption>
+        </figure>
+        <figure>
+          <img src="img/espaco3.png" alt="Detalhes decorativos do consultório" loading="lazy">
+          <figcaption>Detalhes que convidam ao cuidado com o corpo e a alma.</figcaption>
+        </figure>
+      </div>
+    </section>
 
-    <div class="fotos-espaco">
-      <img src="img/espaco1.png" alt="Sala de atendimento 1 - Virlene Figueiredo" loading="lazy">
-      <img src="img/espaco2.png" alt="Sala de atendimento 2 - Virlene Figueiredo" loading="lazy">
-    </div>
-  </div>
+    <section class="info-espaco" aria-labelledby="info-title">
+      <div class="info-content">
+        <div class="info-texto">
+          <h2 id="info-title">Bem-vindo ao seu espaço de cuidado</h2>
+          <p>
+            Com mais de <strong>30 anos de experiência</strong>, o espaço acolhe pessoas em busca de bem-estar físico, emocional e energético. Cada encontro é personalizado para ouvir o corpo e restaurar o fluxo vital.
+          </p>
+          <p>
+            O ambiente é planejado com iluminação suave, aromas terapêuticos e trilhas sonoras que ampliam a sensação de calma. Aqui você encontra um refúgio sereno no coração de Belo Horizonte.
+          </p>
+        </div>
+        <div class="info-detalhes">
+          <div class="info-card">
+            <h3>Endereço</h3>
+            <p><strong>Rua Ouro Fino, 395</strong><br> Bairro Cruzeiro – Sala 304</p>
+          </div>
+          <div class="info-card">
+            <h3>Horários</h3>
+            <ul>
+              <li><strong>Seg a Sex</strong> – 09h00 às 22h00</li>
+              <li><strong>Sáb</strong> – 10h00 às 17h00</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="maps-section" aria-labelledby="mapa-title">
+      <div class="maps-wrapper">
+        <div class="maps-texto">
+          <h2 id="mapa-title">Estamos te esperando</h2>
+          <p>Visite-nos no coração do bairro Cruzeiro, com fácil acesso e um ambiente pensado para acolher.</p>
+        </div>
+        <div class="maps-gps-container">
+          <iframe
+            src="https://www.google.com/maps?q=R.+Ouro+Fino,+395+-+Cruzeiro,+Belo+Horizonte+-+MG,+30310-110&output=embed"
+            width="100%" height="320" style="border:0; border-radius:16px;" allowfullscreen="" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
 
 <script>
         // Menu responsivo sanduíche
