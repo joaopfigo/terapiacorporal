@@ -103,10 +103,9 @@
       }
     }
     @media (max-width: 900px) {
-      .blog-container { flex-direction: column; gap: 24px; }
-      .sidebar { width: 98vw; }
-      .post-card { flex-direction: column; align-items: flex-start; }
-      .post-img { width: 100%; height: 170px; }
+      .blog-content { flex-direction: column; }
+      .sidebar { width: 100%; order: -1; position: static; }
+      .posts-main { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; }
     }
    
     .banner-blog-card {
@@ -121,29 +120,139 @@
       border-left: 6px solid #e4c7a6;
       display: flex; align-items: center; justify-content: flex-start;
     }
-    .blog-container { max-width: 1200px; margin: 30px auto 50px auto; display: flex; gap: 44px; padding: 0 2vw; }
-    .posts-main { display: flex; flex-direction: column; gap: 30px; overflow-x: unset; flex: 1; align-items: stretch; }
-    .post-card {
-      min-width: 500px; max-width: 900px;
-      display: flex; flex-direction: column;
-      background: #fff; border-radius: 17px; margin-bottom: 20px;
-      box-shadow: 0 2px 26px rgba(106,80,54,0.06);
-      padding: 23px 26px; align-items: flex-start;
-      margin-right: 24px; width: 100%;
+    .blog-container { max-width: 1200px; margin: 30px auto 70px auto; display: flex; flex-direction: column; gap: 48px; padding: 0 2vw; }
+    .blog-hero {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(48,121,91,0.92), rgba(106,80,54,0.92)), url('img/espaco3.png') center/cover no-repeat;
+      color: #fff;
+      min-height: 260px;
+      display: flex;
+      align-items: center;
     }
-    .post-img { width: 100%; height: 142px; object-fit: cover; border-radius: 12px; margin-bottom: 10px;}
-    .post-title { color: #30795b; font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; margin: 0 0 7px 0; text-decoration: none; cursor: pointer; }
-    .post-title:hover { text-decoration: underline; }
-    .post-cat { color: #9ac7b3; font-size: 0.98rem; font-weight: 600; margin-bottom: 2px;}
-    .post-desc { color: #564e46; font-size: 1rem; margin-bottom: 8px; margin-top: 3px;}
-    .btn-continuar { background: #e06350; color: #fff; border: none; border-radius: 8px; padding: 9px 19px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .16s;}
-    .btn-continuar:hover { background: #c9513a;}
-    .btn-edit-admin { background: #666; color: #fff; border-radius: 6px; border: none; padding: 5px 9px; font-size: 0.97em; margin-right: 6px; cursor:pointer;}
-    .btn-toggle-admin { background: #ae3829; color: #fff; border-radius: 6px; border: none; padding: 5px 9px; font-size: 0.97em; cursor:pointer;}
-    .sidebar { background: #f4f5f2; border-radius: 17px; padding: 28px 20px 21px 20px; box-shadow: 0 2px 20px rgba(48,121,91,0.04); width: 320px; max-width: 94vw; height: fit-content; }
-    .search-bar { display: flex; gap: 6px; margin-bottom: 21px;}
-    .search-input { flex: 1; border: 1.1px solid #cce6da; border-radius: 6px; padding: 7px 12px; font-size: 1rem; }
-    .search-btn { background: #30795b; color: #fff; border: none; border-radius: 6px; padding: 7px 16px; font-size: 1rem; cursor: pointer; font-weight: 600; }
+    .blog-hero__content { padding: 48px clamp(24px, 5vw, 64px); max-width: 600px; }
+    .blog-hero__title {
+      margin: 0 0 12px 0;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: 0.02em;
+    }
+    .blog-hero__subtitle {
+      margin: 0;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      line-height: 1.7;
+      color: rgba(255,255,255,0.85);
+    }
+    .blog-content { display: flex; gap: 44px; align-items: flex-start; }
+    .posts-main { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; }
+    .post-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 18px 40px rgba(26, 33, 24, 0.08);
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .post-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 45px rgba(26, 33, 24, 0.12);
+    }
+    .post-media { position: relative; }
+    .post-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+    }
+    .post-badge {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      background: rgba(48,121,91,0.9);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .post-body {
+      padding: 26px 28px 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .post-title {
+      color: #2b4a3d;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.32rem;
+      font-weight: 700;
+      text-decoration: none;
+      line-height: 1.3;
+    }
+    .post-title:hover { color: #3f8164; }
+    .post-meta {
+      font-size: 0.93rem;
+      color: #6a9080;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+    .post-desc {
+      color: #4b4238;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .post-actions {
+      margin-top: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn-continuar {
+      background: linear-gradient(135deg, #e06350, #f28b6b);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 22px;
+      font-size: 0.98rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-continuar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(224, 99, 80, 0.3);
+    }
+    .btn-edit-admin,
+    .btn-toggle-admin {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+    .btn-edit-admin { background: #2f2f2f; color: #fff; }
+    .btn-toggle-admin { background: #ae3829; color: #fff; }
+    .btn-edit-admin:hover,
+    .btn-toggle-admin:hover { opacity: 0.85; }
+    .sidebar { background: #fff; border-radius: 26px; padding: 32px 28px; box-shadow: 0 22px 40px rgba(26,33,24,0.08); width: 320px; max-width: 94vw; height: fit-content; position: sticky; top: 120px; display: flex; flex-direction: column; gap: 22px; }
+    .search-bar { display: flex; gap: 8px; }
+    .search-input { flex: 1; border: 1.2px solid rgba(48,121,91,0.3); border-radius: 999px; padding: 10px 18px; font-size: 1rem; background: #f8fbf7; }
+    .search-btn { background: linear-gradient(135deg, #30795b, #4ba384); color: #fff; border: none; border-radius: 999px; padding: 10px 20px; font-size: 1rem; cursor: pointer; font-weight: 600; box-shadow: 0 12px 20px rgba(48,121,91,0.25); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .search-btn:hover { transform: translateY(-2px); box-shadow: 0 18px 28px rgba(48,121,91,0.28); }
     .sidebar-titulo { color: #6a9080; font-size: 1.09rem; font-weight: 700; margin: 13px 0 9px 0; font-family: 'Roboto', sans-serif;}
     .cat-list { list-style: none; padding: 0; margin: 0 0 13px 0;}
     .cat-list li { margin-bottom: 6px;}
@@ -151,14 +260,100 @@
     .cat-link:hover { text-decoration: underline;}
     /* Detalhe SPA */
     #detalhe-post {
-      display:none; max-width:790px; margin:38px auto 60px auto; background:#fff; border-radius:18px; box-shadow:0 4px 32px rgba(106,80,54,0.09); padding:46px 6vw 40px 6vw;
+      display: none;
+      max-width: 1040px;
+      margin: 40px auto 90px auto;
+      padding: 0 2vw;
     }
-    #detalhe-titulo { color: #30795b; font-family:'Playfair Display',serif; font-size:2.0rem; font-weight:700; text-align:left; margin:0 0 19px 0; }
-    #detalhe-cat { color: #9ac7b3; font-size: 1rem; font-weight: 600; margin-bottom: 14px;}
-    #detalhe-img { width: 100%; max-width: 550px; border-radius: 13px; object-fit:cover; box-shadow: 0 2px 8px rgba(106,80,54,0.09); margin-bottom:20px; display: block; }
-    #detalhe-body { color: #423d38; font-size: 1.15rem; margin-bottom:32px; text-align:left; line-height: 1.7;}
-    .btn-voltar { background: none; border: 2px solid #57643a; color: #57643a; border-radius: 8px; padding: 9px 24px; font-size: 1.07rem; font-weight: 600; cursor: pointer; transition: background .16s, color .16s; margin-top:10px;}
-    .btn-voltar:hover { background: #57643a; color:#fff; }
+    .detalhe-content {
+      background: #fff;
+      border-radius: 32px;
+      box-shadow: 0 32px 60px rgba(26, 33, 24, 0.12);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .detalhe-header {
+      background: linear-gradient(135deg, rgba(48,121,91,0.95), rgba(106,80,54,0.9));
+      padding: clamp(32px, 5vw, 56px) clamp(28px, 6vw, 72px) clamp(24px, 4vw, 48px);
+      color: #fff;
+    }
+    .detalhe-cat {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 999px;
+      padding: 6px 18px;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    #detalhe-titulo {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4.2vw, 3.3rem);
+      line-height: 1.2;
+    }
+    .detalhe-media {
+      background: #f3f5ef;
+    }
+    #detalhe-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+    }
+    .detalhe-body {
+      padding: clamp(28px, 6vw, 60px) clamp(28px, 6vw, 72px) clamp(36px, 6vw, 72px);
+      color: #3d3934;
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+    .detalhe-body p { margin-bottom: 1.4em; }
+    .detalhe-body h2,
+    .detalhe-body h3 {
+      font-family: 'Playfair Display', serif;
+      color: #2b4a3d;
+      margin-top: 1.6em;
+    }
+    .btn-voltar {
+      background: #fff;
+      border: 2px solid #57643a;
+      color: #57643a;
+      border-radius: 999px;
+      padding: 10px 26px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+      margin: 0 clamp(28px, 6vw, 72px) 24px clamp(28px, 6vw, 72px);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .btn-voltar:hover {
+      background: #57643a;
+      color: #fff;
+      box-shadow: 0 12px 22px rgba(87,100,58,0.25);
+    }
+    @media (max-width: 700px) {
+      .blog-hero { min-height: 220px; }
+      .detalhe-body { font-size: 1.02rem; line-height: 1.7; }
+      #detalhe-post { margin: 32px auto 70px auto; }
+      .btn-voltar { width: 100%; text-align: center; justify-content: center; }
+    }
+
+    @media (max-width: 600px) {
+      .post-body { padding: 22px 22px 24px 22px; }
+      .post-title { font-size: 1.18rem; }
+      .post-badge { top: 14px; left: 14px; font-size: 0.75rem; }
+      .posts-main { gap: 24px; }
+    }
+
   </style>
 </head>
 <body>
@@ -178,27 +373,41 @@
   </nav>
   <div class="banner-blog-card">Blog</div>
   <div class="blog-container">
-    <main class="posts-main" id="posts-main">
-      <!-- Cards serão renderizados aqui -->
-    </main>
-    <aside class="sidebar">
-      <form class="search-bar" onsubmit="buscarBlog(event)">
-        <input type="text" class="search-input" id="blog-search" placeholder="O que você procura?">
-        <button class="search-btn" type="submit">Buscar</button>
-      </form>
-      <div class="sidebar-titulo">CATEGORIAS</div>
-      <ul class="cat-list" id="cat-list">
-        <!-- Categorias renderizadas via JS -->
-      </ul>
-    </aside>
+    <section class="blog-hero">
+      <div class="blog-hero__content">
+        <h1 class="blog-hero__title">Inspirações para uma vida mais leve</h1>
+        <p class="blog-hero__subtitle">Explore reflexões, práticas e histórias para cultivar equilíbrio corpo-mente em sua jornada de autoconhecimento.</p>
+      </div>
+    </section>
+    <div class="blog-content">
+      <main class="posts-main" id="posts-main">
+        <!-- Cards serão renderizados aqui -->
+      </main>
+      <aside class="sidebar">
+        <form class="search-bar" onsubmit="buscarBlog(event)">
+          <input type="text" class="search-input" id="blog-search" placeholder="O que você procura?">
+          <button class="search-btn" type="submit">Buscar</button>
+        </form>
+        <div class="sidebar-titulo">CATEGORIAS</div>
+        <ul class="cat-list" id="cat-list">
+          <!-- Categorias renderizadas via JS -->
+        </ul>
+      </aside>
+    </div>
   </div>
   <!-- Página Detalhada -->
   <div id="detalhe-post">
     <button class="btn-voltar" onclick="voltarParaBlog()">&larr; Voltar ao Blog</button>
-    <h1 id="detalhe-titulo">Título do Post</h1>
-    <div id="detalhe-cat"></div>
-    <img id="detalhe-img" src="" alt="" onerror="this.onerror=null;this.src='iconeFinal.png';" />
-    <div id="detalhe-body">Conteúdo detalhado aqui...</div>
+    <article class="detalhe-content">
+      <header class="detalhe-header">
+        <span id="detalhe-cat" class="detalhe-cat">Categoria</span>
+        <h1 id="detalhe-titulo">Título do Post</h1>
+      </header>
+      <figure class="detalhe-media">
+        <img id="detalhe-img" src="" alt="" onerror="this.onerror=null;this.src='iconeFinal.png';" />
+      </figure>
+      <div id="detalhe-body" class="detalhe-body">Conteúdo detalhado aqui...</div>
+    </article>
   </div>
   <script>
     let postsBlog = [];
@@ -252,18 +461,23 @@
       }
       lista.forEach((post, idx) => {
         main.innerHTML += `
-        <div class="post-card">
-          <img src="${post.imagem}" class="post-img" alt="${post.titulo}" onerror="this.onerror=null;this.src='iconeFinal.png';">
-          <div class="post-content">
+        <article class="post-card">
+          <figure class="post-media">
+            <img src="${post.imagem}" class="post-img" alt="${post.titulo}" onerror="this.onerror=null;this.src='iconeFinal.png';" />
+            <figcaption class="post-badge">${post.categoria}</figcaption>
+          </figure>
+          <div class="post-body">
+            <span class="post-meta">Categoria • ${post.categoria}</span>
             <a href="#" class="post-title" data-idx="${idx}">${post.titulo}</a>
-            <div class="post-cat">Categoria: ${post.categoria}</div>
-            <div class="post-desc">${post.desc}</div>
-            <button class="btn-continuar" data-idx="${idx}">Continue Lendo</button>
-            ${isAdmin ? `<br>
-            <button class="btn-edit-admin" onclick="window.location.href='admin/blog.php?edit=${post.id}#editar-publicacao'">Editar</button>
-            <button class="btn-toggle-admin" onclick="togglePost(${post.id})">${post.publicado ? 'Arquivar' : 'Publicar'}</button>` : ''}
+            <p class="post-desc">${post.desc}</p>
+            <div class="post-actions">
+              <button class="btn-continuar" data-idx="${idx}">Continue Lendo</button>
+              ${isAdmin ? `
+              <button class="btn-edit-admin" onclick="window.location.href='admin/blog.php?edit=${post.id}#editar-publicacao'">Editar</button>
+              <button class="btn-toggle-admin" onclick="togglePost(${post.id})">${post.publicado ? 'Arquivar' : 'Publicar'}</button>` : ''}
+            </div>
           </div>
-        </div>`;
+        </article>`;
       });
       addPostsEvent(lista);
     }
@@ -282,7 +496,7 @@
       document.querySelector('.blog-container').style.display = 'none';
       const post = (lista || postsBlog)[idx];
       document.getElementById('detalhe-titulo').innerText = post.titulo;
-      document.getElementById('detalhe-cat').innerText = 'Categoria: ' + post.categoria;
+      document.getElementById('detalhe-cat').innerText = post.categoria || 'Blog';
       document.getElementById('detalhe-img').src = post.imagem;
       document.getElementById('detalhe-img').alt = post.titulo;
       document.getElementById('detalhe-body').innerHTML = post.conteudo;
