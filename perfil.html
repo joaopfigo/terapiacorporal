@@ -244,6 +244,13 @@
       display: inline-block;
       margin-top: 4px;
     }
+    .sessao-anamnese {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
     .status-pendente {
       background: #fcf3d4;
       color: var(--cor-status-pendente);
@@ -264,6 +271,40 @@
       color: var(--cor-anamnese);
       margin-left: 9px;
       vertical-align: -2px;
+    }
+    .anamnese-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 14px 6px 12px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+      background: linear-gradient(135deg, rgba(160, 78, 183, 0.92) 0%, rgba(94, 49, 152, 0.9) 100%);
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(160, 78, 183, 0.28);
+    }
+    .anamnese-pill:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 32px rgba(94, 49, 152, 0.25);
+    }
+    .anamnese-pill:focus {
+      outline: 2px solid rgba(160, 78, 183, 0.35);
+      outline-offset: 3px;
+    }
+    .anamnese-pill.indisponivel {
+      cursor: default;
+      background: linear-gradient(135deg, rgba(140, 140, 140, 0.15) 0%, rgba(120, 120, 120, 0.25) 100%);
+      color: #575757;
+      box-shadow: inset 0 0 0 1px rgba(120, 120, 120, 0.2);
+    }
+    .anamnese-pill.indisponivel:hover {
+      transform: none;
+      box-shadow: inset 0 0 0 1px rgba(120, 120, 120, 0.2);
     }
     .historico-title {
       font-size: 1.15rem;
@@ -347,6 +388,119 @@
     }
     .botao-upload:hover {
       background: #e3ce95;
+    }
+    #modal-anamnese {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(26, 18, 34, 0.48);
+      backdrop-filter: blur(6px);
+      z-index: 10000;
+      padding: 24px;
+    }
+    #modal-anamnese.aberto {
+      display: flex;
+    }
+    .modal-anamnese-container {
+      background: linear-gradient(165deg, #ffffff 0%, #f4effb 100%);
+      border-radius: 18px;
+      width: min(540px, 92vw);
+      max-height: min(84vh, 640px);
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(62, 40, 102, 0.28);
+      border: 1px solid rgba(160, 78, 183, 0.15);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .modal-anamnese-header {
+      padding: 20px 28px 12px;
+      background: linear-gradient(135deg, rgba(160, 78, 183, 0.18) 0%, rgba(94, 49, 152, 0.22) 100%);
+      color: var(--cor-btn);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .modal-anamnese-close {
+      background: rgba(255, 255, 255, 0.82);
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(160, 78, 183, 0.22);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      color: #5d3492;
+      font-size: 1.1rem;
+    }
+    .modal-anamnese-close:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 22px rgba(94, 49, 152, 0.25);
+    }
+    .modal-anamnese-content {
+      padding: 16px 28px 28px;
+      overflow-y: auto;
+      color: #403648;
+      line-height: 1.55;
+      font-size: 1.02rem;
+    }
+    .modal-anamnese-content p {
+      margin: 0 0 12px;
+      white-space: pre-line;
+    }
+    .modal-anamnese-content pre {
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 0 0 12px;
+      overflow-x: auto;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: #3f2f58;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
+    }
+    .modal-anamnese-content .campo-anamnese {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 12px rgba(94, 49, 152, 0.08);
+    }
+    .modal-anamnese-content .campo-anamnese strong {
+      display: block;
+      color: #5d3492;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .modal-anamnese-content .campo-anamnese span {
+      display: block;
+      white-space: pre-line;
+    }
+    .modal-anamnese-empty {
+      text-align: center;
+      color: #6a6180;
+      font-style: italic;
+    }
+    @media (max-width: 520px) {
+      .modal-anamnese-header {
+        padding: 16px 20px 10px;
+        font-size: 1.18rem;
+      }
+      .modal-anamnese-content {
+        padding: 12px 20px 22px;
+      }
+      .modal-anamnese-close {
+        width: 34px;
+        height: 34px;
+      }
     }
     .modal-overlay {
       position: fixed;
@@ -528,6 +682,16 @@
     <div id="detalhe-anamnese"></div>
   </div>
 
+  <div id="modal-anamnese" role="dialog" aria-modal="true" aria-labelledby="modal-anamnese-titulo">
+    <div class="modal-anamnese-container">
+      <div class="modal-anamnese-header">
+        <span id="modal-anamnese-titulo">Anamnese da sessão</span>
+        <button type="button" class="modal-anamnese-close" aria-label="Fechar anamnese" onclick="fecharModalAnamnese()">&times;</button>
+      </div>
+      <div id="modal-anamnese-conteudo" class="modal-anamnese-content"></div>
+    </div>
+  </div>
+
   <script>
     let sessoes = [];
     const moedaBRFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -695,17 +859,20 @@
           card.classList.add("sessao-card");
           const tituloTratamento = nomeTratamentos(sessao);
           const pagamentoLinha = textoPagamento(sessao);
-          const resumo = resumoAnamnese(sessao);
+          const temAnamnese = Boolean(sessao && sessao.anamnese);
+          const pillHTML = temAnamnese
+            ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
+            : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
           card.innerHTML = `
             <b>${tituloTratamento}</b><br>
             ${data.toLocaleString()} - ${sessao.duracao} min
             ${sessao.status ? `<br>Status: ${sessao.status}` : ""}
             ${sessao.reclamacao ? `<br><small>Queixa: ${sessao.reclamacao.sintomas} (${sessao.reclamacao.intensidade})</small>` : ""}
             ${pagamentoLinha ? `<br><small>${pagamentoLinha}</small>` : ""}
-            ${resumo ? `<br><small>Anamnese: ${resumo.replace(/\n/g, '<br>')}</small>` : ""}
+            <br>${pillHTML}
           `;
           destino.appendChild(card);
-        });
+          });
       })
       .catch(err => {
         console.error("Erro ao carregar perfil:", err);
@@ -736,13 +903,20 @@
         const data = new Date(sessao.data_horario || sessao.data || sessao.data_inicio);
         const tituloTratamento = nomeTratamentos(sessao);
         const pagamentoLinha = textoPagamento(sessao);
+        const temAnamnese = Boolean(sessao && sessao.anamnese);
+        const pill = temAnamnese
+          ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
+          : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
         lista.innerHTML += `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">
           <div class="sessao-info">
             <div class="sessao-tratamento">${tituloTratamento}</div>
             <div class="sessao-data">${formataData(data.toISOString().slice(0,16).replace('T', ' '))}</div>
             ${pagamentoLinha ? `<div class="sessao-pagamento">${pagamentoLinha}</div>` : ''}
             <span class="sessao-status ${statusClass(sessao.status)}">${sessao.status}</span>
-            ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
+            <div class="sessao-anamnese">
+              ${pill}
+              ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
+            </div>
           </div>
         </div>`;
       });
@@ -762,13 +936,20 @@
       passadas.forEach(sessao => {
         const tituloTratamento = nomeTratamentos(sessao);
         const pagamentoLinha = textoPagamento(sessao);
+        const temAnamnese = Boolean(sessao && sessao.anamnese);
+        const pill = temAnamnese
+          ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
+          : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
         lista.innerHTML += `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">
           <div class="sessao-info">
             <div class="sessao-tratamento">${tituloTratamento}</div>
             <div class="sessao-data">${formataData(sessao.data)}</div>
             ${pagamentoLinha ? `<div class="sessao-pagamento">${pagamentoLinha}</div>` : ''}
             <span class="sessao-status ${statusClass(sessao.status)}">${sessao.status}</span>
-            ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
+            <div class="sessao-anamnese">
+              ${pill}
+              ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
+            </div>
           </div>
         </div>`;
       });
@@ -787,6 +968,105 @@
       return dataObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
         " às " +
         dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function escapeHtml(texto = '') {
+      return String(texto)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function abrirModalAnamnese(id) {
+      const modal = document.getElementById('modal-anamnese');
+      const tituloEl = document.getElementById('modal-anamnese-titulo');
+      const conteudoEl = document.getElementById('modal-anamnese-conteudo');
+      if (!modal || !conteudoEl) return;
+
+      const sessao = (sessoes || []).find(sessao => String(sessao.id) === String(id));
+      if (sessao) {
+        const tituloTrat = nomeTratamentos(sessao) || sessao.tratamento || 'Sessão';
+        tituloEl.textContent = `Anamnese - ${tituloTrat}`;
+      } else {
+        tituloEl.textContent = 'Anamnese da sessão';
+      }
+
+      conteudoEl.innerHTML = gerarConteudoAnamnese(sessao);
+
+      if (sessao) {
+        sessao.visualizada = true;
+        renderProximasSessoes(sessoes);
+        renderHistoricoSessoes(sessoes);
+      }
+
+      modal.classList.add('aberto');
+      document.body.dataset.modalAnamneseAberto = '1';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function fecharModalAnamnese() {
+      const modal = document.getElementById('modal-anamnese');
+      if (!modal) return;
+      modal.classList.remove('aberto');
+      delete document.body.dataset.modalAnamneseAberto;
+      document.body.style.overflow = '';
+    }
+
+    function gerarConteudoAnamnese(sessao) {
+      if (!sessao || !sessao.anamnese) {
+        return '<p class="modal-anamnese-empty">Anamnese indisponível para esta sessão.</p>';
+      }
+
+      const anamnese = sessao.anamnese;
+      if (typeof anamnese === 'string') {
+        const texto = resumoAnamnese(sessao);
+        if (!texto) {
+          return '<p class="modal-anamnese-empty">Anamnese indisponível para esta sessão.</p>';
+        }
+        return `<p>${escapeHtml(texto).replace(/\n/g, '<br>')}</p>`;
+      }
+
+      if (typeof anamnese === 'object') {
+        const partes = [];
+        Object.entries(anamnese).forEach(([chave, valor]) => {
+          if (valor === null || valor === undefined || valor === '') return;
+          if (typeof valor === 'object') {
+            try {
+              const jsonTexto = JSON.stringify(valor, null, 2);
+              partes.push(`<div class="campo-anamnese"><strong>${escapeHtml(chave)}</strong><pre>${escapeHtml(jsonTexto)}</pre></div>`);
+            } catch (e) {
+              partes.push(`<div class="campo-anamnese"><strong>${escapeHtml(chave)}</strong><span>${escapeHtml(String(valor))}</span></div>`);
+            }
+            return;
+          }
+          partes.push(`<div class="campo-anamnese"><strong>${escapeHtml(chave)}</strong><span>${escapeHtml(String(valor)).replace(/\n/g, '<br>')}</span></div>`);
+        });
+
+        if (!partes.length) {
+          const texto = resumoAnamnese(sessao);
+          if (texto) {
+            partes.push(`<p>${escapeHtml(texto).replace(/\n/g, '<br>')}</p>`);
+          }
+        }
+
+        if (!partes.length) {
+          try {
+            const texto = JSON.stringify(anamnese, null, 2);
+            return `<pre>${escapeHtml(texto)}</pre>`;
+          } catch (e) {
+            return '<p class="modal-anamnese-empty">Informações indisponíveis.</p>';
+          }
+        }
+
+        return partes.join('');
+      }
+
+      const texto = resumoAnamnese(sessao);
+      return texto
+        ? `<p>${escapeHtml(texto).replace(/\n/g, '<br>')}</p>`
+        : '<p class="modal-anamnese-empty">Anamnese indisponível para esta sessão.</p>';
     }
 
     // Mostra detalhes da sessão selecionada (SPA)
@@ -911,6 +1191,21 @@
     // Eventos
     document.getElementById('upload-foto').addEventListener('change', function() { uploadFotoPerfil(this); });
     document.getElementById('upload-foto-camera').addEventListener('change', function() { uploadFotoPerfil(this); });
+
+    const modalAnamnese = document.getElementById('modal-anamnese');
+    if (modalAnamnese) {
+      modalAnamnese.addEventListener('click', (event) => {
+        if (event.target === modalAnamnese) {
+          fecharModalAnamnese();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && document.body.dataset.modalAnamneseAberto === '1') {
+        fecharModalAnamnese();
+      }
+    });
 
 
     const botaoEditar = document.querySelector('.perfil-editar');
