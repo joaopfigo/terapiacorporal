@@ -72,20 +72,20 @@
     @media (max-width: 1050px) {
       .navbar-menu {
         position: fixed;
-        top: 120px;
+        top: 96px;
         right: 0;
-        width: 104vw;
-        max-width: 520px;
-        height: 100vh;
+        width: min(100vw, 520px);
+        height: calc(100vh - 96px);
         background: var(--cor-principal);
         flex-direction: column;
         align-items: flex-start;
         gap: 1.6rem;
-        padding: 2.4rem 2rem;
+        padding: 1.8rem 2rem 2.4rem;
         box-shadow: -3px 0 24px #0003;
         transform: translateX(110%);
         transition: transform 0.28s;
         z-index: 999;
+        overflow-y: auto;
       }
       .navbar-menu.open {
         transform: translateX(0%);
