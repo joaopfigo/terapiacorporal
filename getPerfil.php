@@ -34,10 +34,12 @@ $usuario = [
 
 // 3. Busca agendamentos do usuário (sessões)
 $sql = "SELECT ag.id, ag.especialidade_id, ag.servicos_csv, e.nome AS servico, ag.data_horario, ag.duracao, ag.adicional_reflexo, ag.status,
+               ag.preco_final, CASE WHEN up.id IS NOT NULL THEN 1 ELSE 0 END AS usou_pacote,
                fq.desconforto_principal, fq.tempo_desconforto, fq.classificacao_dor, fq.tratamento_medico,
                an.anamnese
         FROM agendamentos ag
         JOIN especialidades e ON e.id = ag.especialidade_id
+        LEFT JOIN uso_pacote up ON up.agendamento_id = ag.id
         LEFT JOIN formularios_queixa fq ON fq.agendamento_id = ag.id
         LEFT JOIN anamneses an ON an.agendamento_id = ag.id
         WHERE ag.usuario_id = ?
@@ -54,6 +56,29 @@ while ($row = $result->fetch_assoc()) {
         $row['servicos_csv'],
         $row['servico']
     );
+    $precoFinal = null;
+    if ($row['preco_final'] !== null && $row['preco_final'] !== '') {
+        $precoFinal = (float) $row['preco_final'];
+    }
+
+    $usouPacote = !empty($row['usou_pacote']);
+
+    $anamnese = null;
+    if (!empty($row['anamnese'])) {
+        $anamneseTexto = str_replace(["\r\n", "\r"], "\n", $row['anamnese']);
+        $anamneseNormalizada = trim($anamneseTexto);
+        if ($anamneseNormalizada !== '' && in_array($anamneseNormalizada[0], ['{', '['])) {
+            $decodificada = json_decode($anamneseNormalizada, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $anamnese = $decodificada;
+            } else {
+                $anamnese = $anamneseTexto;
+            }
+        } else {
+            $anamnese = $anamneseTexto;
+        }
+    }
+
     $sessoes[] = [
         "id"         => $row['id'],
         "tratamento" => $tituloServicos,
@@ -61,13 +86,15 @@ while ($row = $result->fetch_assoc()) {
         "data_horario" => $row['data_horario'],
         "duracao"    => $row['duracao'],
         "status"     => $row['status'],
+        "preco_final" => $precoFinal,
+        "usou_pacote" => $usouPacote,
         "reclamacao" => ($row['desconforto_principal'] ? [
             "sintomas"    => $row['desconforto_principal'],
             "tempo"       => $row['tempo_desconforto'],
             "intensidade" => $row['classificacao_dor'],
             "tratamento"  => $row['tratamento_medico']
         ] : null),
-        "anamnese" => ($row['anamnese'] ? $row['anamnese'] : null)
+        "anamnese" => $anamnese
     ];
 }
 $stmt2->close();

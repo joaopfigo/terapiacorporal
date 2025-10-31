@@ -530,6 +530,38 @@
 
   <script>
     let sessoes = [];
+    const moedaBRFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    function textoPagamento(sessao) {
+      if (sessao && sessao.usou_pacote) {
+        return 'Pagamento: Pacote de sessões';
+      }
+      if (
+        sessao &&
+        typeof sessao.preco_final === 'number' &&
+        Number.isFinite(sessao.preco_final)
+      ) {
+        return `Valor: ${moedaBRFormatter.format(sessao.preco_final)}`;
+      }
+      return '';
+    }
+
+    function resumoAnamnese(sessao) {
+      if (!sessao || !sessao.anamnese) return '';
+      if (typeof sessao.anamnese === 'string') {
+        return sessao.anamnese;
+      }
+      if (typeof sessao.anamnese === 'object') {
+        if (sessao.anamnese.geral) return sessao.anamnese.geral;
+        if (sessao.anamnese.orientacoes) return sessao.anamnese.orientacoes;
+        try {
+          return JSON.stringify(sessao.anamnese);
+        } catch (e) {
+          return '';
+        }
+      }
+      return '';
+    }
         
     function nomeTratamentos(sessao) {
       if (Array.isArray(sessao.tratamentos) && sessao.tratamentos.length) {
@@ -635,7 +667,7 @@
             `Você não possui pacotes ativos. <a href="pacotes.php" style="color:#b48c1a;text-decoration:underline;">Clique aqui para comprar um pacote.</a>`;
         }
 
-        const sessoes = data.sessoes;
+        sessoes = data.sessoes || [];
         renderProximasSessoes(sessoes);
         renderHistoricoSessoes(sessoes);
         const divProximas = document.getElementById("proximas-sessoes");
@@ -662,12 +694,15 @@
           const card = document.createElement("div");
           card.classList.add("sessao-card");
           const tituloTratamento = nomeTratamentos(sessao);
+          const pagamentoLinha = textoPagamento(sessao);
+          const resumo = resumoAnamnese(sessao);
           card.innerHTML = `
             <b>${tituloTratamento}</b><br>
             ${data.toLocaleString()} - ${sessao.duracao} min
             ${sessao.status ? `<br>Status: ${sessao.status}` : ""}
             ${sessao.reclamacao ? `<br><small>Queixa: ${sessao.reclamacao.sintomas} (${sessao.reclamacao.intensidade})</small>` : ""}
-            ${sessao.anamnese ? `<br><small>Anamnese: ${sessao.anamnese.geral}</small>` : ""}
+            ${pagamentoLinha ? `<br><small>${pagamentoLinha}</small>` : ""}
+            ${resumo ? `<br><small>Anamnese: ${resumo.replace(/\n/g, '<br>')}</small>` : ""}
           `;
           destino.appendChild(card);
         });
@@ -700,10 +735,12 @@
       futuras.forEach(sessao => {
         const data = new Date(sessao.data_horario || sessao.data || sessao.data_inicio);
         const tituloTratamento = nomeTratamentos(sessao);
+        const pagamentoLinha = textoPagamento(sessao);
         lista.innerHTML += `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">
           <div class="sessao-info">
             <div class="sessao-tratamento">${tituloTratamento}</div>
             <div class="sessao-data">${formataData(data.toISOString().slice(0,16).replace('T', ' '))}</div>
+            ${pagamentoLinha ? `<div class="sessao-pagamento">${pagamentoLinha}</div>` : ''}
             <span class="sessao-status ${statusClass(sessao.status)}">${sessao.status}</span>
             ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
           </div>
@@ -724,10 +761,12 @@
       }
       passadas.forEach(sessao => {
         const tituloTratamento = nomeTratamentos(sessao);
+        const pagamentoLinha = textoPagamento(sessao);
         lista.innerHTML += `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">
           <div class="sessao-info">
             <div class="sessao-tratamento">${tituloTratamento}</div>
             <div class="sessao-data">${formataData(sessao.data)}</div>
+            ${pagamentoLinha ? `<div class="sessao-pagamento">${pagamentoLinha}</div>` : ''}
             <span class="sessao-status ${statusClass(sessao.status)}">${sessao.status}</span>
             ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
           </div>
@@ -770,11 +809,37 @@
       }
       // Anamnese (se houver)
       if (s.anamnese) {
-        document.getElementById('detalhe-anamnese').innerHTML = `
-          <label>Anamnese da Sessão:</label>
-          <div class="valor"><b>Resumo:</b> ${s.anamnese.geral}</div>
-          <div class="valor"><b>Orientações:</b> ${s.anamnese.orientacoes}</div>
-        `;
+        if (typeof s.anamnese === 'string') {
+          const texto = s.anamnese.replace(/\n/g, '<br>');
+          document.getElementById('detalhe-anamnese').innerHTML = `
+            <label>Anamnese da Sessão:</label>
+            <div class="valor">${texto}</div>
+          `;
+        } else if (typeof s.anamnese === 'object') {
+          const partes = [];
+          if (s.anamnese.geral) {
+            partes.push(`<div class="valor"><b>Resumo:</b> ${s.anamnese.geral}</div>`);
+          }
+          if (s.anamnese.orientacoes) {
+            partes.push(`<div class="valor"><b>Orientações:</b> ${s.anamnese.orientacoes}</div>`);
+          }
+          if (!partes.length) {
+            try {
+              partes.push(`<div class="valor">${JSON.stringify(s.anamnese)}</div>`);
+            } catch (e) {
+              partes.push(`<div class="valor">Informações indisponíveis.</div>`);
+            }
+          }
+          document.getElementById('detalhe-anamnese').innerHTML = `
+            <label>Anamnese da Sessão:</label>
+            ${partes.join('')}
+          `;
+        } else {
+          document.getElementById('detalhe-anamnese').innerHTML = `
+            <label>Anamnese da Sessão:</label>
+            <div class="valor">${String(s.anamnese)}</div>
+          `;
+        }
         // Marca como visualizada (poderia ser atualizado no backend)
         s.visualizada = true;
       } else {
