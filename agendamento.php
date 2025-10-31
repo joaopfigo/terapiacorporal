@@ -695,19 +695,19 @@ if ($res instanceof mysqli_result) {
       <h2>2. Escolha o(s) tratamento(s) que deseja realizar (no máximo dois):</h2>
       <div class="treatments">
         <div class="treatment" data-id="1">
-          <img src="https://images.pexels.com/photos/3822622/pexels-photo-3822622.jpeg?auto=compress&w=300&h=300&fit=crop" alt="Quick Massage">
+          <img src="img/quick.png" alt="Quick Massage">
           <span>Quick Massage</span>
         </div>
         <div class="treatment" data-id="2">
-          <img src="https://images.pexels.com/photos/3997985/pexels-photo-3997985.jpeg?auto=compress&w=300&h=300&fit=crop" alt="Massoterapia">
+          <img src="img/massoterapia.png" alt="Massoterapia">
           <span>Massoterapia</span>
         </div>
         <div class="treatment" data-id="3">
-          <img src="https://images.pexels.com/photos/3182811/pexels-photo-3182811.jpeg?auto=compress&w=300&h=300&fit=crop" alt="Reflexologia Podal">
+          <img src="img/reflexologia.png" alt="Reflexologia Podal">
           <span>Reflexologia Podal</span>
         </div>
         <div class="treatment" data-id="4">
-          <img src="https://images.pexels.com/photos/6621319/pexels-photo-6621319.jpeg?auto=compress&w=300&h=300&fit=crop" alt="Auriculoterapia">
+          <img src="img/auriculoterapia.png" alt="Auriculoterapia">
           <span>Auriculoterapia</span>
         </div>
         <div class="treatment" data-id="5">
@@ -715,7 +715,7 @@ if ($res instanceof mysqli_result) {
           <span>Ventosa</span>
         </div>
         <div class="treatment" data-id="6">
-          <img src="img/acupuntura.jpg" alt="Acupuntura">
+          <img src="img/servicos/acupuntura.png" alt="Acupuntura">
           <span>Acupuntura</span>
         </div>
         <div class="treatment" data-id="7">
@@ -723,7 +723,7 @@ if ($res instanceof mysqli_result) {
           <span>Biomagnetismo</span>
         </div>
         <div class="treatment" data-id="8">
-          <img src="img/reiki.jpg" alt="Reiki">
+          <img src="img/reiki.png" alt="Reiki">
           <span>Reiki</span>
         </div>
       </div>
