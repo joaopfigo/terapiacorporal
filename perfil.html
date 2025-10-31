@@ -834,45 +834,6 @@
         sessoes = data.sessoes || [];
         renderProximasSessoes(sessoes);
         renderHistoricoSessoes(sessoes);
-        const divProximas = document.getElementById("proximas-sessoes");
-        const divHistorico = document.getElementById("historico-sessoes");
-        divProximas.innerHTML = "";
-        divHistorico.innerHTML = "";
-
-        if (!sessoes.some(sessao => {
-            const data = new Date(sessao.data_horario || sessao.data || sessao.data_inicio);
-            return data > new Date();
-        })) {
-          document.getElementById("proximas-sessoes").innerHTML = `
-            <p>Nenhuma sessão agendada.<br>
-            <a href="agendamento.php" style="color:#b48c1a;text-decoration:underline;cursor:pointer;">Clique aqui para agendar uma consulta.</a>
-            </p>`;
-        }
-        
-
-        sessoes.forEach(sessao => {
-          const data = new Date(sessao.data_horario);
-          const agora = new Date();
-          const destino = data > agora ? divProximas : divHistorico;
-
-          const card = document.createElement("div");
-          card.classList.add("sessao-card");
-          const tituloTratamento = nomeTratamentos(sessao);
-          const pagamentoLinha = textoPagamento(sessao);
-          const temAnamnese = Boolean(sessao && sessao.anamnese);
-          const pillHTML = temAnamnese
-            ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
-            : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
-          card.innerHTML = `
-            <b>${tituloTratamento}</b><br>
-            ${data.toLocaleString()} - ${sessao.duracao} min
-            ${sessao.status ? `<br>Status: ${sessao.status}` : ""}
-            ${sessao.reclamacao ? `<br><small>Queixa: ${sessao.reclamacao.sintomas} (${sessao.reclamacao.intensidade})</small>` : ""}
-            ${pagamentoLinha ? `<br><small>${pagamentoLinha}</small>` : ""}
-            <br>${pillHTML}
-          `;
-          destino.appendChild(card);
-          });
       })
       .catch(err => {
         console.error("Erro ao carregar perfil:", err);
@@ -882,15 +843,91 @@
         }
       });
 
-    // Próximas sessões (só mostra as não concluídas/canceladas)
+    function obterDataSessao(sessao) {
+      if (!sessao) return null;
+      const valor = sessao.data_horario || sessao.data || sessao.data_inicio;
+      if (!valor) return null;
+      if (valor instanceof Date) {
+        return Number.isNaN(valor.getTime()) ? null : valor;
+      }
+      const normalizado = typeof valor === 'string' ? valor.replace(' ', 'T') : valor;
+      const data = new Date(normalizado);
+      return Number.isNaN(data.getTime()) ? null : data;
+    }
+
+    function formatarDataSessao(data) {
+      if (!(data instanceof Date) || Number.isNaN(data.getTime())) return '';
+      return data.toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function montarSessaoCard(sessao) {
+      const dataSessao = obterDataSessao(sessao);
+      const tituloTratamento = nomeTratamentos(sessao);
+      const tituloTratamentoHtml = tituloTratamento ? escapeHtml(tituloTratamento) : '';
+      const pagamentoLinha = textoPagamento(sessao);
+      const pagamentoHtml = pagamentoLinha ? `<div class="sessao-pagamento">${escapeHtml(pagamentoLinha)}</div>` : '';
+      const temAnamnese = Boolean(sessao && sessao.anamnese);
+      const pill = temAnamnese
+        ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
+        : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
+      const reclamacaoSintomas = sessao && sessao.reclamacao && sessao.reclamacao.sintomas
+        ? escapeHtml(sessao.reclamacao.sintomas)
+        : '';
+      const reclamacaoIntensidade = sessao && sessao.reclamacao && sessao.reclamacao.intensidade
+        ? ` (${escapeHtml(sessao.reclamacao.intensidade)})`
+        : '';
+      const reclamacao = reclamacaoSintomas
+        ? `<div class="sessao-queixa">Queixa: ${reclamacaoSintomas}${reclamacaoIntensidade}</div>`
+        : '';
+      const statusTexto = sessao && sessao.status ? String(sessao.status) : '';
+      const statusHtml = statusTexto
+        ? `<span class="sessao-status ${statusClass(statusTexto)}">${escapeHtml(statusTexto)}</span>`
+        : '';
+      const dataHtml = dataSessao
+        ? `<div class="sessao-data">${formatarDataSessao(dataSessao)}${sessao && sessao.duracao ? ` - ${sessao.duracao} min` : ''}</div>`
+        : '';
+      const avisoAnamnese = sessao && sessao.anamnese && !sessao.visualizada
+        ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>'
+        : '';
+
+      return [
+        `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">`,
+        '  <div class="sessao-info">',
+        `    <div class="sessao-tratamento">${tituloTratamentoHtml}</div>`,
+        dataHtml ? `    ${dataHtml}` : '',
+        pagamentoHtml ? `    ${pagamentoHtml}` : '',
+        reclamacao ? `    ${reclamacao}` : '',
+        statusHtml ? `    ${statusHtml}` : '',
+        '    <div class="sessao-anamnese">',
+        `      ${pill}`,
+        avisoAnamnese ? `      ${avisoAnamnese}` : '',
+        '    </div>',
+        '  </div>',
+        '</div>'
+      ].filter(Boolean).join('\n');
+    }
+
     function renderProximasSessoes(listaSessoes = sessoes) {
       const lista = document.getElementById('proximas-sessoes');
-      lista.innerHTML = '';
-      // Verifica sessões futuras
-      const futuras = (listaSessoes || []).filter(s =>
-        s.status !== 'Cancelada' &&
-        new Date(s.data_horario || s.data || s.data_inicio) >= new Date()
-      );
+      if (!lista) return;
+
+      const agora = new Date();
+      const futuras = (listaSessoes || [])
+        .map(sessao => ({ sessao, data: obterDataSessao(sessao) }))
+        .filter(item => {
+          if (!item.data || item.data <= agora) return false;
+          const status = (item.sessao.status || '').toLowerCase();
+          return status !== 'cancelada' && status !== 'concluída' && status !== 'concluida';
+        })
+        .sort((a, b) => a.data - b.data)
+        .map(item => item.sessao);
+
       if (!futuras.length) {
         lista.innerHTML = `
           <p>Nenhuma sessão agendada.<br>
@@ -899,75 +936,46 @@
         `;
         return;
       }
-      futuras.forEach(sessao => {
-        const data = new Date(sessao.data_horario || sessao.data || sessao.data_inicio);
-        const tituloTratamento = nomeTratamentos(sessao);
-        const pagamentoLinha = textoPagamento(sessao);
-        const temAnamnese = Boolean(sessao && sessao.anamnese);
-        const pill = temAnamnese
-          ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
-          : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
-        lista.innerHTML += `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">
-          <div class="sessao-info">
-            <div class="sessao-tratamento">${tituloTratamento}</div>
-            <div class="sessao-data">${formataData(data.toISOString().slice(0,16).replace('T', ' '))}</div>
-            ${pagamentoLinha ? `<div class="sessao-pagamento">${pagamentoLinha}</div>` : ''}
-            <span class="sessao-status ${statusClass(sessao.status)}">${sessao.status}</span>
-            <div class="sessao-anamnese">
-              ${pill}
-              ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
-            </div>
-          </div>
-        </div>`;
-      });
+
+      lista.innerHTML = futuras.map(sessao => montarSessaoCard(sessao)).join('');
     }
-    // Histórico de sessões (todas, exceto futuras agendadas)
-    function renderHistoricoSessoes() {
+
+    function renderHistoricoSessoes(listaSessoes = sessoes) {
       const lista = document.getElementById('historico-sessoes');
-      lista.innerHTML = '';
-      // Só mostra sessões confirmadas ou canceladas (nunca pendentes)
-      const passadas = sessoes.filter(s =>
-        (s.status === 'Confirmada' || s.status === 'Cancelada')
-      );
+      if (!lista) return;
+
+      const agora = new Date();
+      const passadas = (listaSessoes || [])
+        .map(sessao => ({ sessao, data: obterDataSessao(sessao) }))
+        .filter(item => {
+          if (!item.data) return false;
+          if (item.data <= agora) return true;
+          const status = (item.sessao.status || '').toLowerCase();
+          return status === 'cancelada' || status === 'concluída' || status === 'concluida' || status === 'realizada';
+        })
+        .sort((a, b) => b.data - a.data)
+        .map(item => item.sessao);
+
       if (!passadas.length) {
         lista.innerHTML = '<div class="nenhuma-sessao">Nenhuma sessão anterior encontrada.</div>';
         return;
       }
-      passadas.forEach(sessao => {
-        const tituloTratamento = nomeTratamentos(sessao);
-        const pagamentoLinha = textoPagamento(sessao);
-        const temAnamnese = Boolean(sessao && sessao.anamnese);
-        const pill = temAnamnese
-          ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
-          : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
-        lista.innerHTML += `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">
-          <div class="sessao-info">
-            <div class="sessao-tratamento">${tituloTratamento}</div>
-            <div class="sessao-data">${formataData(sessao.data)}</div>
-            ${pagamentoLinha ? `<div class="sessao-pagamento">${pagamentoLinha}</div>` : ''}
-            <span class="sessao-status ${statusClass(sessao.status)}">${sessao.status}</span>
-            <div class="sessao-anamnese">
-              ${pill}
-              ${sessao.anamnese && !sessao.visualizada ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>' : ''}
-            </div>
-          </div>
-        </div>`;
-      });
+
+      lista.innerHTML = passadas.map(sessao => montarSessaoCard(sessao)).join('');
     }
 
     function statusClass(status) {
-      if (status === 'Pendente') return 'status-pendente';
-      if (status === 'Confirmada') return 'status-confirmada';
-      if (status === 'Cancelada') return 'status-cancelada';
-      return '';
-    }
-
-    function formataData(dt) {
-      // Espera: "2024-06-04 14:00"
-      const dataObj = new Date(dt.replace(" ", "T"));
-      return dataObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
-        " às " +
-        dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const mapa = {
+        'pendente': 'status-pendente',
+        'confirmada': 'status-confirmada',
+        'concluída': 'status-confirmada',
+        'concluida': 'status-confirmada',
+        'realizada': 'status-confirmada',
+        'cancelada': 'status-cancelada'
+      };
+      if (!status) return '';
+      const chave = String(status).toLowerCase();
+      return mapa[chave] || '';
     }
 
     function escapeHtml(texto = '') {
