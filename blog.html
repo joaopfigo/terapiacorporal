@@ -70,12 +70,16 @@
       margin-left: auto;
     }
     @media (max-width: 1050px) {
+      :root { --navbar-h: 120px; }
       .navbar-menu {
         position: fixed;
-        top: 120px;
+        top: var(--navbar-h);
         right: 0;
+        bottom: 0; 
+        height: calc(100dvh - var(--navbar-h)); 
+        height: calc(100svh - var(--navbar-h));
+        height: calc(100vh  - var(--navbar-h));
         width: min(84vw, 420px);
-        max-height: calc(100vh - 120px);
         background: var(--cor-principal);
         flex-direction: column;
         align-items: flex-start;
