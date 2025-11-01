@@ -266,12 +266,6 @@
       color: var(--cor-status-cancelada);
       border: 1.2px solid #efbfb5;
     }
-    .icon-anamnese {
-      font-size: 1.43rem;
-      color: var(--cor-anamnese);
-      margin-left: 9px;
-      vertical-align: -2px;
-    }
     .anamnese-pill {
       display: inline-flex;
       align-items: center;
@@ -287,6 +281,7 @@
       background: linear-gradient(135deg, rgba(160, 78, 183, 0.92) 0%, rgba(94, 49, 152, 0.9) 100%);
       color: #fff;
       box-shadow: 0 8px 24px rgba(160, 78, 183, 0.28);
+      position: relative;
     }
     .anamnese-pill:hover {
       transform: translateY(-1px);
@@ -305,6 +300,18 @@
     .anamnese-pill.indisponivel:hover {
       transform: none;
       box-shadow: inset 0 0 0 1px rgba(120, 120, 120, 0.2);
+    }
+    .anamnese-pill.nao-visualizada::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 12px;
+      height: 12px;
+      background: #ff5252;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
     .historico-title {
       font-size: 1.15rem;
@@ -891,16 +898,22 @@
       let anamneseHtml = '';
       if (mostrarAnamnese) {
         const temAnamnese = Boolean(sessao && sessao.anamnese);
+        const precisaAviso = Boolean(sessao && sessao.anamnese && (sessao.anamnese_nao_lida ?? !sessao.anamnese_visualizada_em));
+        const pillClasses = ['anamnese-pill'];
+        if (temAnamnese) {
+          pillClasses.push('disponivel');
+          if (precisaAviso) {
+            pillClasses.push('nao-visualizada');
+          }
+        } else {
+          pillClasses.push('indisponivel');
+        }
         const pill = temAnamnese
-          ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
-          : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
-        const avisoAnamnese = sessao && sessao.anamnese && !sessao.visualizada
-          ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>'
-          : '';
+          ? `<button type="button" class="${pillClasses.join(' ')}" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
+          : `<span class="${pillClasses.join(' ')}">Anamnese: Indisponível</span>`;
         anamneseHtml = [
           '    <div class="sessao-anamnese">',
           `      ${pill}`,
-          avisoAnamnese ? `      ${avisoAnamnese}` : '',
           '    </div>'
         ].filter(Boolean).join('\n');
       }
@@ -967,7 +980,12 @@
         return;
       }
 
-      lista.innerHTML = passadas.map(sessao => montarSessaoCard(sessao)).join('');
+      lista.innerHTML = passadas.map(sessao => {
+        if (sessao) {
+          sessao.anamnese_nao_lida = Boolean(sessao.anamnese && !sessao.anamnese_visualizada_em);
+        }
+        return montarSessaoCard(sessao);
+      }).join('');
     }
 
     function statusClass(status) {
@@ -1010,9 +1028,7 @@
       conteudoEl.innerHTML = gerarConteudoAnamnese(sessao);
 
       if (sessao) {
-        sessao.visualizada = true;
-        renderProximasSessoes(sessoes);
-        renderHistoricoSessoes(sessoes);
+        marcarAnamneseComoVisualizada(sessao);
       }
 
       modal.classList.add('aberto');
@@ -1026,6 +1042,43 @@
       modal.classList.remove('aberto');
       delete document.body.dataset.modalAnamneseAberto;
       document.body.style.overflow = '';
+    }
+
+    function marcarAnamneseComoVisualizada(sessao) {
+      if (!sessao || !sessao.anamnese || sessao.anamnese_visualizada_em || sessao.__marcandoAnamnese) {
+        return;
+      }
+
+      sessao.__marcandoAnamnese = true;
+
+      fetch('marcarAnamneseVisualizada.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ agendamento_id: sessao.id })
+      })
+        .then(resposta => {
+          if (!resposta.ok) {
+            throw new Error('Erro ao marcar anamnese como visualizada');
+          }
+          return resposta.json();
+        })
+        .then(dados => {
+          if (dados && dados.sucesso) {
+            sessao.anamnese_visualizada_em = dados.visualizada_em;
+            sessao.anamnese_nao_lida = false;
+            renderProximasSessoes(sessoes);
+            renderHistoricoSessoes(sessoes);
+          }
+        })
+        .catch(() => {
+          // Silencia erros para não interromper a experiência do usuário
+        })
+        .finally(() => {
+          delete sessao.__marcandoAnamnese;
+        });
     }
 
     function gerarConteudoAnamnese(sessao) {
@@ -1134,8 +1187,7 @@
             <div class="valor">${String(s.anamnese)}</div>
           `;
         }
-        // Marca como visualizada (poderia ser atualizado no backend)
-        s.visualizada = true;
+        marcarAnamneseComoVisualizada(s);
       } else {
         document.getElementById('detalhe-anamnese').innerHTML = `<label>Anamnese da Sessão:</label><div class="valor">Ainda não disponível.</div>`;
       }
