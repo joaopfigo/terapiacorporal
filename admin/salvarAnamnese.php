@@ -13,11 +13,7 @@ $agendamento_id = intval($data['agendamento_id'] ?? 0);
 $anamnese = trim($data['anamnese'] ?? '');
 
 if ($agendamento_id > 0 && $anamnese !== '') {
-    $stmt = $conn->prepare(
-        "INSERT INTO anamneses (agendamento_id, anamnese, updated_at, visualizada_em) " .
-        "VALUES (?, ?, NOW(), NULL) " .
-        "ON DUPLICATE KEY UPDATE anamnese = VALUES(anamnese), updated_at = NOW(), visualizada_em = NULL"
-    );
+    $stmt = $conn->prepare("INSERT INTO anamneses (agendamento_id, anamnese, updated_at) VALUES (?, ?, NOW()) ON DUPLICATE KEY UPDATE anamnese = VALUES(anamnese), updated_at = NOW()");
     $stmt->bind_param('is', $agendamento_id, $anamnese);
     $ok = $stmt->execute();
     $stmt->close();

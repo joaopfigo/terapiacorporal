@@ -36,7 +36,7 @@ $usuario = [
 $sql = "SELECT ag.id, ag.especialidade_id, ag.servicos_csv, e.nome AS servico, ag.data_horario, ag.duracao, ag.adicional_reflexo, ag.status,
                ag.preco_final, CASE WHEN up.id IS NOT NULL THEN 1 ELSE 0 END AS usou_pacote,
                fq.desconforto_principal, fq.tempo_desconforto, fq.classificacao_dor, fq.tratamento_medico,
-               an.anamnese, an.updated_at AS anamnese_updated_at, an.visualizada_em
+               an.anamnese
         FROM agendamentos ag
         JOIN especialidades e ON e.id = ag.especialidade_id
         LEFT JOIN uso_pacote up ON up.agendamento_id = ag.id
@@ -79,7 +79,6 @@ while ($row = $result->fetch_assoc()) {
         }
     }
 
-    $visualizadaEm = $row['visualizada_em'] ?? null;
     $sessoes[] = [
         "id"         => $row['id'],
         "tratamento" => $tituloServicos,
@@ -95,10 +94,7 @@ while ($row = $result->fetch_assoc()) {
             "intensidade" => $row['classificacao_dor'],
             "tratamento"  => $row['tratamento_medico']
         ] : null),
-        "anamnese" => $anamnese,
-        "anamnese_updated_at" => $row['anamnese_updated_at'],
-        "anamnese_visualizada_em" => $visualizadaEm,
-        "anamnese_nao_lida" => ($anamnese !== null && empty($visualizadaEm))
+        "anamnese" => $anamnese
     ];
 }
 $stmt2->close();
