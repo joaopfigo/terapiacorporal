@@ -173,27 +173,26 @@ CREATE TABLE `anamneses` (
   `agendamento_id` int(11) NOT NULL,
   `anamnese` text DEFAULT NULL,
   `data_escrita` datetime DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `visualizada_em` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Despejando dados para a tabela `anamneses`
 --
 
-INSERT INTO `anamneses` (`id`, `agendamento_id`, `anamnese`, `data_escrita`, `updated_at`, `visualizada_em`) VALUES
-(1, 1, '', '2025-09-08 06:19:31', NULL, NULL),
-(2, 2, '', '2025-09-08 06:19:51', NULL, NULL),
-(3, 3, '', '2025-09-08 06:43:16', NULL, NULL),
-(4, 4, '', '2025-09-08 07:08:50', NULL, NULL),
-(5, 5, '', '2025-09-08 08:30:24', NULL, NULL),
-(6, 6, '', '2025-09-08 19:40:48', NULL, NULL),
-(7, 7, '', '2025-09-08 19:43:19', NULL, NULL),
-(8, 8, '', '2025-09-08 19:46:08', NULL, NULL),
-(9, 9, 'muito dificil', '2025-10-02 04:13:37', '2025-10-02 19:23:15', NULL),
-(10, 10, '', '2025-10-02 04:20:29', NULL, NULL),
-(11, 11, '', '2025-10-02 06:03:03', NULL, NULL),
-(12, 12, '', '2025-10-02 06:04:13', NULL, NULL);
+INSERT INTO `anamneses` (`id`, `agendamento_id`, `anamnese`, `data_escrita`, `updated_at`) VALUES
+(1, 1, '', '2025-09-08 06:19:31', NULL),
+(2, 2, '', '2025-09-08 06:19:51', NULL),
+(3, 3, '', '2025-09-08 06:43:16', NULL),
+(4, 4, '', '2025-09-08 07:08:50', NULL),
+(5, 5, '', '2025-09-08 08:30:24', NULL),
+(6, 6, '', '2025-09-08 19:40:48', NULL),
+(7, 7, '', '2025-09-08 19:43:19', NULL),
+(8, 8, '', '2025-09-08 19:46:08', NULL),
+(9, 9, 'muito dificil', '2025-10-02 04:13:37', '2025-10-02 19:23:15'),
+(10, 10, '', '2025-10-02 04:20:29', NULL),
+(11, 11, '', '2025-10-02 06:03:03', NULL),
+(12, 12, '', '2025-10-02 06:04:13', NULL);
 
 -- --------------------------------------------------------
 
