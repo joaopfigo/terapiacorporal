@@ -695,29 +695,25 @@ if ($res instanceof mysqli_result) {
     <div class="step" id="step-tratamento">
       <h2>2. Escolha o(s) tratamento(s) que deseja realizar (no máximo dois):</h2>
       <div class="treatments">
-        <div class="treatment" data-id="1">
-          <img src="img/quick.png" alt="Quick Massage">
-          <span>Quick Massage</span>
-        </div>
         <div class="treatment" data-id="2">
           <img src="img/massoterapia.png" alt="Massoterapia">
           <span>Massoterapia</span>
         </div>
-        <div class="treatment" data-id="3">
-          <img src="img/reflexologia.png" alt="Reflexologia Podal">
-          <span>Reflexologia Podal</span>
+        <div class="treatment" data-id="6">
+          <img src="img/acupuntura.jpg" alt="Acupuntura">
+          <span>Acupuntura</span>
         </div>
-        <div class="treatment" data-id="4">
-          <img src="img/auriculoterapia.png" alt="Auriculoterapia">
-          <span>Auriculoterapia</span>
+        <div class="treatment" data-id="1">
+          <img src="img/quick.png" alt="Quick Massage">
+          <span>Quick Massage</span>
         </div>
         <div class="treatment" data-id="5">
           <img src="img/ventosa.jpg" alt="Ventosa">
           <span>Ventosa</span>
         </div>
-        <div class="treatment" data-id="6">
-          <img src="img/acupuntura.jpg" alt="Acupuntura">
-          <span>Acupuntura</span>
+        <div class="treatment" data-id="3">
+          <img src="img/reflexologia.png" alt="Reflexologia Podal">
+          <span>Reflexologia Podal</span>
         </div>
         <div class="treatment" data-id="7">
           <img src="img/biomagnetismo.png" alt="Biomagnetismo">
@@ -726,6 +722,10 @@ if ($res instanceof mysqli_result) {
         <div class="treatment" data-id="8">
           <img src="img/reiki.png" alt="Reiki">
           <span>Reiki</span>
+        </div>
+        <div class="treatment" data-id="4">
+          <img src="img/auriculoterapia.png" alt="Auriculoterapia">
+          <span>Auriculoterapia</span>
         </div>
       </div>
       <div id="aviso-tratamento" style="display:none; margin-top:10px; color:#d9534f; font-weight:600; text-align:center;"></div>
