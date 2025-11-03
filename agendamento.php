@@ -1345,24 +1345,25 @@ if ($res instanceof mysqli_result) {
         const diaBloqueado = disponibilidadeState.datasBloqueadas.has(dataISO);
         const semSlots = disponibilidadeState.carregado && slotsDisponiveis.length === 0;
         const semInformacao = !disponibilidadeState.carregado;
-        const disabled = semInformacao || isPast || isToday || isSunday || diaBloqueado || semSlots;
+        const disabled = semInformacao || isPast || isSunday || diaBloqueado || semSlots;
+        const visuallyDisabled = disabled || isToday;
 
         let dayClass = 'cal-day';
         if (isToday) {
           dayClass += ' today';
         }
-        if (disabled) {
+        if (visuallyDisabled) {
           dayClass += ' cal-disabled';
         }
         if (calendarioState.dataSelecionada === dataISO) {
           dayClass += ' cal-selected';
         }
 
-        const background = disabled ? '#eaeaea' : '#fff9e2';
+        const background = visuallyDisabled ? '#eaeaea' : '#fff9e2';
         const color = isSunday ? '#bdbdbd' : '#756430';
         const cursor = disabled ? 'not-allowed' : 'pointer';
 
-        html += `<button class='${dayClass}' data-date='${dataISO}' data-available-slots='${slotsDisponiveis.length}' style='margin:2px;padding:9px 0;border:none;background:${background};border-radius:8px;color:${color};font-size:1.02em;cursor:${cursor};' ${disabled ? 'disabled' : ''}>${dia}</button>`;
+        html += `<button class='${dayClass}' data-date='${dataISO}' data-available-slots='${slotsDisponiveis.length}' data-is-today='${isToday}' style='margin:2px;padding:9px 0;border:none;background:${background};border-radius:8px;color:${color};font-size:1.02em;cursor:${cursor};' ${disabled ? 'disabled' : ''}>${dia}</button>`;
       }
 
       html += '</div>';
@@ -1380,6 +1381,11 @@ if ($res instanceof mysqli_result) {
 
       calendarElement.querySelectorAll('.cal-day').forEach(btn => {
         btn.addEventListener('click', () => {
+          const isToday = btn.getAttribute('data-is-today') === 'true';
+          if (isToday) {
+            mostrarAvisoDisponibilidade('Para agendar para hoje, entre em contato conosco pelo WhatsApp.', 'info');
+            return;
+          }
           if (btn.disabled) {
             return;
           }
