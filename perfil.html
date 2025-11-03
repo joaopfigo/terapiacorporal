@@ -892,7 +892,8 @@
       const pill = temAnamnese
         ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
         : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
-      const avisoAnamnese = sessao && sessao.anamnese && !sessao.visualizada
+      const temNotificacao = Boolean(sessao && sessao.temNotificacao);
+      const avisoAnamnese = sessao && sessao.anamnese && temNotificacao
         ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>'
         : '';
       const anamneseHtml = [
@@ -976,7 +977,12 @@
         return;
       }
 
-      lista.innerHTML = passadas.map(sessao => montarSessaoCard(sessao)).join('');
+      const cards = passadas.map(sessao => {
+        sessao.temNotificacao = calcularNotificacaoAnamnese(sessao);
+        return montarSessaoCard(sessao);
+      });
+
+      lista.innerHTML = cards.join('');
     }
 
     function statusClass(status) {
@@ -1002,6 +1008,58 @@
         .replace(/'/g, '&#39;');
     }
 
+    function obterChaveAnamnese(id) {
+      return `anamnese_lida_${id}`;
+    }
+
+    function obterLocalStorageSeguro() {
+      if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
+        return null;
+      }
+      try {
+        return window.localStorage;
+      } catch (erro) {
+        console.warn('LocalStorage indisponível:', erro);
+        return null;
+      }
+    }
+
+    function lerVersaoAnamnese(idSessao, storageReferencia = null) {
+      const storage = storageReferencia ?? obterLocalStorageSeguro();
+      if (!storage || !idSessao) return null;
+      try {
+        const valor = storage.getItem(obterChaveAnamnese(idSessao));
+        return valor && valor !== 'undefined' ? valor : null;
+      } catch (erro) {
+        console.warn('Não foi possível ler a versão da anamnese:', erro);
+        return null;
+      }
+    }
+
+    function salvarVersaoAnamnese(idSessao, timestamp) {
+      const storage = obterLocalStorageSeguro();
+      if (!storage || !idSessao) return;
+      try {
+        if (timestamp) {
+          storage.setItem(obterChaveAnamnese(idSessao), String(timestamp));
+        } else {
+          storage.removeItem(obterChaveAnamnese(idSessao));
+        }
+      } catch (erro) {
+        console.warn('Não foi possível salvar a versão da anamnese:', erro);
+      }
+    }
+
+    function calcularNotificacaoAnamnese(sessao) {
+      if (!sessao || !sessao.id) return false;
+      if (!sessao.anamnese || !sessao.anamnese_atualizada_em) return false;
+      const storage = obterLocalStorageSeguro();
+      if (!storage) return false;
+      const versaoAtual = String(sessao.anamnese_atualizada_em);
+      const versaoLida = lerVersaoAnamnese(sessao.id, storage);
+      return versaoLida !== versaoAtual;
+    }
+
     function abrirModalAnamnese(id) {
       const modal = document.getElementById('modal-anamnese');
       const tituloEl = document.getElementById('modal-anamnese-titulo');
@@ -1019,7 +1077,13 @@
       conteudoEl.innerHTML = gerarConteudoAnamnese(sessao);
 
       if (sessao) {
-        sessao.visualizada = true;
+        const timestampAtual = sessao.anamnese_atualizada_em
+          ? String(sessao.anamnese_atualizada_em)
+          : null;
+        if (timestampAtual) {
+          salvarVersaoAnamnese(sessao.id, timestampAtual);
+        }
+        sessao.temNotificacao = false;
         renderProximasSessoes(sessoes);
         renderHistoricoSessoes(sessoes);
       }
@@ -1143,8 +1207,13 @@
             <div class="valor">${String(s.anamnese)}</div>
           `;
         }
-        // Marca como visualizada (poderia ser atualizado no backend)
-        s.visualizada = true;
+        const timestampAtual = s.anamnese_atualizada_em
+          ? String(s.anamnese_atualizada_em)
+          : null;
+        if (timestampAtual) {
+          salvarVersaoAnamnese(s.id, timestampAtual);
+        }
+        s.temNotificacao = false;
       } else {
         document.getElementById('detalhe-anamnese').innerHTML = `<label>Anamnese da Sessão:</label><div class="valor">Ainda não disponível.</div>`;
       }
