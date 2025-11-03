@@ -89,6 +89,13 @@ if ($row = $res->fetch_assoc()) {
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
+.btn-icon-placeholder {
+  display: inline-flex;
+  width: 1.3rem;
+  height: 1.3rem;
+  align-items: center;
+  justify-content: center;
+}
 </style>
 </head>
 <body>
@@ -175,7 +182,7 @@ if ($row = $res->fetch_assoc()) {
               aria-expanded="false"
             >📋</button>
           <?php else: ?>
-            <span title="Sem formulário">&mdash;</span>
+            <span class="btn-icon-placeholder" title="Sem formulário" aria-hidden="true"></span>
           <?php endif; ?>
           <button
             onclick="toggleAnamnese(<?= $agendamento_id ?>)"
@@ -186,8 +193,8 @@ if ($row = $res->fetch_assoc()) {
             aria-expanded="false"
           >
             <span class="anamnese-icon" aria-hidden="true"><?= $iconeAnamnese ?></span>
-            <span class="sr-only"><?= htmlspecialchars($descricaoStatus) ?> - </span>
-            Anamnese
+            <span class="sr-only"><?= htmlspecialchars($descricaoStatus) ?> - Anamnese/Orientação</span>
+            <span aria-hidden="true">Anamnese/Orientação</span>
           </button>
         </div>
       </td>

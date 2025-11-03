@@ -750,6 +750,9 @@
       }
       return sessao.tratamento;
     }
+    const TEXTO_ANAMNESE_DISPONIVEL = 'Anamnese/Orientação disponível';
+    const TEXTO_ANAMNESE_INDISPONIVEL = 'Anamnese/Orientação indisponível';
+
     let usuario = {};
     let exigirDadosObrigatorios = false;
 
@@ -913,11 +916,9 @@
         const badgeHtml = temAnamnese && temAtualizacaoNaoLida
           ? '<span class="anamnese-badge" aria-hidden="true"></span>'
           : '';
-        const textoDisponivel = 'Anamnese/Orientação disponível';
-        const textoIndisponivel = 'Anamnese/Orientação indisponível';
         const pill = temAnamnese
-          ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">${badgeHtml}<span>${textoDisponivel}</span></button>`
-          : `<span class="anamnese-pill indisponivel">${textoIndisponivel}</span>`;
+          ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">${badgeHtml}<span>${TEXTO_ANAMNESE_DISPONIVEL}</span></button>`
+          : `<span class="anamnese-pill indisponivel">${TEXTO_ANAMNESE_INDISPONIVEL}</span>`;
         anamneseHtml = [
           '    <div class="sessao-anamnese">',
           `      ${pill}`,
