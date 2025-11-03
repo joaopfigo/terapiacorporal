@@ -866,7 +866,7 @@
       });
     }
 
-    function montarSessaoCard(sessao, { mostrarAnamnese = true } = {}) {
+    function montarSessaoCard(sessao) {
       const dataSessao = obterDataSessao(sessao);
       const tituloTratamento = nomeTratamentos(sessao);
       const tituloTratamentoHtml = tituloTratamento ? escapeHtml(tituloTratamento) : '';
@@ -888,22 +888,19 @@
       const dataHtml = dataSessao
         ? `<div class="sessao-data">${formatarDataSessao(dataSessao)}${sessao && sessao.duracao ? ` - ${sessao.duracao} min` : ''}</div>`
         : '';
-      let anamneseHtml = '';
-      if (mostrarAnamnese) {
-        const temAnamnese = Boolean(sessao && sessao.anamnese);
-        const pill = temAnamnese
-          ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
-          : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
-        const avisoAnamnese = sessao && sessao.anamnese && !sessao.visualizada
-          ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>'
-          : '';
-        anamneseHtml = [
-          '    <div class="sessao-anamnese">',
-          `      ${pill}`,
-          avisoAnamnese ? `      ${avisoAnamnese}` : '',
-          '    </div>'
-        ].filter(Boolean).join('\n');
-      }
+      const temAnamnese = Boolean(sessao && sessao.anamnese);
+      const pill = temAnamnese
+        ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
+        : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
+      const avisoAnamnese = sessao && sessao.anamnese && !sessao.visualizada
+        ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>'
+        : '';
+      const anamneseHtml = [
+        '    <div class="sessao-anamnese">',
+        `      ${pill}`,
+        avisoAnamnese ? `      ${avisoAnamnese}` : '',
+        '    </div>'
+      ].filter(Boolean).join('\n');
 
       return [
         `<div class="sessao-card" onclick="abrirSessao(${sessao.id})">`,
@@ -917,6 +914,14 @@
         '  </div>',
         '</div>'
       ].filter(Boolean).join('\n');
+    }
+
+    function removerAnamneseDoCard(cardHtml = '') {
+      if (!cardHtml) return cardHtml;
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = cardHtml;
+      wrapper.querySelectorAll('.sessao-anamnese, .anamnese-pill').forEach(elemento => elemento.remove());
+      return wrapper.innerHTML;
     }
 
     function renderProximasSessoes(listaSessoes = sessoes) {
@@ -943,7 +948,11 @@
         return;
       }
 
-      lista.innerHTML = futuras.map(sessao => montarSessaoCard(sessao, { mostrarAnamnese: false })).join('');
+      const cardsSemAnamnese = futuras
+        .map(sessao => montarSessaoCard(sessao))
+        .map(cardHtml => removerAnamneseDoCard(cardHtml));
+
+      lista.innerHTML = cardsSemAnamnese.join('');
     }
 
     function renderHistoricoSessoes(listaSessoes = sessoes) {
