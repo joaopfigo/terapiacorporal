@@ -1818,7 +1818,7 @@ if ($res instanceof mysqli_result) {
               });
           }
 
-          if (mensagem) {
+          if (!sucesso && mensagem) {
             alert(mensagem);
           }
 
