@@ -276,6 +276,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      position: relative;
       border-radius: 999px;
       padding: 5px 14px 6px 12px;
       font-size: 0.92rem;
@@ -295,6 +296,22 @@
     .anamnese-pill:focus {
       outline: 2px solid rgba(160, 78, 183, 0.35);
       outline-offset: 3px;
+    }
+    .anamnese-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #f04f70;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 8px rgba(160, 78, 183, 0.25);
+      pointer-events: none;
+    }
+    .anamnese-pill > span {
+      position: relative;
+      z-index: 1;
     }
     .anamnese-pill.indisponivel {
       cursor: default;
@@ -889,17 +906,16 @@
         ? `<div class="sessao-data">${formatarDataSessao(dataSessao)}${sessao && sessao.duracao ? ` - ${sessao.duracao} min` : ''}</div>`
         : '';
       const temAnamnese = Boolean(sessao && sessao.anamnese);
-      const pill = temAnamnese
-        ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">Anamnese: Disponível</button>`
-        : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
       const temNotificacao = Boolean(sessao && sessao.temNotificacao);
-      const avisoAnamnese = sessao && sessao.anamnese && temNotificacao
-        ? '<span class="icon-anamnese" title="Anamnese disponível!">&#128196;</span>'
+      const badgeHtml = temAnamnese && temNotificacao
+        ? '<span class="anamnese-badge" aria-hidden="true"></span>'
         : '';
+      const pill = temAnamnese
+        ? `<button type="button" class="anamnese-pill disponivel" onclick="event.stopPropagation(); abrirModalAnamnese(${sessao.id})">${badgeHtml}<span>Anamnese: Disponível</span></button>`
+        : `<span class="anamnese-pill indisponivel">Anamnese: Indisponível</span>`;
       const anamneseHtml = [
         '    <div class="sessao-anamnese">',
         `      ${pill}`,
-        avisoAnamnese ? `      ${avisoAnamnese}` : '',
         '    </div>'
       ].filter(Boolean).join('\n');
 
@@ -978,7 +994,16 @@
       }
 
       const cards = passadas.map(sessao => {
-        sessao.temNotificacao = calcularNotificacaoAnamnese(sessao);
+        const atualizadoEm = sessao && sessao.anamnese_atualizada_em
+          ? String(sessao.anamnese_atualizada_em)
+          : null;
+        const temNotificacao = Boolean(
+          sessao &&
+          sessao.anamnese &&
+          atualizadoEm &&
+          obterAnamneseLida(sessao.id) !== atualizadoEm
+        );
+        sessao.temNotificacao = temNotificacao;
         return montarSessaoCard(sessao);
       });
 
@@ -1024,8 +1049,8 @@
       }
     }
 
-    function lerVersaoAnamnese(idSessao, storageReferencia = null) {
-      const storage = storageReferencia ?? obterLocalStorageSeguro();
+    function obterAnamneseLida(idSessao) {
+      const storage = obterLocalStorageSeguro();
       if (!storage || !idSessao) return null;
       try {
         const valor = storage.getItem(obterChaveAnamnese(idSessao));
@@ -1036,7 +1061,7 @@
       }
     }
 
-    function salvarVersaoAnamnese(idSessao, timestamp) {
+    function marcarAnamneseLida(idSessao, timestamp) {
       const storage = obterLocalStorageSeguro();
       if (!storage || !idSessao) return;
       try {
@@ -1048,16 +1073,6 @@
       } catch (erro) {
         console.warn('Não foi possível salvar a versão da anamnese:', erro);
       }
-    }
-
-    function calcularNotificacaoAnamnese(sessao) {
-      if (!sessao || !sessao.id) return false;
-      if (!sessao.anamnese || !sessao.anamnese_atualizada_em) return false;
-      const storage = obterLocalStorageSeguro();
-      if (!storage) return false;
-      const versaoAtual = String(sessao.anamnese_atualizada_em);
-      const versaoLida = lerVersaoAnamnese(sessao.id, storage);
-      return versaoLida !== versaoAtual;
     }
 
     function abrirModalAnamnese(id) {
@@ -1076,15 +1091,12 @@
 
       conteudoEl.innerHTML = gerarConteudoAnamnese(sessao);
 
-      if (sessao) {
+      if (sessao && sessao.anamnese) {
         const timestampAtual = sessao.anamnese_atualizada_em
           ? String(sessao.anamnese_atualizada_em)
-          : null;
-        if (timestampAtual) {
-          salvarVersaoAnamnese(sessao.id, timestampAtual);
-        }
+          : new Date().toISOString();
+        marcarAnamneseLida(sessao.id, timestampAtual);
         sessao.temNotificacao = false;
-        renderProximasSessoes(sessoes);
         renderHistoricoSessoes(sessoes);
       }
 
@@ -1209,10 +1221,8 @@
         }
         const timestampAtual = s.anamnese_atualizada_em
           ? String(s.anamnese_atualizada_em)
-          : null;
-        if (timestampAtual) {
-          salvarVersaoAnamnese(s.id, timestampAtual);
-        }
+          : new Date().toISOString();
+        marcarAnamneseLida(s.id, timestampAtual);
         s.temNotificacao = false;
       } else {
         document.getElementById('detalhe-anamnese').innerHTML = `<label>Anamnese da Sessão:</label><div class="valor">Ainda não disponível.</div>`;
