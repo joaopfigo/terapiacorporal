@@ -63,6 +63,7 @@ if ($res instanceof mysqli_result) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agendamento Online | Terapias</title>
+    <link rel="icon" type="image/png" href="/favicon-transparente.png">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
     :root {
