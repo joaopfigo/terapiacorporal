@@ -16,7 +16,20 @@
       --cor-btn-hover: #30795b;
       --cor-icon: #25d366;
     }
-    body { background: var(--cor-clara); margin: 0; font-family: 'Roboto', Arial, sans-serif; color: #222; }
+    body {
+      background: var(--cor-clara);
+      margin: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .page-wrapper {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
     .navbar {
       display: flex;
       align-items: center;
@@ -204,11 +217,21 @@
       font-size: 1.11rem;
       box-shadow: 0 2px 9px rgba(48,121,91,0.06);
     }
+    .footer {
+      text-align: center;
+      background: var(--cor-principal);
+      color: #fff;
+      padding: 1.2rem;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      margin-top: 44px;
+    }
   </style>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div class="page-wrapper">
   <nav class="navbar">
     <div class="navbar-logo-central">
       <img src="img/logo.png" alt="Consultório de Terapia Corporal Sistêmica" />
@@ -245,6 +268,10 @@
     </form>
     <div id="contato-msg"></div>
   </div>
+  </div>
+  <footer class="footer">
+    <p>Consultório de Terapia Corporal Sistêmica</p>
+  </footer>
   <script>
     // Busca dados reais do usuário logado
     window.onload = function() {
