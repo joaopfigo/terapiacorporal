@@ -21,6 +21,14 @@
       color: var(--cor-texto);
       font-size: 1.05rem;
       line-height: 1.7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .page-wrapper {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
     }
     .navbar {
       display: flex;
@@ -124,6 +132,7 @@
       flex-direction: column;
       gap: 72px;
       padding-bottom: 96px;
+      flex: 1 0 auto;
     }
 
     h1, h2, h3 {
@@ -339,6 +348,16 @@
       border-radius: 0;
     }
 
+    .footer {
+      text-align: center;
+      background: var(--cor-principal);
+      color: #fff;
+      padding: 1.2rem;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      margin-top: 44px;
+    }
+
     @media (max-width: 960px) {
       main {
         gap: 60px;
@@ -437,6 +456,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div class="page-wrapper">
   <nav class="navbar">
     <div class="navbar-logo-central">
       <img src="img/logo.png" alt="Consultório de Terapia Corporal Sistêmica" />
@@ -528,6 +548,10 @@
       </div>
     </section>
   </main>
+  </div>
+  <footer class="footer">
+    <p>Consultório de Terapia Corporal Sistêmica</p>
+  </footer>
 
 <script>
         // Menu responsivo sanduíche

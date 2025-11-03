@@ -15,7 +15,20 @@
       --cor-fundo: #fcfaf7;
     }
     /* --- Inline, cards em linha --- */
-    body { background: var(--cor-fundo); margin: 0; font-family: 'Roboto', Arial, sans-serif; color: var(--cor-texto); }
+    body {
+      background: var(--cor-fundo);
+      margin: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      color: var(--cor-texto);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .page-wrapper {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
     .navbar {
       display: flex;
       align-items: center;
@@ -272,6 +285,15 @@
     .cat-list li { margin-bottom: 6px;}
     .cat-link { color: #30795b; text-decoration: none; font-size: 1.01rem;}
     .cat-link:hover { text-decoration: underline;}
+    .footer {
+      text-align: center;
+      background: var(--cor-principal);
+      color: #fff;
+      padding: 1.2rem;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      margin-top: 44px;
+    }
     /* Detalhe SPA */
     #detalhe-post {
       display: none;
@@ -371,6 +393,7 @@
   </style>
 </head>
 <body>
+  <div class="page-wrapper">
   <nav class="navbar">
     <div class="navbar-logo-central">
       <img src="img/logo.png" alt="Consultório de Terapia Corporal Sistêmica" />
@@ -423,6 +446,11 @@
       <div id="detalhe-body" class="detalhe-body">Conteúdo detalhado aqui...</div>
     </article>
   </div>
+  </div>
+  <footer class="footer">
+    <p>Consultório de Terapia Corporal Sistêmica</p>
+  </footer>
+
   <script>
     let postsBlog = [];
     let allCategories = [];
